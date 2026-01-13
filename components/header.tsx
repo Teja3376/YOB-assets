@@ -19,7 +19,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="#" className="text-gray-700 hover:text-gray-900 transition">
+            <Link href="/" className="text-gray-700 hover:text-gray-900 transition">
               Home
             </Link>
             <Link href="#" className="text-gray-700 hover:text-gray-900 transition">
@@ -51,9 +51,12 @@ export default function Header() {
           </nav>
 
           {/* CTA Button */}
-          <button className="hidden md:block px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-colors">
+          <Link 
+            href="/apply"
+            className="hidden md:block px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-colors"
+          >
             Start Tokenizing
-          </button>
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -68,7 +71,7 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isOpen && (
           <nav className="md:hidden pb-4 border-t border-gray-200">
-            <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
+            <Link href="/" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
               Home
             </Link>
             <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
@@ -80,9 +83,13 @@ export default function Header() {
             <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
               Contact Us
             </Link>
-            <button className="w-full mt-2 mx-4 px-4 py-2 bg-orange-500 text-white font-medium rounded-full transition">
+            <Link 
+              href="/apply"
+              onClick={() => setIsOpen(false)}
+              className="w-full mt-2 mx-4 px-4 py-2 bg-orange-500 text-white font-medium rounded-full transition text-center block"
+            >
               Start Tokenizing
-            </button>
+            </Link>
           </nav>
         )}
       </div>
