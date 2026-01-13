@@ -1,8 +1,8 @@
-import Header from "@/components/header"
-import Footer from "@/components/footer"
+import Header from "@/components/layout/header"
+import Footer from "@/components/layout/footer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ApplicationForm from "@/components/application-form"
-import StatusCheck from "@/components/status-check"
+import ApplicationForm from "@/components/forms/application-form"
+import StatusCheck from "@/components/features/auth/status-check"
 import { FileText, Search } from "lucide-react"
 
 export default function ApplyPage() {
