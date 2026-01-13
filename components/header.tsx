@@ -27,7 +27,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-10">
+          <nav className="hidden md:flex items-center space-x-10">
             <Link href="/" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
               Home
             </Link>
@@ -62,10 +62,15 @@ export default function Header() {
             <Link href="/contact" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
               Contact Us
             </Link>
-            <button className="cta-button px-6 py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] text-white rounded-full font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
-              Start Tokenizing
-            </button>
-          </div>
+          </nav>
+
+          {/* CTA Button */}
+          <Link 
+            href="/apply"
+            className="hidden md:block px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-colors"
+          >
+            Start Tokenizing
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -82,7 +87,7 @@ export default function Header() {
       {/* Mobile Menu */}
       {isOpen && (
         <div id="mobile-menu" className="md:hidden bg-white border-t border-gray-100">
-          <div className="px-4 py-4 space-y-3">
+          <nav className="px-4 py-4 space-y-3">
             <Link href="/" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
               Home
             </Link>
@@ -113,10 +118,14 @@ export default function Header() {
             <Link href="/contact" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
               Contact Us
             </Link>
-            <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] text-white rounded-full font-semibold">
+            <Link 
+              href="/apply"
+              onClick={() => setIsOpen(false)}
+              className="w-full mt-2 mx-4 px-4 py-2 bg-orange-500 text-white font-medium rounded-full transition text-center block"
+            >
               Start Tokenizing
-            </button>
-          </div>
+            </Link>
+          </nav>
         </div>
       )}
     </nav>
