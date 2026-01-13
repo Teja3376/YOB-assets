@@ -3,89 +3,122 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ChevronDown, Menu, X } from "lucide-react"
+import Image from "next/image"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+    <nav id="navbar" className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full" />
-            <span className="text-lg font-bold text-gray-900">YOB</span>
-          </Link>
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/yob-assets-logo.png" 
+                alt="YOB Assets Logo" 
+                width={48} 
+                height={48}
+                className="h-12 w-auto"
+                priority
+              />
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="#" className="text-gray-700 hover:text-gray-900 transition">
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-10">
+            <Link href="/" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
               Home
             </Link>
-            <Link href="#" className="text-gray-700 hover:text-gray-900 transition">
+            <Link href="/about" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
               About
             </Link>
             <div className="relative group">
-              <button className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition">
-                Assets
-                <ChevronDown size={16} />
+              <button className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors flex items-center">
+                Assets <ChevronDown className="ml-1 text-xs" size={12} />
               </button>
-              <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 first:rounded-t-lg">
+              <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                <Link href="/real-estate" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors">
                   Real Estate
                 </Link>
-                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
+                <Link href="/equity" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors">
                   Company Equity
                 </Link>
-                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
+                <Link href="/art" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors">
                   Art & Collectibles
                 </Link>
-                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 last:rounded-b-lg">
+                <Link href="/commodities" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors">
                   Commodities
+                </Link>
+                <Link href="/intellectual-property" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors">
+                  Intellectual Property
+                </Link>
+                <Link href="/vehicles" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors rounded-b-xl">
+                  Vehicles & Equipment
                 </Link>
               </div>
             </div>
-            <Link href="#" className="text-gray-700 hover:text-gray-900 transition">
+            <Link href="/contact" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
               Contact Us
             </Link>
-          </nav>
-
-          {/* CTA Button */}
-          <button className="hidden md:block px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-colors">
-            Start Tokenizing
-          </button>
+            <button className="cta-button px-6 py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] text-white rounded-full font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+              Start Tokenizing
+            </button>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
+            id="mobile-menu-btn"
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition"
+            className="md:hidden text-gray-700"
             aria-label="Toggle menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+      </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <nav className="md:hidden pb-4 border-t border-gray-200">
-            <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div id="mobile-menu" className="md:hidden bg-white border-t border-gray-100">
+          <div className="px-4 py-4 space-y-3">
+            <Link href="/" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
               Home
             </Link>
-            <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
+            <Link href="/about" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
               About
             </Link>
-            <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
-              Assets
-            </Link>
-            <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-orange-50">
+            <div className="border-t border-gray-200 pt-2">
+              <p className="text-sm font-semibold text-gray-500 mb-2">Assets</p>
+              <Link href="/real-estate" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+                Real Estate
+              </Link>
+              <Link href="/equity" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+                Company Equity
+              </Link>
+              <Link href="/art" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+                Art & Collectibles
+              </Link>
+              <Link href="/commodities" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+                Commodities
+              </Link>
+              <Link href="/intellectual-property" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+                Intellectual Property
+              </Link>
+              <Link href="/vehicles" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+                Vehicles & Equipment
+              </Link>
+            </div>
+            <Link href="/contact" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
               Contact Us
             </Link>
-            <button className="w-full mt-2 mx-4 px-4 py-2 bg-orange-500 text-white font-medium rounded-full transition">
+            <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] text-white rounded-full font-semibold">
               Start Tokenizing
             </button>
-          </nav>
-        )}
-      </div>
-    </header>
+          </div>
+        </div>
+      )}
+    </nav>
   )
 }

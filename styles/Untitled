@@ -1,0 +1,25 @@
+## Error Type
+Build Error
+
+## Error Message
+Parsing CSS source code failed
+
+## Build Output
+./YOB-assets/app/globals.css:5409:8
+Parsing CSS source code failed
+  5407 |   initial-value: 0;
+  5408 | }
+> 5409 | @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+       |        ^
+  5410 | :root {
+  5411 |   --background: oklch(1 0 0);
+  5412 |   --foreground: oklch(0.145 0 0);
+
+@import rules must precede all rules aside from @charset and @layer statements
+
+Import trace:
+  Client Component Browser:
+    ./YOB-assets/app/globals.css [Client Component Browser]
+    ./YOB-assets/app/layout.tsx [Server Component]
+
+Next.js version: 16.0.10 (Turbopack)
