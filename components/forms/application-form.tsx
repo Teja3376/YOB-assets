@@ -119,7 +119,9 @@ export default function ApplicationForm() {
       await submitApplication(payload)
       // Set the application ID from the response
       setStatus("submitted")
-      router.push("/dashboard")
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 5000)
     } catch (error) {
       setStatus("error")
       console.error("Error submitting application:", error)
