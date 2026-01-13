@@ -9,6 +9,13 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Form,
   FormControl,
   FormField,
@@ -18,32 +25,62 @@ import {
   FormDescription,
 } from "@/components/ui/form"
 import AuthLayout from "@/components/layout/auth-layout"
+import { authAPI } from "@/lib/api-client"
+import { useState } from "react"
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
+  countryCode: z.string().min(1, "Country code is required"),
   phone: z.string().min(1, "Phone number is required"),
 })
 
+const countries = [
+  { code: "+971", name: "UAE" },
+  { code: "+1", name: "USA" },
+  { code: "+44", name: "UK" },
+  { code: "+91", name: "India" },
+  { code: "+966", name: "Saudi Arabia" },
+]
+
 export default function RegisterPage() {
   const router = useRouter()
+  const [error, setError] = useState<string>("")
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
+      countryCode: "+971",
       phone: "",
     },
   })
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    setError("")
+    try {
+      // Call signup API
+      const response = await authAPI.signup({
+        email: values.email,
+        firstName : values.firstName,
+        lastName: values.lastName,
+        phoneNumber: String(values.phone),
+        countryCode: values.countryCode,
+      })
 
-    // Redirect to OTP page with email
-    router.push(`/otp?email=${encodeURIComponent(values.email)}&flow=register`)
+      // Store isNewUser flag in sessionStorage for OTP page
+      const isNewUser = response.data?.isNewUser || false
+      sessionStorage.setItem("isNewUser", String(isNewUser))
+
+      // Redirect to OTP page with email
+      router.push(`/otp?email=${encodeURIComponent(values.email)}&flow=register`)
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again."
+      )
+    }
   }
 
   return (
@@ -52,7 +89,7 @@ export default function RegisterPage() {
         {/* Back Link */}
         <Link
           href="/"
-          className="inline-flex items-center text-gray-600 hover:text-[#FF6B00] mb-8 transition-colors"
+          className="inline-flex items-center text-gray-600 hover:text-[#FF6B00] mb-2 transition-colors"
         >
           <ArrowLeft className="mr-2" size={16} />
           Back
@@ -136,40 +173,66 @@ export default function RegisterPage() {
               )}
             />
 
+            {/* Password */}
+
             {/* Phone Number */}
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700">
-                    What is your phone number?
-                  </FormLabel>
-                  {/* <FormDescription className="text-sm text-gray-600">
-                    Provide a valid phone number for contact purposes.
-                  </FormDescription> */}
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <div className="w-24">
+            <div className="space-y-2">
+              <FormLabel className="text-gray-700">
+                What is your phone number?
+              </FormLabel>
+              <div className="flex gap-2 items-start">
+                <FormField
+                  control={form.control}
+                  name="countryCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger
+  className="w-32 min-h-12 h-12 py-0 flex items-center bg-white border-gray-300"
+>
+  <SelectValue placeholder="Code" />
+</SelectTrigger>
+
+                          <SelectContent>
+                            {countries.map((country) => (
+                              <SelectItem key={country.code} value={country.code}>
+                                {country.code} ({country.name})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
                         <Input
-                          type="text"
-                          value="+971"
-                          readOnly
-                          className="bg-white border-gray-300 text-gray-900 h-12 text-center"
+                          type="tel"
+                          placeholder="Phone number"
+                          className="h-12 bg-white border-gray-300 text-gray-900"
+                          {...field}
                         />
-                      </div>
-                      <Input
-                        type="tel"
-                        placeholder="Phone number"
-                        className="flex-1 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FF6B00] focus:ring-[#FF6B00] h-12"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
 
             <Button
               type="submit"
@@ -177,7 +240,7 @@ export default function RegisterPage() {
               className="w-full bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] hover:shadow-lg text-white h-12 rounded-lg font-medium"
             >
               {form.formState.isSubmitting
-                ? "Sending..."
+                ? "Creating account..."
                 : "Send email verification code →"}
             </Button>
           </form>

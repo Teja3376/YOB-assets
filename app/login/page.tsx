@@ -17,6 +17,8 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import AuthLayout from "@/components/layout/auth-layout"
+import { authAPI } from "@/lib/api-client"
+import { useState } from "react"
 
 const loginSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -24,6 +26,7 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
     const router = useRouter()
+    const [error, setError] = useState<string>("")
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -32,11 +35,27 @@ export default function LoginPage() {
     })
 
     const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        setError("")
+        try {
+            // Call login API
+            const response = await authAPI.login({
+                email: values.email,
+            })
 
-        // Redirect to OTP page with email
-        router.push(`/otp?email=${encodeURIComponent(values.email)}`)
+            // Store tokens in sessionStorage
+            if (response.data?.accessToken && response.data?.refreshToken) {
+                sessionStorage.setItem("accessToken", response.data.accessToken)
+                sessionStorage.setItem("refreshToken", response.data.refreshToken)
+            }
+
+            // Always redirect to OTP page - OTP is required for everyone
+            router.push(`/otp?email=${encodeURIComponent(values.email)}`)
+
+        } catch (err: any) {
+            setError(
+                err.response?.data?.message || "Login failed. Please try again."
+            )
+        }
     }
 
     return (
@@ -83,15 +102,22 @@ export default function LoginPage() {
                             )}
                         />
 
+                        
+
+                        {/* Error Message */}
+                        {error && (
+                            <div className="text-red-500 text-sm text-center">{error}</div>
+                        )}
+
                         <Button
                             type="submit"
                             disabled={form.formState.isSubmitting}
                             className="w-full bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] hover:shadow-lg text-white h-12 rounded-lg font-medium"
                         >
                             {form.formState.isSubmitting
-                                ? "Sending..."
-                                : "Send email verification code →"}
-                        </Button>
+                                ? "Logging in..."
+                                : "Login →"}
+                        </Button>   
                     </form>
                 </Form>
 

@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import useIssuerRequestApi from "@/connection/useIssuerRequestApi"
 
 const assetCategories = [
   "Real Estate",
@@ -54,66 +55,7 @@ const countryCodes = [
   { code: "+1", country: "US/CA", flag: "🇺🇸" },
   { code: "+1", country: "US", flag: "🇺🇸" },
   { code: "+44", country: "UK", flag: "🇬🇧" },
-  { code: "+61", country: "AU", flag: "🇦🇺" },
-  { code: "+49", country: "DE", flag: "🇩🇪" },
-  { code: "+33", country: "FR", flag: "🇫🇷" },
-  { code: "+39", country: "IT", flag: "🇮🇹" },
-  { code: "+34", country: "ES", flag: "🇪🇸" },
-  { code: "+31", country: "NL", flag: "🇳🇱" },
-  { code: "+32", country: "BE", flag: "🇧🇪" },
-  { code: "+41", country: "CH", flag: "🇨🇭" },
-  { code: "+43", country: "AT", flag: "🇦🇹" },
-  { code: "+46", country: "SE", flag: "🇸🇪" },
-  { code: "+47", country: "NO", flag: "🇳🇴" },
-  { code: "+45", country: "DK", flag: "🇩🇰" },
-  { code: "+358", country: "FI", flag: "🇫🇮" },
-  { code: "+48", country: "PL", flag: "🇵🇱" },
-  { code: "+351", country: "PT", flag: "🇵🇹" },
-  { code: "+353", country: "IE", flag: "🇮🇪" },
-  { code: "+30", country: "GR", flag: "🇬🇷" },
-  { code: "+420", country: "CZ", flag: "🇨🇿" },
-  { code: "+40", country: "RO", flag: "🇷🇴" },
-  { code: "+36", country: "HU", flag: "🇭🇺" },
-  { code: "+359", country: "BG", flag: "🇧🇬" },
-  { code: "+385", country: "HR", flag: "🇭🇷" },
-  { code: "+421", country: "SK", flag: "🇸🇰" },
-  { code: "+386", country: "SI", flag: "🇸🇮" },
-  { code: "+370", country: "LT", flag: "🇱🇹" },
-  { code: "+371", country: "LV", flag: "🇱🇻" },
-  { code: "+372", country: "EE", flag: "🇪🇪" },
-  { code: "+352", country: "LU", flag: "🇱🇺" },
-  { code: "+356", country: "MT", flag: "🇲🇹" },
-  { code: "+357", country: "CY", flag: "🇨🇾" },
-  { code: "+81", country: "JP", flag: "🇯🇵" },
-  { code: "+86", country: "CN", flag: "🇨🇳" },
-  { code: "+91", country: "IN", flag: "🇮🇳" },
-  { code: "+82", country: "KR", flag: "🇰🇷" },
-  { code: "+65", country: "SG", flag: "🇸🇬" },
-  { code: "+852", country: "HK", flag: "🇭🇰" },
-  { code: "+60", country: "MY", flag: "🇲🇾" },
-  { code: "+66", country: "TH", flag: "🇹🇭" },
-  { code: "+62", country: "ID", flag: "🇮🇩" },
-  { code: "+63", country: "PH", flag: "🇵🇭" },
-  { code: "+84", country: "VN", flag: "🇻🇳" },
-  { code: "+886", country: "TW", flag: "🇹🇼" },
-  { code: "+64", country: "NZ", flag: "🇳🇿" },
-  { code: "+27", country: "ZA", flag: "🇿🇦" },
-  { code: "+55", country: "BR", flag: "🇧🇷" },
-  { code: "+52", country: "MX", flag: "🇲🇽" },
-  { code: "+54", country: "AR", flag: "🇦🇷" },
-  { code: "+56", country: "CL", flag: "🇨🇱" },
-  { code: "+57", country: "CO", flag: "🇨🇴" },
-  { code: "+51", country: "PE", flag: "🇵🇪" },
-  { code: "+971", country: "AE", flag: "🇦🇪" },
-  { code: "+966", country: "SA", flag: "🇸🇦" },
-  { code: "+972", country: "IL", flag: "🇮🇱" },
-  { code: "+90", country: "TR", flag: "🇹🇷" },
-  { code: "+7", country: "RU", flag: "🇷🇺" },
-  { code: "+380", country: "UA", flag: "🇺🇦" },
-  { code: "+20", country: "EG", flag: "🇪🇬" },
-  { code: "+234", country: "NG", flag: "🇳🇬" },
-  { code: "+254", country: "KE", flag: "🇰🇪" },
-  { code: "+233", country: "GH", flag: "🇬🇭" },
+  
   { code: "+212", country: "MA", flag: "🇲🇦" },
   { code: "+216", country: "TN", flag: "🇹🇳" },
   { code: "+213", country: "DZ", flag: "🇩🇿" },
@@ -143,6 +85,7 @@ export default function ApplicationForm() {
   const router = useRouter()
   const [status, setStatus] = useState<ApplicationStatus>("idle")
   const [applicationId, setApplicationId] = useState<string | null>(null)
+  const { submitApplication, loading: apiLoading, error: apiError } = useIssuerRequestApi()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -161,30 +104,27 @@ export default function ApplicationForm() {
     setStatus("submitting")
     
     try {
-      // Simulate API call - replace with actual API endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      
-      // Generate a mock application ID
-      const mockApplicationId = `APP-${Date.now().toString().slice(-8)}`
-      setApplicationId(mockApplicationId)
-      
-      // Store application ID in localStorage for status checking
-      if (typeof window !== "undefined") {
-        const applications = JSON.parse(localStorage.getItem("applications") || "[]")
-        applications.push({
-          id: mockApplicationId,
-          ...data,
-          submittedAt: new Date().toISOString(),
-          status: "pending",
-        })
-        localStorage.setItem("applications", JSON.stringify(applications))
+      // Prepare API payload (exclude phone fields as they're not in API spec)
+      const payload = {
+        legalEntityName: data.legalEntityName,
+        countryOfIncorporation: data.countryOfIncorporation,
+        email: data.email,
+        assetCategory: data.assetCategory,
+        shortAssetDescription: data.shortAssetDescription,
+        phoneCountryCode: data.phoneCountryCode,
+        phoneNumber: data.phoneNumber,
       }
-      
+
+      // Call the API
+      await submitApplication(payload)
+      // Set the application ID from the response
       setStatus("submitted")
-      form.reset()
+      router.push("/dashboard")
     } catch (error) {
       setStatus("error")
       console.error("Error submitting application:", error)
+    } finally {
+      form.reset()
     }
   }
 
@@ -439,7 +379,7 @@ export default function ApplicationForm() {
           {status === "error" && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-800">
-                An error occurred while submitting your application. Please try again.
+                {apiError || "An error occurred while submitting your application. Please try again."}
               </p>
             </div>
           )}
@@ -447,10 +387,10 @@ export default function ApplicationForm() {
           <div className="pt-2">
             <Button
               type="submit"
-              disabled={status === "submitting"}
+              disabled={status === "submitting" || apiLoading}
               className="w-full h-12 text-base font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-md hover:shadow-lg transition-all"
             >
-              {status === "submitting" ? (
+              {status === "submitting" || apiLoading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Submitting...

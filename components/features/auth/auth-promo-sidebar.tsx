@@ -46,7 +46,7 @@ export default function AuthPromoSidebar() {
       <div className="relative z-10 max-w-md">
         {/* Main Heading */}
         <h1 className="text-5xl font-bold mb-12 leading-tight text-gray-900">
-          Dubai's real estate,{" "}
+          World's real estate,{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8A33]">tokenised</span>
         </h1>
 

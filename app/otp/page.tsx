@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import {  useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import OTPInput from "@/components/features/auth/otp-input"
 import AuthLayout from "@/components/layout/auth-layout"
+import { authAPI } from "@/lib/api-client"
 
 function OTPPageContent() {
   const router = useRouter()
@@ -15,6 +16,8 @@ function OTPPageContent() {
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [resendTimer, setResendTimer] = useState(60)
+  const [error, setError] = useState<string>("")
+  const [resendLoading, setResendLoading] = useState(false)
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -34,20 +37,55 @@ function OTPPageContent() {
     if (otp.length !== 6) return
 
     setIsLoading(true)
+    setError("")
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Call verify OTP API
+      const response = await authAPI.verifyOTP({ otp: otp, email: email })
 
-    // Redirect to dashboard or home
-    router.push("/")
+      // Update tokens if new ones are provided
+      if (response.data?.accessToken && response.data?.refreshToken) {
+        sessionStorage.setItem("accessToken", response.data.accessToken)
+        sessionStorage.setItem("refreshToken", response.data.refreshToken)
+      }
+
+      // Check if this is a new user - redirect to KYB (Know Your Business) form
+      const isNewUser = sessionStorage.getItem("isNewUser") === "true"
+      
+      if (isNewUser) {
+        // Clear the flag after using it
+        sessionStorage.removeItem("isNewUser")
+        // Redirect to KYB page for business verification
+        router.push("/kyb")
+      } else {
+        // Existing user - go directly to dashboard
+        router.push("/dashboard")
+      }
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || "OTP verification failed. Please try again."
+      )
+      setIsLoading(false)
+    }
   }
 
   const handleResend = async () => {
-    if (resendTimer > 0) return
+    if (resendTimer > 0 || resendLoading) return
 
-    // Simulate resend API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    setResendTimer(60)
+    setResendLoading(true)
+    setError("")
+
+    try {
+      // Call resend OTP API
+      await authAPI.resendOTP()
+      setResendTimer(60)
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || "Failed to resend OTP. Please try again."
+      )
+    } finally {
+      setResendLoading(false)
+    }
   }
 
   const formatTime = (seconds: number) => {
@@ -93,17 +131,28 @@ function OTPPageContent() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <OTPInput length={6} onComplete={handleOTPComplete} />
 
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
+
           {/* Resend Code */}
           <div className="flex items-center justify-center">
             <Button
               type="button"
               onClick={handleResend}
-              disabled={resendTimer > 0}
+              disabled={resendTimer > 0 || resendLoading}
               variant="ghost"
               className="text-gray-600 hover:text-[#FF6B00] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Resend code in {formatTime(resendTimer)}
-              {resendTimer === 0 && <ArrowRight className="ml-2" size={16} />}
+              {resendLoading
+                ? "Sending..."
+                : resendTimer > 0
+                ? `Resend code in ${formatTime(resendTimer)}`
+                : "Resend code"}
+              {resendTimer === 0 && !resendLoading && (
+                <ArrowRight className="ml-2" size={16} />
+              )}
             </Button>
           </div>
 
