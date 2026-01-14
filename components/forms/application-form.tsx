@@ -62,8 +62,7 @@ const countryCodes = [
   { code: "+44", country: "UK", flag: "🇬🇧" },
   
   { code: "+212", country: "MA", flag: "🇲🇦" },
-  { code: "+216", country: "TN", flag: "🇹🇳" },
-  { code: "+213", country: "DZ", flag: "🇩🇿" },
+  
 ]
 
 // Phone number validation regex (supports international formats)
@@ -90,10 +89,11 @@ export default function ApplicationForm() {
   const router = useRouter()
   const [status, setStatus] = useState<ApplicationStatus>("idle")
   const [applicationId, setApplicationId] = useState<string | null>(null)
-  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError } = useFetchIssuer();
+  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError, refetch: refetchIssuer } = useFetchIssuer();
   const [successAnimation, setSuccessAnimation] = useState<any>(null)
   const [pendingAnimation, setPendingAnimation] = useState<any>(null)
   const [rejectAnimation, setRejectAnimation] = useState<any>(null)
+  const [localIssuerStatus, setLocalIssuerStatus] = useState<string | null>(null)
 
   const { submitApplication, loading: apiLoading, error: apiError } = useIssuerRequestApi()
 
@@ -146,6 +146,13 @@ export default function ApplicationForm() {
 
       // Call the API
       await submitApplication(payload)
+      
+      // After successful submission, set status to pending
+      setLocalIssuerStatus("pending")
+      setStatus("submitted")
+      
+      // Refetch issuer data to get updated status
+      await refetchIssuer()
 
     } catch (error) {
       setStatus("error")
@@ -175,8 +182,8 @@ export default function ApplicationForm() {
     )
   }
 
-  // Get issuer status from the API response
-  const issuerStatus = issuerData?.data?.issuerStatus
+  // Get issuer status from the API response or local state (after submission)
+  const issuerStatus = localIssuerStatus || issuerData?.data?.issuerStatus
 
   // Pending Status UI
   if (issuerStatus === "pending") {

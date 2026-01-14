@@ -122,6 +122,7 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
         </div>
       </div>
 
+
       {/* Mobile Menu */}
       {!hideNavigation && isOpen && (
         <div id="mobile-menu" className="md:hidden bg-white border-t border-gray-100">
