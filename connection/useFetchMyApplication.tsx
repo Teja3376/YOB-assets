@@ -42,7 +42,10 @@ export interface MyApplicationsResponse {
       hasNextPage: boolean;
       hasPrevPage: boolean;
     };
-    user: User;
+    user: User | {
+      user: User;
+      issuerStatus?: string;
+    };
   };
 }
 

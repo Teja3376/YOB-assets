@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -21,10 +21,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import Lottie from "lottie-react"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Loader2 } from "lucide-react"
+import { Loader2, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import useIssuerRequestApi from "@/connection/useIssuerRequestApi"
+import { useFetchIssuer } from "@/connection/useFetchIssuer"
+import dynamic from "next/dynamic"
+
+// Dynamically import Lottie to avoid SSR issues
 
 const assetCategories = [
   "Real Estate",
@@ -53,7 +58,7 @@ const countries = [
 // Country codes with flags/names
 const countryCodes = [
   { code: "+1", country: "US/CA", flag: "🇺🇸" },
-  { code: "+1", country: "US", flag: "🇺🇸" },
+
   { code: "+44", country: "UK", flag: "🇬🇧" },
   
   { code: "+212", country: "MA", flag: "🇲🇦" },
@@ -85,7 +90,31 @@ export default function ApplicationForm() {
   const router = useRouter()
   const [status, setStatus] = useState<ApplicationStatus>("idle")
   const [applicationId, setApplicationId] = useState<string | null>(null)
+  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError } = useFetchIssuer();
+  const [successAnimation, setSuccessAnimation] = useState<any>(null)
+  const [pendingAnimation, setPendingAnimation] = useState<any>(null)
+  const [rejectAnimation, setRejectAnimation] = useState<any>(null)
+
   const { submitApplication, loading: apiLoading, error: apiError } = useIssuerRequestApi()
+
+  // Load Lottie animations
+  useEffect(() => {
+    const loadAnimations = async () => {
+      try {
+        const [success, pending, reject] = await Promise.all([
+          fetch("/lottie/success.json").then(res => res.json()),
+          fetch("/lottie/pending.json").then(res => res.json()),
+          fetch("/lottie/reject.json").then(res => res.json()),
+        ])
+        setSuccessAnimation(success)
+        setPendingAnimation(pending)
+        setRejectAnimation(reject)
+      } catch (error) {
+        console.error("Failed to load Lottie animations:", error)
+      }
+    }
+    loadAnimations()
+  }, [])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -117,11 +146,7 @@ export default function ApplicationForm() {
 
       // Call the API
       await submitApplication(payload)
-      // Set the application ID from the response
-      setStatus("submitted")
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 5000)
+
     } catch (error) {
       setStatus("error")
       console.error("Error submitting application:", error)
@@ -136,64 +161,188 @@ export default function ApplicationForm() {
     form.reset()
   }
 
-  if (status === "submitted") {
+  // Show loading state while fetching issuer data
+  if (isIssuerLoading) {
     return (
-      <div className="space-y-6">
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center">
-            <div className="rounded-full bg-green-100 p-4">
-              <CheckCircle2 className="h-10 w-10 text-green-600" />
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-[#FF6B00] mx-auto mb-4" />
+            <p className="text-gray-600">Loading application status...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Get issuer status from the API response
+  const issuerStatus = issuerData?.data?.issuerStatus
+
+  // Pending Status UI
+  if (issuerStatus === "pending") {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-8 space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-16 h-16 flex items-center justify-center">
+              {pendingAnimation && (
+                <Lottie 
+                  animationData={pendingAnimation} 
+                  loop={true}
+                  style={{ width: 64, height: 64 }}
+                />
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-orange-900">
+                Application Pending Review
+              </h3>
+              <p className="text-sm text-orange-700 mt-1">
+                Your issuer application is currently under review
+              </p>
             </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Application Submitted Successfully!
-            </h2>
-            <p className="text-gray-600">
-              Your issuer application has been received and is now under review.
+          
+          <div className="bg-white rounded-lg p-6 border border-orange-200">
+            <p className="text-sm text-orange-800 leading-relaxed mb-4">
+              Thank you for submitting your issuer application. Our team is currently reviewing your submission. 
+              You will be notified via email once a decision has been made.
+            </p>
+            <p className="text-sm text-orange-800 leading-relaxed">
+              If approved, you will be able to access the dashboard and start tokenizing your assets. 
+              If rejected, you will receive feedback and can submit a new application.
             </p>
           </div>
+
+          {applicationId && (
+            <div className="bg-white rounded-lg p-4 border border-orange-200">
+              <p className="text-xs font-medium text-orange-600 mb-1">Application ID</p>
+              <p className="text-sm font-mono text-orange-900">{applicationId}</p>
+            </div>
+          )}
         </div>
-        
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 space-y-3">
-          <div>
-            <h4 className="font-semibold text-orange-900 mb-2">
-              Application Status: Awaiting Review
-            </h4>
-            <p className="text-sm text-orange-800 mb-3">
-              Your application is pending review. You will be notified of the status in the portal once it has been approved or rejected.
-              if approved, you will be able to login to the portal and start tokenizing your assets. If rejected, you will be able to submit another application.
-            </p>
-            {applicationId && (
-              <div className="bg-white rounded-md p-3 border border-orange-200">
-                <p className="text-xs text-orange-600 mb-1">Application ID</p>
-                <p className="text-sm font-mono text-orange-900">{applicationId}</p>
-              </div>
-            )}
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-blue-900 mb-2">What's Next?</p>
+              <p className="text-sm text-blue-800 leading-relaxed">
+                Please check your email regularly for updates.
+              </p>
+            </div>
           </div>
         </div>
+      </div>
+    )
+  }
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
-            <strong>Next Steps:</strong> Please check your email for confirmation and login to the portal at{" "}
-            <a 
-              href="https://www.yobassets.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="underline font-semibold"
-            >
-              www.yobassets.com
-            </a>{" "}
-            to track your application status. You can also check the status using the "Check Status" tab above.
-          </p>
+  // Rejected Status UI
+  if (issuerStatus === "rejected") {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-8 space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-16 h-16 flex items-center justify-center">
+              {rejectAnimation && (
+                <Lottie 
+                  animationData={rejectAnimation} 
+                  loop={true}
+                  style={{ width: 64, height: 64 }}
+                />
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-red-900">
+                Application Rejected
+              </h3>
+              <p className="text-sm text-red-700 mt-1">
+                Your issuer application was not approved
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg p-6 border border-red-200">
+            <p className="text-sm text-red-800 leading-relaxed mb-4">
+              We're sorry, but your issuer application has been rejected. This could be due to incomplete information, 
+              missing documentation, or not meeting our requirements.
+            </p>
+            <p className="text-sm text-red-800 leading-relaxed">
+              Please review your application details and feel free to submit a new application with updated information. 
+              If you have questions, please contact our support team.
+            </p>
+          </div>
+
+          {applicationId && (
+            <div className="bg-white rounded-lg p-4 border border-red-200">
+              <p className="text-xs font-medium text-red-600 mb-1">Application ID</p>
+              <p className="text-sm font-mono text-red-900">{applicationId}</p>
+            </div>
+          )}
         </div>
 
-        <div className="flex gap-3 justify-center">
-          <Button onClick={handleNewApplication} variant="outline">
-            Submit Another Application
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+          <p className="text-sm font-medium text-gray-900 mb-3">Would you like to submit a new application?</p>
+          <Button
+            onClick={handleNewApplication}
+            className="w-full sm:w-auto bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white"
+          >
+            Submit New Application
           </Button>
-          <Button onClick={() => router.push("/")}>
-            Back to Home
+        </div>
+      </div>
+    )
+  }
+
+  // Approved Status UI
+  if (issuerStatus === "approved") {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-8 space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-16 h-16 flex items-center justify-center">
+              {successAnimation && (
+                <Lottie 
+                  animationData={successAnimation} 
+                  loop={false}
+                  style={{ width: 64, height: 64 }}
+                />
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-green-900">
+                Application Approved!
+              </h3>
+              <p className="text-sm text-green-700 mt-1">
+                Congratulations! Your issuer application has been approved
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg p-6 border border-green-200">
+            <p className="text-sm text-green-800 leading-relaxed mb-4">
+              Great news! Your issuer application has been approved. You now have access to the dashboard 
+              where you can start tokenizing your assets and managing your applications.
+            </p>
+            <p className="text-sm text-green-800 leading-relaxed">
+              Click the button below to continue to your dashboard and begin your journey with YOB Assets.
+            </p>
+          </div>
+
+          {applicationId && (
+            <div className="bg-white rounded-lg p-4 border border-green-200">
+              <p className="text-xs font-medium text-green-600 mb-1">Application ID</p>
+              <p className="text-sm font-mono text-green-900">{applicationId}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-center">
+          <Button
+            onClick={() => router.push("/dashboard")}
+            className="w-full sm:w-auto px-8 h-12 text-base font-semibold bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white rounded-lg shadow-md hover:shadow-lg transition-all"
+          >
+            Continue to Dashboard
           </Button>
         </div>
       </div>
@@ -209,8 +358,10 @@ export default function ApplicationForm() {
         </p>
       </div>
 
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+<div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="legalEntityName"
@@ -255,7 +406,9 @@ export default function ApplicationForm() {
               </FormItem>
             )}
           />
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="email"
@@ -273,7 +426,34 @@ export default function ApplicationForm() {
               </FormItem>
             )}
           />
-
+            <FormField
+            control={form.control}
+            name="assetCategory"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Asset Category *</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select asset category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {assetCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-3">
             <FormField
               control={form.control}
@@ -332,33 +512,7 @@ export default function ApplicationForm() {
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="assetCategory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Asset Category *</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select asset category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {assetCategories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        
 
           <FormField
             control={form.control}
@@ -404,6 +558,7 @@ export default function ApplicationForm() {
           </div>
         </form>
       </Form>
+
     </div>
   )
 }

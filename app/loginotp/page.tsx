@@ -6,8 +6,8 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import OTPInput from "@/components/features/auth/otp-input"
-import GetStartedLayout from "@/components/layout/get-started"
 import { authAPI } from "@/lib/api-client"
+import AuthLayout from "@/components/layout/auth-layout"
 
 function OTPPageContent() {
   const router = useRouter()
@@ -51,7 +51,7 @@ function OTPPageContent() {
       }
 
          // Clear the isNewUser flag if it exists
-          router.push("/kyb")
+          router.push("/dashboard")
        
     } catch (err: any) {
       setError(
@@ -91,7 +91,7 @@ function OTPPageContent() {
   
   
   return (
-    <GetStartedLayout>
+    <AuthLayout>
       <div className="w-full">
         {/* Title */}
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -166,7 +166,7 @@ function OTPPageContent() {
           </p>
         </div>
       </div>
-    </GetStartedLayout>
+    </AuthLayout>
   )
 }
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import IssuerLayout from "@/components/layout/issuer-layout";
 import { useFetchMyApplication } from "@/connection/useFetchMyApplication";
+import { useFetchIssuer } from "@/connection/useFetchIssuer";
 import {
   Card,
   CardContent,
@@ -90,6 +91,7 @@ const getStepperSteps = (status: string): StepperStep[] => {
 export default function IssuerDashboard() {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
+  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError } = useFetchIssuer();
   const { data, isLoading, error, refetch } = useFetchMyApplication();
 
   useEffect(() => {
@@ -97,12 +99,8 @@ export default function IssuerDashboard() {
     const checkAuth = () => {
       if (typeof window === "undefined") return;
 
-      const accessToken =
-        sessionStorage.getItem("accessToken") ||
-        localStorage.getItem("accessToken");
-      const refreshToken =
-        sessionStorage.getItem("refreshToken") ||
-        localStorage.getItem("refreshToken");
+      const accessToken = sessionStorage.getItem("accessToken");
+      const refreshToken = sessionStorage.getItem("refreshToken");
 
       // If either token is missing, redirect to login
       if (!accessToken || !refreshToken) {
@@ -117,8 +115,52 @@ export default function IssuerDashboard() {
     checkAuth();
   }, [router]);
 
-  // Show loading state while checking authentication
-  if (isChecking) {
+  useEffect(() => {
+    // Check issuer application status first
+    if (!isChecking && !isIssuerLoading && !issuerError && issuerData) {
+      // Get issuer application status from the /me endpoint
+      const issuerApplicationStatus = 
+        issuerData.data?.issuerStatus ;
+
+        console.log(issuerApplicationStatus, "issuerApplicationStatus");
+
+      // If issuer application status is not "approved", redirect to apply page
+      if (issuerApplicationStatus !== "approved") {
+        router.push("/apply");
+        return;
+      }
+
+    }
+  }, [issuerData, isIssuerLoading, issuerError, isChecking, router]);
+
+  useEffect(() => {
+    if (!isChecking && !isLoading && !error && data) {
+      // ✅ 1. KYC check
+      // The user data can be nested: data.data.user.user.kycStatus or flat: data.data.user.kycStatus
+      const userData = data.data?.user;
+      // Type guard: check if userData has a 'user' property (nested structure)
+      const user = (userData && typeof userData === 'object' && 'user' in userData) 
+        ? (userData as { user: any }).user 
+        : userData;
+      const kycStatus = user?.kycStatus;
+      
+      console.log("KYC Status check:", {
+        kycStatus,
+        user,
+        userData: data.data?.user,
+        fullData: data.data
+      });
+  
+      // If KYC status is not "approved", redirect to KYB page
+      if (kycStatus && kycStatus !== "approved") {
+        router.push("/kyb");
+        return;
+      }
+    }
+  }, [data, isLoading, error, isChecking, router]);
+  
+  // Show loading state while checking authentication or loading issuer data
+  if (isChecking || isIssuerLoading) {
     return (
       <IssuerLayout>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -155,45 +197,59 @@ export default function IssuerDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium">{data.data.user.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p className="font-medium">{data.data.user.phoneNumber}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <FileText className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <p className="text-sm text-gray-500">Name</p>
-                    <p className="font-medium">
-                      {data.data.user.firstName} {data.data.user.lastName}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <p className="text-sm text-gray-500">KYC Status</p>
-                    <Badge
-                      variant="outline"
-                      className={
-                        data.data.user.kycStatus === "approved"
-                          ? "bg-green-100 text-green-800 border-green-200"
-                          : "bg-yellow-100 text-yellow-800 border-yellow-200"
-                      }
-                    >
-                      {data.data.user.kycStatus}
-                    </Badge>
-                  </div>
-                </div>
+                {(() => {
+                  // Handle nested user structure: data.data.user.user or data.data.user
+                  const userData = data.data.user;
+                  // Type guard: check if userData has a 'user' property (nested structure)
+                  const user = (userData && typeof userData === 'object' && 'user' in userData)
+                    ? (userData as { user: any }).user
+                    : userData;
+                  const kycStatus = user?.kycStatus;
+                  
+                  return (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <p className="text-sm text-gray-500">Email</p>
+                          <p className="font-medium">{user?.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <p className="text-sm text-gray-500">Phone</p>
+                          <p className="font-medium">{user?.phoneNumber}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <p className="text-sm text-gray-500">Name</p>
+                          <p className="font-medium">
+                            {user?.firstName} {user?.lastName}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <p className="text-sm text-gray-500">KYB Status</p>
+                          <Badge
+                            variant="outline"
+                            className={
+                              kycStatus === "approved"
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                            }
+                          >
+                            {kycStatus || "N/A"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </CardContent>
           </Card>
