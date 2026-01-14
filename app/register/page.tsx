@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -24,7 +23,7 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form"
-import AuthLayout from "@/components/layout/auth-layout"
+import GetStartedLayout from "@/components/layout/get-started"
 import { authAPI } from "@/lib/api-client"
 import { useState } from "react"
 
@@ -53,7 +52,7 @@ export default function RegisterPage() {
       firstName: "",
       lastName: "",
       email: "",
-      countryCode: "+971",
+      countryCode: "+91",
       phone: "",
     },
   })
@@ -84,17 +83,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout>
-      <div className="max-w-md w-full mx-auto">
-        {/* Back Link */}
-        <Link
-          href="/"
-          className="inline-flex items-center text-gray-600 hover:text-[#FF6B00] mb-2 transition-colors"
-        >
-          <ArrowLeft className="mr-2" size={16} />
-          Back
-        </Link>
-
+    <GetStartedLayout>
+      <div className="max-w-3xl w-full mx-auto">
         {/* Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-8">
           Let's get to know each other!
@@ -102,8 +92,9 @@ export default function RegisterPage() {
 
         {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* First Name */}
+            <div className="grid grid-cols-2 gap-2">
             <FormField
               control={form.control}
               name="firstName"
@@ -146,6 +137,7 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
+            </div>
 
             {/* Email */}
             <FormField
@@ -259,6 +251,6 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
-    </AuthLayout>
+    </GetStartedLayout>
   )
 }

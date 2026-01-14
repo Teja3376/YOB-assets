@@ -13,7 +13,7 @@ export default function CTASection() {
             Start free today or book a demo to see how YOB Assets transforms your financial operations.
           </p>
           <div className="cta-button-group">
-            <Link href="/get-started" className="cta-primary-button">
+            <Link href="/apply" className="cta-primary-button">
               Get Started Now
             </Link>
           </div>

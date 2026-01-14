@@ -49,7 +49,7 @@ export default function LoginPage() {
             }
 
             // Always redirect to OTP page - OTP is required for everyone
-            router.push(`/otp?email=${encodeURIComponent(values.email)}`)
+            router.push(`/loginotp?email=${encodeURIComponent(values.email)}`)
 
         } catch (err: any) {
             setError(

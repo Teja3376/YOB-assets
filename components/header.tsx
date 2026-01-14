@@ -100,8 +100,8 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                 Login
               </Link>
               <Link
-                href="/get-started"
-                className="px-6 py-2.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] hover:shadow-lg text-white font-medium rounded-full transition-all"
+                href="/apply"
+                className="px-6 py-2.5 bg-linear-to-r from-[#FF6B00] to-[#FF8A33] hover:shadow-lg text-white font-medium rounded-full transition-all"
               >
                 Get Started
               </Link>
@@ -186,9 +186,9 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                   Login
                 </Link>
                 <Link
-                  href="/get-started"
+                  href="/apply"
                   onClick={() => setIsOpen(false)}
-                  className="w-full px-4 py-2 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] text-white font-medium rounded-full transition text-center block"
+                  className="w-full px-4 py-2 bg-linear-to-r from-[#FF6B00] to-[#FF8A33] text-white font-medium rounded-full transition text-center block"
                 >
                   Get Started
                 </Link>
