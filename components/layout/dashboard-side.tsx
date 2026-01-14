@@ -15,10 +15,10 @@ import { useRouter } from "next/navigation";
 
 const menu = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "SPV List", href: "/issuer/spv", icon: Building2, disabled: true },
-  { name: "Assets", href: "/issuer/assets", icon: Package, disabled: true },
-  { name: "Orders", href: "/issuer/orders", icon: ShoppingCart, disabled: true },
-  { name: "Investors", href: "/issuer/investors", icon: Users, disabled: true },
+  { name: "SPV List(WIP)", href: "/issuer/spv", icon: Building2, disabled: true },
+  { name: "Assets(WIP)", href: "/issuer/assets", icon: Package, disabled: true },
+  { name: "Orders(WIP)", href: "/issuer/orders", icon: ShoppingCart, disabled: true },
+  { name: "Investors(WIP)", href: "/issuer/investors", icon: Users, disabled: true },
 ];
 
 export default function DashboardSidebar() {
@@ -40,9 +40,7 @@ export default function DashboardSidebar() {
   return (
     <aside className="w-64 bg-white border-r flex flex-col">
       {/* Header */}
-      <div className="h-[72px] flex items-center px-6 font-semibold border-b">
-        Issuer Panel
-      </div>
+    
 
       {/* Menu */}
       <nav className="flex-1 px-3 py-4 space-y-1">

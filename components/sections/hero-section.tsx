@@ -45,7 +45,7 @@ export default function HeroSection() {
           <div className="hero-button-container">
             <button
               className="hero-primary-button"
-              onClick={() => router.push('/apply')}
+              onClick={() => router.push('/register')}
             >
               Get Started Now
             </button>
