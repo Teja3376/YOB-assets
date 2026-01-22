@@ -39,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`font-sans antialiased bg-gray-50 text-gray-900 overflow-x-hidden`}>
+      <body className={`font-sans antialiased bg-gray-50 text-gray-900 overflow-x-hidden overflow-y-hidden`}>
         <QueryProvider>
           {children}
         </QueryProvider>

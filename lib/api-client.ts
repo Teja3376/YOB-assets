@@ -3,7 +3,6 @@ import axios from "axios";
 // Create an Axios instance
 export const api = axios.create({
   baseURL: "http://localhost:5050/api",
-  // baseURL: "https://test.ownmali.com/api/auth-issuer",
   headers: {
     "Content-Type": "application/json",
   },
