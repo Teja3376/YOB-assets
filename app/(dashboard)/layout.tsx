@@ -1,8 +1,5 @@
 "use client";
-
-import Header from "@/common/Header";
-import SideBar from "@/common/SideBar";
-import Footer from "@/common/Footer";
+import IssuerLayout from "@/components/layout/issuer-layout";
 
 export default function DashboardLayout({
     children,
@@ -11,25 +8,9 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="flex flex-col h-screen overflow-hidden">
-            {/* Top Header */}
-            <Header />
-
-            {/* Main Content Area with Sidebar */}
-            <div className="flex flex-1 overflow-hidden">
-                {/* Sidebar */}
-                <SideBar />
-
-                {/* Main Content */}
-                <div className="flex flex-col flex-1 overflow-hidden">
-                    {/* Scrollable Content Area */}
-                    <main className="flex-1 overflow-y-auto bg-white">
-                        {children}
-                    </main>
-
-                    {/* Bottom Footer */}
-                    <Footer />
-                </div>
-            </div>
+           <IssuerLayout>
+            {children}
+           </IssuerLayout>
         </div>
     );
 }

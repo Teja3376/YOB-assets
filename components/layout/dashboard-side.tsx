@@ -15,8 +15,8 @@ import { useRouter } from "next/navigation";
 
 const menu = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "SPV List(WIP)", href: "/issuer/spv", icon: Building2, disabled: true },
-  { name: "Assets(WIP)", href: "/issuer/assets", icon: Package, disabled: true },
+  { name: "SPV List(WIP)", href: "/spv", icon: Building2, },
+  { name: "Assets(WIP)", href: "/assets", icon: Package, },
   { name: "Orders(WIP)", href: "/issuer/orders", icon: ShoppingCart, disabled: true },
   { name: "Investors(WIP)", href: "/issuer/investors", icon: Users, disabled: true },
 ];

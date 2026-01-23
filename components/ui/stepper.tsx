@@ -1,131 +1,69 @@
+"use client";
 
-import * as React from 'react';
-import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { CheckCircle2, Circle } from "lucide-react";
 
-// Update the StepType interface to include an id field
-export interface StepType {
-  id: string; // Add this line
-  title: string;
-  description?: string;
-  icon?: React.ReactNode;
-  disabled?: boolean;
-  completed?: boolean;
+export interface StepperStep {
+  label: string;
+  status: "completed" | "current" | "pending";
 }
 
-// Update the StepperProps interface
-export interface StepperProps {
-  steps: StepType[];
-  currentStepId: string; // Change from currentStep: number
-  onStepChange: (stepId: string) => void; // Change from (step: number)
+interface StepperProps {
+  steps: StepperStep[];
   className?: string;
 }
 
-// Update the Stepper component to work with IDs instead of indices
-export function Stepper({
-  steps,
-  currentStepId,
-  onStepChange,
-  className,
-}: StepperProps) {
-  const handleStepClick = (id: string) => {
-    const stepIndex = steps.findIndex((step) => step.id === id);
-    if (steps[stepIndex].disabled) return;
-    onStepChange(id);
-  };
-
+export function Stepper({ steps, className }: StepperProps) {
   return (
-    <div className={cn('w-full', className)}>
-      {/* Steps */}
-      <div className='mb-8 flex flex-col md:flex-row md:items-center'>
+    <div className={cn("w-full", className)}>
+      <div className="flex items-center justify-between">
         {steps.map((step, index) => {
-          const isActive = step.id === currentStepId;
-          const isCompleted = step.completed;
-          const isDisabled = step.disabled;
           const isLast = index === steps.length - 1;
+          const isCompleted = step.status === "completed";
+          const isCurrent = step.status === "current";
 
           return (
-            <React.Fragment key={step.id}>
-              <div
-                className={cn(
-                  'group flex items-center',
-                  isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
-                  'md:flex-col md:items-center'
-                )}
-                onClick={() => !isDisabled && handleStepClick(step.id)}
-              >
-                <div
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors duration-200',
-                    isActive && !isCompleted
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : isCompleted
-                      ? 'border-green-500 bg-green-500 text-white'
-                      : isDisabled
-                      ? 'border-muted bg-muted text-muted-foreground'
-                      : 'border-border bg-background text-foreground hover:border-primary'
-                  )}
-                >
-                  {isCompleted ? (
-                    <Check className='h-5 w-5' />
-                  ) : step.icon ? (
-                    step.icon
-                  ) : (
-                    <span>{index + 1}</span>
-                  )}
-                </div>
-                <div className='ml-3 md:ml-0 md:mt-2 md:text-center'>
+            <React.Fragment key={index}>
+              <div className="flex flex-col items-center flex-1">
+                <div className="flex items-center">
                   <div
                     className={cn(
-                      'text-sm font-medium',
-                      isActive
-                        ? 'text-foreground'
-                        : isDisabled
-                        ? 'text-muted-foreground'
-                        : 'text-foreground'
+                      "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors",
+                      isCompleted
+                        ? "bg-green-500 border-green-500 text-white"
+                        : isCurrent
+                        ? "bg-[#FF6B00] border-[#FF6B00] text-white"
+                        : "bg-white border-gray-300 text-gray-400"
                     )}
                   >
-                    {step.title}
+                    {isCompleted ? (
+                      <CheckCircle2 className="h-5 w-5" />
+                    ) : (
+                      <Circle className="h-5 w-5" />
+                    )}
                   </div>
-                  {step.description && (
-                    <div
-                      className={cn(
-                        'text-xs',
-                        isDisabled
-                          ? 'text-muted-foreground'
-                          : 'text-muted-foreground'
-                      )}
-                    >
-                      {step.description}
-                    </div>
-                  )}
+                </div>
+                <div className="mt-2 text-center">
+                  <p
+                    className={cn(
+                      "text-sm font-medium",
+                      isCompleted || isCurrent
+                        ? "text-gray-900"
+                        : "text-gray-500"
+                    )}
+                  >
+                    {step.label}
+                  </p>
                 </div>
               </div>
               {!isLast && (
                 <div
                   className={cn(
-                    'mx-2 hidden h-[2px] flex-1 md:block',
-                    isCompleted && steps[index + 1].completed
-                      ? 'bg-green-500'
-                      : isActive || isCompleted
-                      ? 'bg-primary'
-                      : 'bg-border'
+                    "h-0.5 flex-1 mx-2 -mt-5",
+                    isCompleted ? "bg-green-500" : "bg-gray-300"
                   )}
                 />
-              )}
-              {!isLast && (
-                <div className='my-2 h-8 w-[2px] md:hidden'>
-                  <div
-                    className={cn(
-                      'h-full w-full',
-                      isCompleted && steps[index + 1].completed
-                        ? 'bg-green-500'
-                        : isActive || isCompleted
-                        ? 'bg-primary'
-                        : 'bg-border'
-                    )}
-                  />
-                </div>
               )}
             </React.Fragment>
           );

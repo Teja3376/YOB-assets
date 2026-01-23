@@ -4,7 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/LoadingSpinner";
-import { Stepper } from "@/components/ui/stepper";
+import { Stepper } from "@/components/ui/long-stepper";
 import {
     ArrowLeft,
     ArrowRight,
