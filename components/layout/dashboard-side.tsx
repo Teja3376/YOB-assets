@@ -38,7 +38,7 @@ export default function DashboardSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-white border-r flex flex-col">
+    <aside className="w-56 bg-white border-r flex flex-col">
       {/* Header */}
     
 

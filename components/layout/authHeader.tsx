@@ -27,7 +27,7 @@ const ProfilePopover = () => {
           <User />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} className="w-50 mr-2 px-4 py-2">
+      <PopoverContent sideOffset={10} className=" z-10 w-50 mr-2 px-4 py-2 rounded-lg shadow-lg border border-gray-200  bg-white">
         <h1 className="font-semibold mb-2">My Account</h1>
         <hr className="my-1" />
         <div
@@ -47,16 +47,16 @@ export default function AuthHeader({ hideNavigation = false }: HeaderProps) {
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-[70px] items-center justify-between">
           
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
             <Image
               src="/yob-assets-logo.png"
               alt="YOB Assets Logo"
-              width={44}
-              height={44}
+              width={80}
+              height={80}
               priority
             />
             <span className="hidden sm:block text-lg font-semibold text-gray-900">

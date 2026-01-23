@@ -22,6 +22,7 @@ const SPVTable: React.FC<SPVTableProps> = ({ data, setSpv }) => {
     {
       header: "Spv Id",
       accessorKey: "_id",
+      size: 100,
       cell: (info: any) => {
         const id = info.getValue();
         return (

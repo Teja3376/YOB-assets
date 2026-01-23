@@ -130,6 +130,10 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-primary: var(--orange-primary);
+  --color-primary-foreground: var(--white);
+  --color-secondary: var(--black);
+  --color-secondary-foreground: var(--white);
 }
 
 @layer base {
