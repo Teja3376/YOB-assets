@@ -108,8 +108,9 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
       );
     },
     enableResizing: true,
-    size: 150,
-    maxSize: 200,
+    size: 140,
+    minSize: 140,
+    maxSize: 140,
   },
   {
     header: "Funding Status",
@@ -129,9 +130,9 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
         </Badge>
       );
     },
-    size: 70,
-    minSize: 70,
-    maxSize: 70,
+    size: 100,
+    minSize: 100,
+    maxSize: 100,
   },
   {
     header: "Max Supply",
@@ -142,9 +143,9 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
       console.log("info.row.origina", info.row.original);
       return <span>{value}</span>;
     },
-    size: 30,
-    minSize: 30,
-    maxSize: 30,
+    size: 50,
+    minSize: 50,
+    maxSize: 50,
   },
   {
     header: "Investors",
@@ -155,8 +156,8 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
       return <span>{value}</span>;
     },
     maxSize: 50,
-    size: 40,
-    minSize: 40,
+    size: 50,
+    minSize: 50,
   },
   {
     header: "Orders",
@@ -167,8 +168,8 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
       return <span>{value}</span>;
     },
     maxSize: 50,
-    size: 30,
-    minSize: 30,
+    size: 50,
+    minSize: 50,
   },
   {
     header: "Active",
@@ -187,9 +188,9 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
         />
       );
     },
-    size: 30,
-    minSize: 30,
-    maxSize: 30,
+    size: 50,
+    minSize: 50,
+    maxSize: 50,
   },
   {
     header: "Join Waitlist",
@@ -209,9 +210,9 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
         />
       );
     },
-    size: 30,
-    minSize: 30,
-    maxSize: 30,
+    size: 60,
+    minSize: 60,
+    maxSize: 60,
   },
   {
     header: "Actions",
@@ -246,9 +247,8 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
       );
     },
     enableResizing: false,
-    size: 30,
-    minSize: 30,
-    maxSize: 30,
+    size: 60,
+    maxSize: 80,
   },
 ];
 

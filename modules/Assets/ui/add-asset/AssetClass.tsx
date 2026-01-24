@@ -143,7 +143,7 @@ export default function AssetClass({
             Close
           </Button>
           <Button
-            className="bg-ryzer-primary hover:bg-ryzer-primary-hover text-white"
+            className="bg-primary text-white"
             onClick={() => router.push(`/assets/add-asset`)}
           >
             Next Step

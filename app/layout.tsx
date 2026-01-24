@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { QueryProvider } from "@/components/providers/query-provider"
 import "./globals.css"
+import { Toaster } from "sonner"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -39,10 +40,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`font-sans antialiased bg-gray-50 text-gray-900 overflow-x-hidden overflow-y-hidden`}>
+      <body className={`font-sans antialiased text-gray-900 overflow-x-hidden overflow-y-hidden`}>
         <QueryProvider>
           {children}
         </QueryProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>

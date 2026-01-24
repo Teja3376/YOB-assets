@@ -10,10 +10,10 @@ import { Control } from "react-hook-form";
 import InputGroupController from "./InputGroupController";
 import InputSelectController from "./InputSelectController.tsx";
 import ButtonController from "./ButtonController";
-// import ImageUploader from "./ImageController";
+import ImageUploader from "./ImageController";
 import FileUploadController from "./FileController";
-// import ImageAndFileUploader from "./ImageAndFile";
-// import MultiImageUploader from "./MultipleContoller";
+import ImageAndFileUploader from "./ImageAndFile";
+import MultiImageUploader from "./MultipleContoller";
 import Switch2Controller from "./Switch2Controller";
 import { useFormMode } from "./FormMode";
 import PhoneNumberController from "./phoneNumberController";
@@ -56,14 +56,14 @@ const ControllerMap = (props: any) => {
       return <InputSelectController {...props} />;
     case "button":
       return <ButtonController {...props} />;
-    // case "image":
-    //   return <ImageUploader {...props} />;
+    case "image":
+      return <ImageUploader {...props} />;
     case "file":
       return <FileUploadController {...props} />;
-    // case "imageAndFile":
-    //   return <ImageAndFileUploader {...props} />;
-    // case "multiImage":
-    //   return <MultiImageUploader {...props} />;
+    case "imageAndFile":
+      return <ImageAndFileUploader {...props} />;
+    case "multiImage":
+      return <MultiImageUploader {...props} />;
     case "phoneNumber":
       return <PhoneNumberController {...props} />;
 

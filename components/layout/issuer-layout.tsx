@@ -26,7 +26,7 @@ export default function IssuerLayout({
       const accessToken = sessionStorage.getItem("accessToken");
       const refreshToken = sessionStorage.getItem("refreshToken");
 
-      if (!accessToken || !refreshToken) {
+      if (!accessToken && !refreshToken || !refreshToken) {
         router.push("/login");
         return;
       }
@@ -71,14 +71,14 @@ export default function IssuerLayout({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF6B00] mx-auto mb-4" />
-          <p className="text-gray-600">Verifying authentication...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <AuthHeader />
 
       <div className="flex pt-20" style={{ height: "calc(100vh - 10px)" }}>
