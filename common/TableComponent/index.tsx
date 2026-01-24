@@ -21,7 +21,7 @@ function TableComponent<TData>({ columns, data, model }: TableComponentProps<TDa
   const [columnSizing, setColumnSizing] = React.useState({});
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
-    data,
+    data: data,
     columns,
     state: {
       sorting,

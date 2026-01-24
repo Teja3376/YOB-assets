@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/LoadingSpinner";
@@ -25,6 +25,10 @@ import EscrowDetails from "./Steps/EscrowDetails";
 import LegalDocuments from "./Steps/LegalDocuments";
 import BoardMembers from "./Steps/BoardMembers";
 import DAOCreation from "./Steps/DAO";
+import useCreateSpv from "../../hooks/useCreateSpv";
+import useUpdateSpv from "../../hooks/useUpdateSpv";
+import useGetSpvWithId from "../../hooks/useGetSpvWithId";
+import normalizedSpv from "../../utils/normalizedspv";
 const DEFAULT_STEP = "basic-information";
 
 interface SpvFormData {
@@ -33,13 +37,32 @@ interface SpvFormData {
 }
 
 const SpvFormPage = () => {
+    //routers to navigate
     const router = useRouter();
+    //getting spv id from url
     const { spvId: id } = useParams();
-    const isCreate = !id;
-
-    // ----------------------------------
-    // FORM
-    // ----------------------------------
+    //creating spv hooks
+    const { createSpv, loading: createLoading, responseData: createResponseData, error: createError } = useCreateSpv();
+    //updating spv hooks
+    const { updateSpv, status: updateStatus, error: updateError, responseData: updateResponseData } = useUpdateSpv();
+    //getting spv with id hooks
+    const { getSpvWithId, status: getSpvWithIdStatus, error: getSpvWithIdError, responseData: getSpvWithIdResponseData } = useGetSpvWithId();
+    const normalizedSpvData = useMemo(() => normalizedSpv(getSpvWithIdResponseData), [getSpvWithIdResponseData]);
+    console.log("normalizedSpvData", normalizedSpvData);
+    useEffect(() => {
+        const fetchSpv = async () => {
+          if (id) {
+           
+            try {
+              await getSpvWithId(id as string);
+            } catch (error: any) {
+              toast.error(error.response?.data?.message || "Failed to fetch Spv");
+            }
+          }
+        };
+        fetchSpv();
+      }, [id]);
+    
     const methods = useForm<SpvFormData>({
         defaultValues: {
             completedSteps: [],
@@ -47,25 +70,31 @@ const SpvFormPage = () => {
         mode: "onBlur",
     });
 
+    // Populate form when SPV data is loaded
+    useEffect(() => {
+        if (normalizedSpvData && Object.keys(normalizedSpvData).length > 0 && id) {
+            // Reset form with SPV data
+            methods.reset({
+                ...normalizedSpvData,
+                completedSteps: normalizedSpvData.completedSteps || methods.getValues("completedSteps") || [],
+            }, {
+                keepDefaultValues: false,
+            });
+        }
+    }, [normalizedSpvData, id, methods]);
+
+
     const { watch } = methods;
     const { isDirty } = methods.formState;
     const completedSteps = watch("completedSteps") || [];
 
-    // ----------------------------------
-    // STEP CONTROL (LOCAL)
-    // ----------------------------------
     const [step, setStep] = useState(DEFAULT_STEP);
-    const [isLoading, setIsLoading] = useState(false);
     /** Highest step index reached via Next; used to restrict stepper in create mode */
-    const [maxReachedIndex, setMaxReachedIndex] = useState(0);
 
-    // ----------------------------------
-    // STEP CONTENT
-    // ----------------------------------
     const renderStepContent = useMemo(() => {
         switch (step) {
             case "basic-information":
-                return <BasicInformation />;
+                return <BasicInformation spv={normalizedSpvData} />;
             case "memo-terms":
                 return <Memos />;
             case "escrow-bank-details":
@@ -79,11 +108,9 @@ const SpvFormPage = () => {
             default:
                 return null;
         }
-    }, [step]);
+    }, [step, normalizedSpvData]);
 
-    // ----------------------------------
-    // STEPS
-    // ----------------------------------
+  
     const steps = useMemo(
         () => [
             {
@@ -130,10 +157,6 @@ const SpvFormPage = () => {
     const isFirstStep = currentIndex === 0;
     const isLastStep = currentIndex === steps.length - 1;
 
-
-    // ----------------------------------
-    // HANDLERS
-    // ----------------------------------
     const handleBack = () => {
         if (!isFirstStep) {
             setStep(steps[currentIndex - 1].id);
@@ -158,22 +181,30 @@ const SpvFormPage = () => {
             setStep(steps[currentIndex + 1].id);
         }
     };
+        //assset submoit logic
 
-    const onSubmit: SubmitHandler<any> = async (data) => {
-        setIsLoading(true);
-        console.log("FORM SUBMIT PAYLOAD:", data);
-        setTimeout(() => {
-            setIsLoading(false);
-            toast.success("SPV saved (mock)");
-        }, 1000);
-    };
+    const onSubmit: SubmitHandler<any> = async (data: any) => {
+        const payload = { ...data };
+        console.log("paylaod is here @##$#", payload);
+        try {
+          if (id) {
+            payload.completedSteps = completedSteps.includes(step)
+              ? completedSteps
+              : [...completedSteps, step];
+            await updateSpv(id as string, payload);
+          } else {
+            payload.completedSteps = [step];
+            await createSpv(payload);
+          }
+        } catch (error: any) {
+          console.error(error.response?.data?.message || "SPV save failed");
+        } 
+      };
 
-    // ----------------------------------
-    // RENDER
-    // ----------------------------------
+  
     return (
-        <div className="container mx-auto px-6 py-8 space-y-4">
-            {isLoading && (
+        <div className="container mx-auto   px-6 py-8 space-y-4">
+            {createLoading && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
                     <LoadingSpinner size="h-12 w-12" />
                 </div>
@@ -185,7 +216,7 @@ const SpvFormPage = () => {
                 <Button
                     onClick={() => router.push("/spv")}
                     variant="outline"
-                    disabled={isLoading}
+                    disabled={createLoading}
                 >
                     <span className="flex items-center gap-2">
                         <ArrowLeft className="h-4 w-4" />
@@ -219,9 +250,9 @@ const SpvFormPage = () => {
                             <Button
                                 type="submit"
                                 className="px-3 text-white transition-colors duration-200 flex items-center gap-2"
-                                disabled={isLoading || !isDirty}
+                                disabled={createLoading || !isDirty}
                             >
-                                {isLoading ? (
+                                {createLoading ? (
                                     <>
                                         <LoadingSpinner size="h-4 w-4" className="mr-2" />
                                         {id ? "Updating..." : "Creating..."}
