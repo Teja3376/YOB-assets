@@ -58,12 +58,12 @@ export function Stepper({
                   className={cn(
                     'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors duration-200',
                     isActive && !isCompleted
-                      ? 'border-primary bg-primary text-primary-foreground'
+                      ? 'border-primary-color bg-primary-color text-primary-text'
                       : isCompleted
                       ? 'border-green-500 bg-green-500 text-white'
                       : isDisabled
                       ? 'border-muted bg-muted text-muted-foreground'
-                      : 'border-border bg-background text-foreground hover:border-primary'
+                      : 'border-border bg-background text-foreground hover:border-primary-color'
                   )}
                 >
                   {isCompleted ? (

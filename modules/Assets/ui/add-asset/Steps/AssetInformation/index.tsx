@@ -22,7 +22,7 @@ interface Props {
 
 
 const AssetInformation = ({ tab, step, asset }: Props) => {
-  const { id = null } = useParams<{ id?: string }>();
+  const { assetId = null } = useParams<{ assetId?: string }>();
   const navigate = useRouter();
 
   // Inside AssetInformation
@@ -60,10 +60,10 @@ const getComponentByTabId = (tabId: string): JSX.Element => {
   // Memoized tab change handler
   const handleTabChange = useCallback(
     (tabId: string) => {
-      const basePath = id ? `/assets/edit-asset/${id}` : '/assets/add-asset';
+      const basePath = assetId ? `/assets/edit-asset/${assetId}` : '/assets/add-asset';
       navigate.push(`${basePath}?step=${step}&tab=${tabId}`);
     },
-    [id, navigate, step]
+    [assetId, navigate, step]
   );
 
   // Memoized tabs computation
@@ -78,7 +78,7 @@ const getComponentByTabId = (tabId: string): JSX.Element => {
   }, [step, asset]);
 
   const disabledTabs = useMemo(() => {
-    if (id) {
+    if (assetId) {
       return [];
     } else {
       return tabs.slice(1, tabs.length).map((tab:any) => tab.id);

@@ -3,7 +3,7 @@ import { FormFieldConfig } from "@/components/use-form/ControllerMap";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "next/navigation";
 
-export const formConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
+export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
   const { spvId } = useParams<{ spvId?: string }>();
   const { control, setValue } = useFormContext();
 //   const { spvNames, fetchSpv, fetchSpvNames } = useSpvNames();

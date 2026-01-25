@@ -21,15 +21,12 @@ import Loading from "@/components/ui/Loading";
 const AssetInformation = dynamic(() => import("./Steps/AssetInformation"));
 const TokenInformation = dynamic(() => import("./Steps/TokenInformation"));
 const MediaAndDocuments = dynamic(() => import("./Steps/MediaAndDocuments"));
-// const IssueDue = dynamic(() => import("./IssueDue"), { suspense: true });
-// const TermsAndConditions = dynamic(() => import("./TermsAndConditions"), { suspense: true });
-// const FeaturesAndAmenities = dynamic(() => import("./FeaturesAndAmenities"), { suspense: true });
-// const LocationPlaces = dynamic(() => import("./LocationPlaces"), { suspense: true });
-// const TokenInformation = dynamic(() => import("./TokenInformation"), { suspense: true });
-// const SignatureInvestors = dynamic(
-//   () => import("./SignatureTemplate/index"),
-//   { suspense: true }
-// );
+const IssueDue = dynamic(() => import("./Steps/IssueDue"));
+const FeaturesAndAmenities = dynamic(() => import("./Steps/FeaturesAndAmenities"));
+const AdditionalDetails = dynamic(() => import("./Steps/AdditionalDetails"));
+const LocationPlaces = dynamic(() => import("./Steps/LocationPlaces"));
+const TermsAndConditions = dynamic(() => import("./Steps/TermsAndConditions"));
+const SignatureInvestors = dynamic(() => import("./Steps/SignatureTemplate"));
 
 export default function AssetPage() {
   const router = useRouter();
@@ -218,12 +215,12 @@ export default function AssetPage() {
                 "asset-information": <AssetInformation step={step} tab={tab} asset={[]} />,
                 "token-information": <TokenInformation step={step} tab={tab} asset={[]} />,
                 "media-documents": <MediaAndDocuments step={step} tab={tab} />,
-                // "additional-details": <AdditionalDetails step={step} tab={tab} />,
-                // "issues-due-diligence": <IssueDue step={step} tab={tab} asset={asset} />,
-                // "tandc-faq": <TermsAndConditions tab={tab} />,
-                // "features-amenities": <FeaturesAndAmenities step={step} tab={tab} />,
-                // "location-places": <LocationPlaces step={step} tab={tab} />,
-                // "signature-verification": <SignatureInvestors step={step} tab={tab} />,
+                "issues-due-diligence": <IssueDue step={step} tab={tab} asset={[]} />,
+                "features-amenities": <FeaturesAndAmenities step={step} tab={tab} />,
+                "location-places": <LocationPlaces step={step} tab={tab} />,
+                "additional-details": <AdditionalDetails step={step} tab={tab} />,
+                "tandc-faq": <TermsAndConditions tab={tab} />,
+                "signature-verification": <SignatureInvestors step={step} tab={tab} />,
               }[step] || null}
             </Suspense>
 

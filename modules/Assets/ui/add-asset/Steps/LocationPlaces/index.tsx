@@ -1,12 +1,10 @@
 
 
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { lazy, Suspense, memo, useCallback, useMemo, JSX } from 'react';
-import CustomTabs from '@/components/ui/custom-tab';
 import { ASSET_STEPS_TABS } from '@/modules/Assets/utils/global';
 import Loading from '@/components/ui/Loading';
-import Gallery from './Gallery';
-import Documents from './Documents';
+const Location = lazy(() => import('./Location'));
 
 interface Props {
   tab: string;
@@ -14,19 +12,14 @@ interface Props {
 }
 
 const COMPONENT_MAP: Record<string, JSX.Element> = {
-  gallery: (
+  location: (
     <Suspense fallback={<Loading />}>
-      <Gallery />
-    </Suspense>
-  ),
-  documents: (
-    <Suspense fallback={<Loading />}>
-      <Documents />
+      <Location />
     </Suspense>
   ),
 } as const;
 
-const IssuesDue = memo(({ tab, step }: Props) => {
+const LocationPlaces = memo(({ tab, step }: Props) => {
   const { assetId = null } = useParams<{ assetId?: string }>();
   const router = useRouter();
 
@@ -50,18 +43,21 @@ const IssuesDue = memo(({ tab, step }: Props) => {
   }, [step]);
 
   return (
-    <Suspense fallback={<div>Loading Asset Information...</div>}>
-      <div className='asset-information'>
-        <h1 className='text-2xl font-bold mb-4'>Media & Documents</h1>
-        <CustomTabs
+    <Suspense fallback={<div>Location Information...</div>}>
+      <div className='L'>
+        <h1 className='text-2xl font-bold mb-4'>Location & Places</h1>
+        <Location />
+        {/* <CustomTabs
           defaultTab={tab}
           tabs={tabs}
           handleTabChange={handleTabChange}
-          aria-label='Asset information tabs'
-        />
+          aria-label='Location and places tabs'
+        /> */}
       </div>
     </Suspense>
   );
 });
 
-export default IssuesDue;
+LocationPlaces.displayName = 'LocationPlaces';
+
+export default LocationPlaces;

@@ -1,6 +1,6 @@
 import FormGenerator from "@/components/use-form/FormGenerator";
 import { useFormContext } from "react-hook-form";
-import { formConfig } from "@/modules/Assets/form-config/AssetInformation/DaoConfig";
+import { DaoConfig } from "@/modules/Assets/form-config/AssetInformation/DaoConfig";
 import SelectCompany from "./SelectCompany";
 import NoCompanySelected from "./NoCompanySelected";
 import DAOConfigurationDetails from "./DAOConfigurationDetails";
@@ -14,7 +14,7 @@ const Index = ({ asset }: { asset: any }) => {
   return (
     <div>
       <SelectCompany />
-      {FormGenerator(formConfig({ asset }))}
+      {FormGenerator(DaoConfig({ asset }))}
       {!company ? (
         <NoCompanySelected />
       ) : (
