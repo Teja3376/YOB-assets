@@ -14,13 +14,13 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { AssetTable } from "./assetTable";
 import CustomTabs from "@/components/ui/custom-tab";
 import { set } from "lodash";
-import { mockAssets } from "@/modules/Assets/mock/assetList";
+import { useAssetList } from "@/modules/Assets/hooks/useAssetList";
+// import { mockAssets } from "@/modules/Assets/mock/assetList"; // Hidden - using API data instead
 
 const Index: React.FC = () => {
     const [asset, setAsset] = useState<any>(null);
     const [search, setSearch] = useState<string>("");
     const [pagination, setPagination] = useState<{ page: number; limit: number }>({ page: 1, limit: 10 });
-    const [activeTab, setActiveTab] = useState("active");
     const [newStatus, setNewStatus] = useState<"active" | "waitlist" | "">("");
     const [statusUpdate, setStatusUpdate] = useState<"active" | "waitlist" | "">("");
     const searchTerm = useDebounce(search, 500);
@@ -38,12 +38,39 @@ const Index: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const queryParams = queryString.parse(searchParams.toString());
-    const [currentPage, setCurrentPage] = useState(1);
-    const [limit, setLimit] = useState(10);
-    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    
+    // Initialize state from URL params (no useEffect needed)
+    const currentPage = Number(queryParams?.page) || 1;
+    const limit = Number(queryParams?.limit) || 10;
     const assetStatus = Array.isArray(queryParams?.tab)
         ? queryParams.tab[0]
         : queryParams?.tab || "active";
+    const [activeTab, setActiveTab] = useState(assetStatus);
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    
+    // Map status for API: "draft" tab should query "inactive" status
+    const apiStatus = activeTab === "draft" ? "inactive" : activeTab;
+    
+    // Use the hook to fetch asset list
+    const { data: assetListResponse, isLoading } = useAssetList({
+        page: currentPage,
+        limit: limit,
+        search: searchTerm,
+        status: apiStatus,
+    });
+    
+    // Extract data from API response
+    const assetList = assetListResponse?.data || assetListResponse?.assets || assetListResponse || [];
+    // const assetList = mockAssets; // Hidden - using API data instead
+    
+    // Extract pagination from API response or use defaults
+    const paginationData = assetListResponse?.pagination || {
+        page: currentPage,
+        limit: limit,
+        total: assetListResponse?.total || 0,
+        totalPages: Math.ceil((assetListResponse?.total || 0) / limit),
+    };
+    
     const columns = getColumns(setAsset, setNewStatus);
 
     const [isToggleSwitchClicked, setIsToggleSwitchClicked] = useState(false);
@@ -71,7 +98,7 @@ const Index: React.FC = () => {
         //   await updateAssetStatus(asset._id, newStatus);
         // }
     };
-    const assetList = mockAssets;
+    // const assetList = mockAssets;
     //   if (status === "loading") {
     //     return (
     //       <div className="flex items-center justify-center min-h-[400px]">
@@ -81,46 +108,59 @@ const Index: React.FC = () => {
     //   }
 
     const handleTabChange = (tabId: string) => {
-        router.push(`/assets-list?tab=${tabId}&page=1&limit=${limit}`);
+        router.push(`/assets?tab=${tabId}&page=1&limit=${limit}`);
     };
-    const filteredData = useMemo(() => {
-        return assetList
-            .filter((item: any) => item.status === activeTab)
-            .filter((item: any) =>
-                selectedFilters.length > 0
-                    ? selectedFilters.includes(item.type)
-                    : true
-            )
-            .filter((item: any) =>
-                searchTerm
-                    ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    : true
-            );
-    }, [activeTab, selectedFilters, searchTerm]);
+    // const filteredData = useMemo(() => {
+    //     return assetList
+    //         .filter((item: any) => item.status === activeTab)
+    //         .filter((item: any) =>
+    //             selectedFilters.length > 0
+    //                 ? selectedFilters.includes(item.type)
+    //                 : true
+    //         )
+    //         .filter((item: any) =>
+    //             searchTerm
+    //                 ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    //                 : true
+    //         );
+    // }, [activeTab, selectedFilters, searchTerm]);
 
-    const totalPages = Math.ceil(filteredData.length / limit);
-    const paginatedData = filteredData.slice(
-        (currentPage - 1) * limit,
-        currentPage * limit
-    );
+    // const totalPages = Math.ceil(filteredData.length / limit);
+    // const paginatedData = filteredData.slice(
+    //     (currentPage - 1) * limit,
+    //     currentPage * limit
+    // );
 
     const tabs = [
         {
             id: "active",
             title: "Active",
-            component: <AssetTable columns={columns} assetList={paginatedData} />,
+            component: <AssetTable columns={columns} assetList={assetList} />,
         },
         {
             id: "draft",
             title: "Drafts",
-            component: <AssetTable columns={columns} assetList={paginatedData} />,
+            component: <AssetTable columns={columns} assetList={assetList} />,
         },
         {
-            id: "waitlist",
-            title: "Waitlist",
-            component: <AssetTable columns={columns} assetList={paginatedData} />,
+            id: "inactive",
+            title: "Inactive",
+            component: <AssetTable columns={columns} assetList={assetList} />,
         },
+        // {
+        //     id: "waitlist",
+        //     title: "Waitlist",
+        //     component: <AssetTable columns={columns} assetList={paginatedData} />,
+        // },
     ];
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <LoadingSpinner size="h-12 w-12" color="text-blue-600" />
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 space-y-2">
@@ -159,25 +199,13 @@ const Index: React.FC = () => {
                     tabs={tabs}
                     defaultTab={activeTab ?? undefined}
                     aria-label="Asset information tabs"
-                    // handleTabChange={handleTabChange}
-                    handleTabChange={(tabId: string) => {
-                        setActiveTab(tabId);
-                        setCurrentPage(1);
-                      }}
+                    handleTabChange={handleTabChange}
                 />
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    hasPreviousPage={currentPage > 1}
-                    hasNextPage={currentPage < totalPages}
-                    limit={limit}
-                    pageSizeOptions={PAGE_SIZE_OPTIONS}
-                    onPageChange={setCurrentPage}
-                    onPageSizeChange={(size: number) => {
-                        setLimit(size);
-                        setCurrentPage(1);
-                    }}
-                />
+               <Pagination
+          {...pagination}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
             </div>
         </div>
     );

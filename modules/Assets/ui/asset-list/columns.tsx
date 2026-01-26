@@ -192,28 +192,28 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
     minSize: 50,
     maxSize: 50,
   },
-  {
-    header: "Join Waitlist",
-    accessorKey: "status",
-    cell: (info: any) => {
-      const status = info.getValue();
-      const isWaitlisted = status === "waitlist";
-      const handleUpdateStatus = (asset: any) => {
-        setAsset(asset);
-        setNewStatus(!isWaitlisted ? "waitlist" : "inactive");
-      };
-      return (
-        <Switch
-          checked={isWaitlisted}
-          onCheckedChange={() => handleUpdateStatus(info.row.original)}
-          disabled={status === "active"}
-        />
-      );
-    },
-    size: 60,
-    minSize: 60,
-    maxSize: 60,
-  },
+  // {
+  //   header: "Join Waitlist",
+  //   accessorKey: "status",
+  //   cell: (info: any) => {
+  //     const status = info.getValue();
+  //     const isWaitlisted = status === "waitlist";
+  //     const handleUpdateStatus = (asset: any) => {
+  //       setAsset(asset);
+  //       setNewStatus(!isWaitlisted ? "waitlist" : "inactive");
+  //     };
+  //     return (
+  //       <Switch
+  //         checked={isWaitlisted}
+  //         onCheckedChange={() => handleUpdateStatus(info.row.original)}
+  //         disabled={status === "active"}
+  //       />
+  //     );
+  //   },
+  //   size: 60,
+  //   minSize: 60,
+  //   maxSize: 60,
+  // },
   {
     header: "Actions",
     accessorKey: "actions",

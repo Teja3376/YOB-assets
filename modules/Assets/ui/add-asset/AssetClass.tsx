@@ -111,7 +111,7 @@ export default function AssetClass({
               disabled={option.isDisabled}
               className={`p-4 h-full cursor-pointer flex items-start gap-3 transition-all  ${
                 selectedAsset === option.id
-                  ? "ring-1 ring-ryzer-primary bg-ryzer-primary/10"
+                  ? "ring-1 ring-primary bg-primary/10"
                   : "hover:bg-gray-50"
               }`}
               onClick={() => setSelectedAsset(option.id)}
@@ -119,7 +119,7 @@ export default function AssetClass({
               <div
                 className={`${
                   selectedAsset === option.id
-                    ? "text-ryzer-primary bg-violet-100 "
+                    ? "text-primary bg-primary/10 "
                     : "text-gray-500 bg-gray-100 "
                 } mt-1 p-2 rounded-full`}
               >
@@ -131,7 +131,7 @@ export default function AssetClass({
               </div>
               <div className="flex items-center justify-center h-5 w-5 rounded-full border border-gray-300 ml-2">
                 {selectedAsset === option.id && (
-                  <div className="h-3 w-3 rounded-full bg-ryzer-primary" />
+                  <div className="h-3 w-3 rounded-full bg-primary" />
                 )}
               </div>
             </Button>
