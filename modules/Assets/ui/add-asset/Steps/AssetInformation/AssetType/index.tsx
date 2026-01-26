@@ -22,23 +22,23 @@ function Index({ asset }: { asset: any }) {
       <div className="space-y-4">
         <DAO asset={asset} />
 
-        {/* {hasCompany && ( */}
-        <>
-          <h1 className="text-xl font-semibold">Asset Category</h1>
-          <div className="grid grid-cols-4 gap-4">
-            {FormGenerator(assetCategory())}
-          </div>
+        {hasCompany && (
+          <>
+            <h1 className="text-xl font-semibold">Asset Category</h1>
+            <div className="grid grid-cols-4 gap-4">
+              {FormGenerator(assetCategory())}
+            </div>
 
-          <h1 className="text-xl font-semibold">Asset Stage</h1>
-          <div className="grid grid-cols-4 gap-4">
-            {FormGenerator(assetStageConfig())}
-          </div>
+            <h1 className="text-xl font-semibold">Asset Stage</h1>
+            <div className="grid grid-cols-4 gap-4">
+              {FormGenerator(assetStageConfig())}
+            </div>
 
-          <div className="grid  grid-cols-2  gap-2">
-            <AssetInfoSection asset={asset} />
-          </div>
-        </>
-        {/* )} */}
+            <div className="grid  grid-cols-2  gap-2">
+              <AssetInfoSection asset={asset} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
