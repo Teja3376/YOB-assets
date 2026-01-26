@@ -17,7 +17,7 @@ export const boardMembersFormConfig = ({
   }) as string | undefined;
   const watchedCountryCode = useWatch({
     control,
-    name: `boardOfDirectors.additionalBoardMembers.${index}.countryCode`,
+    name: `boardMembers.${index}.countryCode`,
   }) as string | undefined;
 
   const getCallingCode = (country?: string) => {
@@ -69,7 +69,7 @@ export const boardMembersFormConfig = ({
   return [
     {
       label: "Full Name",
-      name: `boardOfDirectors.additionalBoardMembers.${index}.fullName`,
+      name: `boardMembers.${index}.fullName`,
       type: "text",
       fullWidth: false,
       control,
@@ -92,7 +92,7 @@ export const boardMembersFormConfig = ({
     {
       control,
       label: "Email",
-      name: `boardOfDirectors.additionalBoardMembers.${index}.email`,
+      name: `boardMembers.${index}.email`,
       type: "email",
       fullWidth: false,
       rules: {
@@ -106,8 +106,8 @@ export const boardMembersFormConfig = ({
     {
       control,
       label: "Phone Number",
-      name: `boardOfDirectors.additionalBoardMembers.${index}.phoneNumber`,
-      selectName: `boardOfDirectors.additionalBoardMembers.${index}.countryCode`,
+      name: `boardMembers.${index}.phoneNumber`,
+      selectName: `boardMembers.${index}.countryCode`,
       type: "inputGroup",
       fullWidth: false,
       rules: {
@@ -132,11 +132,12 @@ export const boardMembersFormConfig = ({
     {
       control,
       label: "Select Role",
-      name: `boardOfDirectors.additionalBoardMembers.${index}.role`,
+      name: `boardMembers.${index}.role`,
       type: "select",
       options: [
-        { label: "Treasury Manger", value: "treasury-manager" },
-        { label: "Asset Manager", value: "asset-manager" },
+        { label: "Director", value: "DIRECTOR" },
+        { label: "Asset Manager", value: "Asset Manager" },
+        { label: "Investor Manager", value: "Investor Manager" },
       ],
       rules: {
         required: "Role is required",
@@ -144,7 +145,7 @@ export const boardMembersFormConfig = ({
     },
     {
       label: "Id Number",
-      name: `boardOfDirectors.additionalBoardMembers.${index}.idNumber`,
+      name: `boardMembers.${index}.idNumber`,
       type: "text",
       fullWidth: false,
       control,
@@ -167,7 +168,7 @@ export const boardMembersFormConfig = ({
     {
       control,
       label: "Id Proof",
-      name: `boardOfDirectors.additionalBoardMembers.${index}.idProof`,
+      name: `boardMembers.${index}.idProof`,
       type: "file",
       fullWidth: true,
       accept: ["png", "jpg", "jpeg", "pdf"],

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { handleCopy, maskId } from "@/helpers/global";
@@ -11,13 +11,13 @@ import { formatCurrencyFlexible, formatCompactNumber } from "@/lib/format.utils"
 import { SPV_TYPES } from "@/modules/SPV/utils/global";
 import TableComponent from "@/common/TableComponent";
 
-
 interface SPVTableProps {
-  data: any[];
-  setSpv: (spv: any) => void;
+  data?: any[];
 }
 
-const SPVTable: React.FC<SPVTableProps> = ({ data, setSpv }) => {
+const SPVTable: React.FC<SPVTableProps> = ({ data }) => {
+
+
   const columns: ColumnDef<any, any>[] = [
     {
       header: "Spv Id",
@@ -128,7 +128,7 @@ const SPVTable: React.FC<SPVTableProps> = ({ data, setSpv }) => {
         return (
           <Switch
             checked={isActive}
-            onCheckedChange={() => setSpv(info.row.original)}
+            onCheckedChange={() => data?.map((item: any) => item._id === info.row.original._id ? { ...item, status: isActive ? "active" : "inactive" } : item)}
             disabled={isActive && info.row.original.assets.length > 0}
           />
         );
@@ -157,7 +157,7 @@ const SPVTable: React.FC<SPVTableProps> = ({ data, setSpv }) => {
     },
   ];
 
-  return <TableComponent columns={columns} data={data} model="spv" />;
+  return <TableComponent columns={columns} data={data || []} model="spv" />;
 };
 
 export default SPVTable;

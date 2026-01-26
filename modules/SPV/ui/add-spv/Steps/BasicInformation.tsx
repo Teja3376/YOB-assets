@@ -5,19 +5,19 @@ import { Building2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 
 import FormGenerator from "@/components/use-form/FormGenerator";
-import { useFormConfig } from "@/modules/SPV/form-config/basicInformation";
+import { basicInformationFormConfig } from "@/modules/SPV/form-config/basicInformation";
 
 interface BasicInformationProps {
   spv?: any;
 }
 
 const BasicInformation: React.FC<BasicInformationProps> = ({ spv }) => {
-  const { control } = useFormContext<any>();
-
-  console.log(
-    "SPV data in Basic Information page",
-    spv ? spv : "N/A"
+  console.log("spv in basic information", spv);
+  const { control } = useFormContext<any>(
+    
   );
+
+  
 
   return (
     <div className="p-4 rounded-lg">
@@ -38,7 +38,7 @@ const BasicInformation: React.FC<BasicInformationProps> = ({ spv }) => {
 };
 
 const BasicInfo = ({ spv }: { spv: any }) => {
-  const config = useFormConfig({ spv });
+  const config = basicInformationFormConfig({ spv });
   return <>{FormGenerator(config)}</>;
 };
 

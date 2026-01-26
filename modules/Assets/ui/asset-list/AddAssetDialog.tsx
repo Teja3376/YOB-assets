@@ -11,7 +11,7 @@ interface AddAssetDialogProps {
 const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ open, setOpen }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-[900px] max-w-4xl">
+      <DialogContent className="w-225 max-w-4xl scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold">
             What type of asset class do you want to distribute?

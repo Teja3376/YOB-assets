@@ -39,7 +39,7 @@ export default function StepIndicator({
                     : 'hover:bg-gray-100 hover:text-gray-700'
                 }`}
               >
-                <p className='font-medium text-center'>{step.title}</p>
+                <p className='font-medium  text-center'>{step.title}</p>
               </button>
             </li>
           );

@@ -172,7 +172,7 @@ const Index: React.FC = () => {
                         placeholder="Search assets..."
                         value={search || ""}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-[200px] h-10"
+                        className="w-50 h-10"
                     />
 
                     <Button type="button" onClick={() => setOpen(true)}>

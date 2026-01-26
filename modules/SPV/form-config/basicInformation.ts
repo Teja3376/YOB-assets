@@ -5,15 +5,15 @@ import { useEffect, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 
-export const useFormConfig = ({ spv }: { spv: any }): FormFieldConfig[] => {
+export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConfig[] => {
   const { control, setValue } = useFormContext<any>();
   const params = useParams<{ id?: string; spvId?: string }>();
   const id = params?.spvId ?? params?.id;
-
   const jurisdiction = useWatch({ control, name: "jurisdiction" });
   const currency = useWatch({ control, name: "currency" });
 
   const autoSetCurrencyRef = useRef<string | null>(null);
+  console.log("spv in form config", spv);
 
 
   const countryCurrencyMap: Record<string, string> = {
@@ -43,23 +43,16 @@ export const useFormConfig = ({ spv }: { spv: any }): FormFieldConfig[] => {
 
   // Force update values when spv data changes
   useEffect(() => {
-    if (spv) {
-      const timer = setTimeout(() => {
-        if (spv.type) {
-          setValue("type", spv.type, {
-            shouldValidate: true,
-            shouldDirty: true,
+    if (spv && Object.keys(spv).length > 0) {
+      // Set all form values from SPV data
+      Object.keys(spv).forEach((key) => {
+        if (spv[key] !== undefined && spv[key] !== null) {
+          setValue(key as any, spv[key], {
+            shouldValidate: false,
+            shouldDirty: false,
           });
         }
-        if (spv.jurisdiction) {
-          setValue("jurisdiction", spv.jurisdiction, {
-            shouldValidate: true,
-            shouldDirty: true,
-          });
-        }
-      }, 100);
-
-      return () => clearTimeout(timer);
+      });
     }
   }, [spv, setValue]);
 

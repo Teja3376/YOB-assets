@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CustomTabs from "@/components/ui/custom-tab";
 import Pagination from "@/common/Pagination";
@@ -9,6 +9,7 @@ import SPVTable from "@/modules/SPV/ui/spv-list/spvtable";
 import SPVStatusDialog from "@/modules/SPV/ui/spv-list/spvstatusdialog";
 import { mockSpvData } from "@/modules/SPV/mock-data/mock-data-spv";
 import { useRouter } from "next/navigation";
+import useGetAllSpv from "../../hooks/useGetAllSpv";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25];
 
@@ -21,6 +22,20 @@ const SpvPage = () => {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const router = useRouter();
 
+  const { getAllSpv, getAllSpvStatus, error: getAllSpvError, responseData: getAllSpvResponseData } = useGetAllSpv();
+  
+  useEffect(() => {
+    getAllSpv({
+      page: currentPage,
+      limit: limit,
+      status: activeTab,
+      type: selectedFilters,
+      search: searchTerm,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, limit, activeTab, selectedFilters, searchTerm]);
+
+  console.log(getAllSpvResponseData);
   // -------------------------
   // Filters
   // -------------------------
@@ -69,21 +84,26 @@ const SpvPage = () => {
   // -------------------------
   // Tabs
   // -------------------------
+  // Extract data array from response (handle both nested and flat structures)
+  const spvData = Array.isArray(getAllSpvResponseData) 
+    ? getAllSpvResponseData 
+    : getAllSpvResponseData?.data || [];
+
   const tabs = [
     {
       id: "active",
       title: "Active",
-      component: <SPVTable data={paginatedData} setSpv={setSpv} />,
+      component: <SPVTable data={spvData}  />,
     },
     {
       id: "draft",
       title: "Drafts",
-      component: <SPVTable data={paginatedData} setSpv={setSpv} />,
+      component: <SPVTable data={spvData}  />,
     },
     {
       id: "inactive",
       title: "Inactive",
-      component: <SPVTable data={paginatedData} setSpv={setSpv} />,
+      component: <SPVTable data={spvData}  />,
     },
   ];
 

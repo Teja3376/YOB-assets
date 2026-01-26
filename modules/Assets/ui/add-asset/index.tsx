@@ -181,7 +181,7 @@ export default function AssetPage() {
   /* ------------------ UI ------------------ */
   if (isLoadingAsset && assetId) {
     return (
-      <div className="flex items-center justify-center min-h-[600px]">
+      <div className="flex items-center justify-center min-h-150">
         <Loading />
       </div>
     );

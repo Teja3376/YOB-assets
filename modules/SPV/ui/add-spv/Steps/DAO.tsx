@@ -61,7 +61,7 @@ const DAOCreation = () => {
             <div className=" py-4 border-t border-gray-100">
                 <span className="text-black font-medium block mb-3">Block Chain</span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {["polygon", "xdc", "xrpl"].map((chain) => (
+                    {["Ethereum", "Polygon", "XRPL"].map((chain) => (
                         <Button
                             key={chain}
                             variant={blockChain === chain ? "secondary" : "outline"}
@@ -87,48 +87,48 @@ const DAOCreation = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <Button
                         variant={
-                            governanceModel === "token-weighted" ? "secondary" : "outline"
+                            governanceModel === "Token-Weighted" ? "secondary" : "outline"
                         }
                         className="w-full h-12 justify-start px-4 relative"
                         type="button"
-                        onClick={() => handleGovernanceModelSelect("token-weighted")}
+                        onClick={() => handleGovernanceModelSelect("Token-Weighted")}
                     //   disabled={spv?.daoConfiguration?.governanceModel ? true : false}
                     >
                         <Coins className="text-gray-500 mr-2 h-5 w-5" />
                         <span>Token Weighted</span>
-                        {governanceModel === "token-weighted" && (
+                        {governanceModel === "Token-Weighted" && (
                             <Check className="absolute right-3 h-4 w-4" />
                         )}
                     </Button>
 
                     <Button
                         variant={
-                            governanceModel === "equal-voting" ? "secondary" : "outline"
+                            governanceModel === "Equal-Voting" ? "secondary" : "outline"
                         }
                         className="w-full h-12 justify-start px-4 relative"
                         type="button"
-                        onClick={() => handleGovernanceModelSelect("equal-voting")}
+                        onClick={() => handleGovernanceModelSelect("Equal-Voting")}
                     //   disabled={spv?.daoConfiguration?.governanceModel ? true : false}
                     >
                         <Users className="text-gray-500 mr-2 h-5 w-5" />
                         <span>Equal Voting</span>
-                        {governanceModel === "equal-voting" && (
+                        {governanceModel === "Equal-W" && (
                             <Check className="absolute right-3 h-4 w-4" />
                         )}
                     </Button>
 
                     <Button
                         variant={
-                            governanceModel === "reputatin-based" ? "secondary" : "outline"
+                            governanceModel === "Reputation-Based" ? "secondary" : "outline"
                         }
                         className="w-full h-12 justify-start px-4 relative"
                         type="button"
-                        onClick={() => handleGovernanceModelSelect("reputatin-based")}
+                        onClick={() => handleGovernanceModelSelect("Reputation-Based")}
                     //   disabled={spv?.daoConfiguration?.governanceModel ? true : false}
                     >
                         <Star className="text-gray-500 mr-2 h-5 w-5" />
                         <span>Reputation Based</span>
-                        {governanceModel === "reputatin-based" && (
+                        {governanceModel === "Reputation-Based" && (
                             <Check className="absolute right-3 h-4 w-4" />
                         )}
                     </Button>

@@ -40,6 +40,7 @@ export default function AssetClass({
 }) {
   const [selectedAsset, setSelectedAsset] = useState<AssetClass>("real-estate");
   const router = useRouter();
+  console.log("Selected Asset:", selectedAsset);
 
   const assetOptions: AssetOption[] = [
     {
@@ -102,24 +103,24 @@ export default function AssetClass({
 
   return (
     <div className="flex items-center justify-center">
-      <div className="bg-white ">
+      <div className="bg-white">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {assetOptions.map((option) => (
             <Button
               key={option.id}
               variant="outline"
               disabled={option.isDisabled}
-              className={`p-4 h-full cursor-pointer flex items-start gap-3 transition-all  ${
+              className={`p-4 h-full cursor-pointer flex items-start gap-3 transition-all hover:bg-yob-primary-light/30  ${
                 selectedAsset === option.id
-                  ? "ring-1 ring-primary bg-primary/10"
-                  : "hover:bg-gray-50"
+                  ? "ring-1 ring-yob-primary bg-yob-primary/10 "
+                  : "hover:bg-yob-primary-light"
               }`}
               onClick={() => setSelectedAsset(option.id)}
             >
               <div
                 className={`${
                   selectedAsset === option.id
-                    ? "text-primary bg-primary/10 "
+                    ? "text-yob-primary bg-yob-primary/10 "
                     : "text-gray-500 bg-gray-100 "
                 } mt-1 p-2 rounded-full`}
               >
@@ -131,7 +132,7 @@ export default function AssetClass({
               </div>
               <div className="flex items-center justify-center h-5 w-5 rounded-full border border-gray-300 ml-2">
                 {selectedAsset === option.id && (
-                  <div className="h-3 w-3 rounded-full bg-primary" />
+                  <div className="h-3 w-3 rounded-full bg-yob-primary" />
                 )}
               </div>
             </Button>
@@ -143,7 +144,7 @@ export default function AssetClass({
             Close
           </Button>
           <Button
-            className="bg-primary text-white"
+            className="bg-yob-primary text-white"
             onClick={() => router.push(`/assets/add-asset`)}
           >
             Next Step
