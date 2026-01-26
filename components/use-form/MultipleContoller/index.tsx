@@ -58,7 +58,7 @@ export default function MultiImageUploader({
     fileSize: file.size,
     refId: meta?.refId || '',
     belongsTo: meta?.belongsTo || '',
-    isPubilc: meta?.isPublic || false,
+    isPublic: meta?.isPublic || false,
     metadata: {}, // optional metadata if needed
   }));
 

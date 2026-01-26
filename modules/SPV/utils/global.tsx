@@ -16,10 +16,10 @@ export const SPV_TYPES = [
     { label: "Partnership", value: "Partnership" },
   ];
   export const BANK_ACCOUNT_TYPE = [
-    { label: "Escrow Bank Account", value: "escrow-bank-account" },
-    { label: "Current Account", value: "current-account" },
-    { label: "Corporate Account", value: "corporate-account" },
-    { label: "Saving Account", value: "savings-account" },
+    { label: "Escrow Bank Account", value: "Escrow" },
+    { label: "Current Account", value: "Current" },
+    { label: "Corporate Account", value: "Corporate" },
+    { label: "Saving Account", value: "Savings" },
   ];
 
   export interface SpvPayload {

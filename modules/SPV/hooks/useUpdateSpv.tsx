@@ -6,7 +6,7 @@ import { SPVType } from "../utils/global";
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 // Fields that should be excluded from update requests (MongoDB internal fields)
-const EXCLUDED_FIELDS = ['_id', 'userId', 'createdAt', 'updatedAt', '__v'];
+const EXCLUDED_FIELDS = ['_id', 'userId', 'createdAt', 'updatedAt', '__v', 'lastModified' , "webkitRelativePath" , "size" , "type" , "lastModifiedDate"];
 
 // Helper function to clean data by removing MongoDB internal fields
 const cleanUpdateData = (data: any): any => {
@@ -43,64 +43,64 @@ const useUpdateSpv = () => {
       const cleanData = cleanUpdateData(data);
       
       const res = await api.put(`/spv/${id}`, cleanData);
-      const hasRequiredData = 
-      data.daoConfiguration && 
-      data.daoConfiguration.blockchain && 
-      data.daoConfiguration.daoName &&
-      data.name && 
-      data.type && 
-      data.jurisdiction;
+      // const hasRequiredData = 
+      // data.daoConfiguration && 
+      // data.daoConfiguration.blockchain && 
+      // data.daoConfiguration.daoName &&
+      // data.name && 
+      // data.type && 
+      // data.jurisdiction;
     
-    if (hasRequiredData) {
+    // if (hasRequiredData) {
      
-         // Upload to IPFS first
-         const metadata = {
-           name: data.name,
-           spa_type: data.type,
-           currency: data.currency,
-           jurisdiction: data.jurisdiction,
-           businessPurpose: data.businessPurpose,
-           legalDocuments: [
-             {
-               articlesOfAssociation_name: data.legalDocuments?.articlesOfAssociation?.name || "",
-               articlesOfAssociation_url: data.legalDocuments?.articlesOfAssociation?.url || ""
-             },
-             {
-               llcOperatingAgreement_name: data.legalDocuments?.llcOperatingAgreement?.name || "",
-               llcOperatingAgreement_url: data.legalDocuments?.llcOperatingAgreement?.url || ""
-             },
-             {
-               memorandumOfAssociation_name: data.legalDocuments?.memorandumOfAssociation?.name || "",
-               memorandumOfAssociation_url: data.legalDocuments?.memorandumOfAssociation?.url || ""
-             },
-             {
-               otherDocuments_name: data.legalDocuments?.otherDocuments?.name || "",
-               otherDocuments_url: data.legalDocuments?.otherDocuments?.url || ""
-             }
-           ] as [
-             { articlesOfAssociation_name: string; articlesOfAssociation_url: string },
-             { llcOperatingAgreement_name: string; llcOperatingAgreement_url: string },
-             { memorandumOfAssociation_name: string; memorandumOfAssociation_url: string },
-             { otherDocuments_name: string; otherDocuments_url: string }
-           ]
-         };
+    //      // Upload to IPFS first
+    //      const metadata = {
+    //        name: data.name,
+    //        spa_type: data.type,
+    //        currency: data.currency,
+    //        jurisdiction: data.jurisdiction,
+    //        businessPurpose: data.businessPurpose,
+    //        legalDocuments: [
+    //          {
+    //            articlesOfAssociation_name: data.legalDocuments?.articlesOfAssociation?.name || "",
+    //            articlesOfAssociation_url: data.legalDocuments?.articlesOfAssociation?.url || ""
+    //          },
+    //          {
+    //            llcOperatingAgreement_name: data.legalDocuments?.llcOperatingAgreement?.name || "",
+    //            llcOperatingAgreement_url: data.legalDocuments?.llcOperatingAgreement?.url || ""
+    //          },
+    //          {
+    //            memorandumOfAssociation_name: data.legalDocuments?.memorandumOfAssociation?.name || "",
+    //            memorandumOfAssociation_url: data.legalDocuments?.memorandumOfAssociation?.url || ""
+    //          },
+    //          {
+    //            otherDocuments_name: data.legalDocuments?.otherDocuments?.name || "",
+    //            otherDocuments_url: data.legalDocuments?.otherDocuments?.url || ""
+    //          }
+    //        ] as [
+    //          { articlesOfAssociation_name: string; articlesOfAssociation_url: string },
+    //          { llcOperatingAgreement_name: string; llcOperatingAgreement_url: string },
+    //          { memorandumOfAssociation_name: string; memorandumOfAssociation_url: string },
+    //          { otherDocuments_name: string; otherDocuments_url: string }
+    //        ]
+    //      };
          
-        //  const ipfsResult = await uploadSpaFiles(metadata);
+    //     //  const ipfsResult = await uploadSpaFiles(metadata);
          
-         // Map the company type to the expected enum
-         const companyTypeMap: Record<string, SPVType> = {
-           'llc': SPVType.LLC,
-           'private-limited': SPVType.PrivateLimited,
-           'dao-llc': SPVType.DAOLLC,
-           'corporation': SPVType.Corporation,
-           'public-entity': SPVType.PublicEntity,
-           'partnership': SPVType.Partnership
-         };
+    //      // Map the company type to the expected enum
+    //      const companyTypeMap: Record<string, SPVType> = {
+    //        'llc': SPVType.LLC,
+    //        'private-limited': SPVType.PrivateLimited,
+    //        'dao-llc': SPVType.DAOLLC,
+    //        'corporation': SPVType.Corporation,
+    //        'public-entity': SPVType.PublicEntity,
+    //        'partnership': SPVType.Partnership
+    //      };
          
-         const companyType: SPVType = companyTypeMap[data.type];
+    //      const companyType: SPVType = companyTypeMap[data.type];
         
      
-    }
+    // }
     
     setStatus('success');
     toast.success('Spv updated successfully');

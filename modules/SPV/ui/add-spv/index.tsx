@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/LoadingSpinner";
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { toast } from "sonner";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import BasicInformation from "./Steps/BasicInformation";
 import Memos from "./Steps/Memos";
 import EscrowDetails from "./Steps/EscrowDetails";
@@ -29,6 +29,7 @@ import useCreateSpv from "../../hooks/useCreateSpv";
 import useUpdateSpv from "../../hooks/useUpdateSpv";
 import useGetSpvWithId from "../../hooks/useGetSpvWithId";
 import normalizedSpv from "../../utils/normalizedspv";
+
 const DEFAULT_STEP = "basic-information";
 
 interface SpvFormData {
@@ -36,60 +37,167 @@ interface SpvFormData {
     [key: string]: any;
 }
 
+const STEP_IDS = [
+    "basic-information",
+    "memo-terms",
+    "escrow-bank-details",
+    "legal-documents",
+    "board-members",
+    "dao-integration",
+] as const;
+
 const SpvFormPage = () => {
-    //routers to navigate
     const router = useRouter();
-    //getting spv id from url
+    const searchParams = useSearchParams();
     const { spvId: id } = useParams();
-    //creating spv hooks
-    const { createSpv, loading: createLoading, responseData: createResponseData, error: createError } = useCreateSpv();
-    //updating spv hooks
-    const { updateSpv, status: updateStatus, error: updateError, responseData: updateResponseData } = useUpdateSpv();
-    //getting spv with id hooks
-    const { getSpvWithId, status: getSpvWithIdStatus, error: getSpvWithIdError, responseData: getSpvWithIdResponseData } = useGetSpvWithId();
+
+    const { createSpv, loading: createLoading } = useCreateSpv();
+    const { updateSpv, status: updateStatus } = useUpdateSpv();
+    const { getSpvWithId, status: getSpvWithIdStatus, responseData: getSpvWithIdResponseData } = useGetSpvWithId();
+
     const normalizedSpvData = useMemo(() => normalizedSpv(getSpvWithIdResponseData), [getSpvWithIdResponseData]);
-    console.log("normalizedSpvData", normalizedSpvData);
+
+    const step = (searchParams.get("step") as (typeof STEP_IDS)[number]) || DEFAULT_STEP;
+    const basePath = id ? `/spv/edit-spv/${id}` : "/spv/add-spv";
+
     useEffect(() => {
-        const fetchSpv = async () => {
-          if (id) {
-           
-            try {
-              await getSpvWithId(id as string);
-            } catch (error: any) {
-              toast.error(error.response?.data?.message || "Failed to fetch Spv");
-            }
-          }
-        };
-        fetchSpv();
-      }, [id]);
-    
+        if (id) {
+            getSpvWithId(id as string).catch((err: any) => {
+                toast.error(err.response?.data?.message || "Failed to fetch SPV");
+            });
+        }
+    }, [id]);
+
     const methods = useForm<SpvFormData>({
-        defaultValues: {
-            completedSteps: [],
-        },
+        defaultValues: { completedSteps: [] },
         mode: "onBlur",
     });
 
-    // Populate form when SPV data is loaded
     useEffect(() => {
         if (normalizedSpvData && Object.keys(normalizedSpvData).length > 0 && id) {
-            // Reset form with SPV data
             methods.reset({
                 ...normalizedSpvData,
-                completedSteps: normalizedSpvData.completedSteps || methods.getValues("completedSteps") || [],
-            }, {
-                keepDefaultValues: false,
-            });
+                completedSteps: normalizedSpvData.completedSteps ?? methods.getValues("completedSteps") ?? [],
+            }, { keepDefaultValues: false });
         }
     }, [normalizedSpvData, id, methods]);
 
-
     const { watch } = methods;
     const { isDirty } = methods.formState;
-    const completedSteps = watch("completedSteps") || [];
+    const completedSteps = watch("completedSteps") ?? [];
 
-    const [step, setStep] = useState(DEFAULT_STEP);
-    /** Highest step index reached via Next; used to restrict stepper in create mode */
+    const steps = useMemo(
+        () => [
+            {
+                id: "basic-information",
+                title: "Basic Information",
+                description: "Company details",
+                icon: <FileText className="h-5 w-5" />,
+                disabled: false,
+                completed: !!id,
+            },
+            {
+                id: "memo-terms",
+                title: "Memo & Terms",
+                description: "Legal agreements",
+                icon: <FileSignature className="h-5 w-5" />,
+                disabled: !id,
+                completed: !!id && completedSteps.includes("memo-terms"),
+            },
+            {
+                id: "escrow-bank-details",
+                title: "Escrow Bank Details",
+                description: "Financial information",
+                icon: <Building2 className="h-5 w-5" />,
+                disabled: !id || !completedSteps.includes("memo-terms"),
+                completed: completedSteps.includes("escrow-bank-details"),
+            },
+            {
+                id: "legal-documents",
+                title: "Legal Documents",
+                description: "Required paperwork",
+                icon: <ClipboardCheck className="h-5 w-5" />,
+                disabled: !id || !completedSteps.includes("escrow-bank-details"),
+                completed: completedSteps.includes("legal-documents"),
+            },
+            {
+                id: "board-members",
+                title: "Board Members",
+                description: "Leadership team",
+                icon: <Users className="h-5 w-5" />,
+                disabled: !id || !completedSteps.includes("legal-documents"),
+                completed: completedSteps.includes("board-members"),
+            },
+            {
+                id: "dao-integration",
+                title: "DAO Integration",
+                description: "Blockchain setup",
+                icon: <Wallet2 className="h-5 w-5" />,
+                disabled: !id || !completedSteps.includes("board-members"),
+                completed: completedSteps.includes("dao-integration"),
+            },
+        ],
+        [id, completedSteps]
+    );
+
+    const currentIndex = steps.findIndex((s) => s.id === step);
+    const isFirstStep = currentIndex <= 0;
+    const isLastStep = currentIndex >= steps.length - 1;
+    const isSaving = createLoading || updateStatus === "loading";
+
+    const changeStep = (stepId: string) => {
+        router.push(`${basePath}?step=${stepId}`);
+    };
+
+    const handleBack = () => {
+        if (!isFirstStep) router.push(`${basePath}?step=${steps[currentIndex - 1].id}`);
+    };
+
+    const handleNext = async () => {
+        const isValid = await methods.trigger();
+        if (!isValid) return;
+
+        if (step === "board-members") {
+            const data = methods.getValues();
+            if (!data.boardOfDirectors?.additionalBoardMembers?.length) {
+                toast.error("Please add at least one board member.");
+                return;
+            }
+        }
+
+        if (isLastStep || !id) return;
+
+        const data = methods.getValues();
+        const nextCompleted = completedSteps.includes(step) ? completedSteps : [...completedSteps, step];
+        const payload = { ...data, completedSteps: nextCompleted } as any;
+
+        try {
+            await updateSpv(id as string, payload);
+            methods.setValue("completedSteps", nextCompleted, { shouldDirty: false });
+            router.push(`${basePath}?step=${steps[currentIndex + 1].id}`);
+        } catch (err: any) {
+            console.error(err.response?.data?.message ?? "SPV save failed");
+        }
+    };
+
+    const onSubmit: SubmitHandler<SpvFormData> = async (data) => {
+        const payload = { ...data } as any;
+        try {
+            if (id) {
+                const nextCompleted = completedSteps.includes(step)
+                    ? completedSteps
+                    : [...completedSteps, step];
+                payload.completedSteps = nextCompleted;
+                await updateSpv(id as string, payload);
+                methods.setValue("completedSteps", nextCompleted, { shouldDirty: false });
+            } else {
+                payload.completedSteps = [step];
+                await createSpv(payload);
+            }
+        } catch (err: any) {
+            console.error(err.response?.data?.message ?? "SPV save failed");
+        }
+    };
 
     const renderStepContent = useMemo(() => {
         switch (step) {
@@ -110,105 +218,31 @@ const SpvFormPage = () => {
         }
     }, [step, normalizedSpvData]);
 
-  
-    const steps = useMemo(
-        () => [
-            {
-                id: "basic-information",
-                title: "Basic Information",
-                description: "Company details",
-                icon: <FileText className="h-5 w-5" />,
-            },
-            {
-                id: "memo-terms",
-                title: "Memo & Terms",
-                description: "Legal agreements",
-                icon: <FileSignature className="h-5 w-5" />,
-            },
-            {
-                id: "escrow-bank-details",
-                title: "Escrow Bank Details",
-                description: "Financial information",
-                icon: <Building2 className="h-5 w-5" />,
-            },
-            {
-                id: "legal-documents",
-                title: "Legal Documents",
-                description: "Required paperwork",
-                icon: <ClipboardCheck className="h-5 w-5" />,
-            },
-            {
-                id: "board-members",
-                title: "Board Members",
-                description: "Leadership team",
-                icon: <Users className="h-5 w-5" />,
-            },
-            {
-                id: "dao-integration",
-                title: "DAO Integration",
-                description: "Blockchain setup",
-                icon: <Wallet2 className="h-5 w-5" />,
-            },
-        ],
-        []
-    );
+    if (getSpvWithIdStatus === "loading" && id) {
+        return (
+            <div className="container mx-auto px-6 py-8 flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <LoadingSpinner size="h-16 w-16" />
+                    <p className="mt-4 text-muted-foreground">Loading SPV data...</p>
+                </div>
+            </div>
+        );
+    }
 
-    const currentIndex = steps.findIndex((s) => s.id === step);
-    const isFirstStep = currentIndex === 0;
-    const isLastStep = currentIndex === steps.length - 1;
-
-    const handleBack = () => {
-        if (!isFirstStep) {
-            setStep(steps[currentIndex - 1].id);
-        }
-    };
-
-    const handleNext = async () => {
-        const isValid = await methods.trigger();
-        if (!isValid) return;
-
-        if (step === "board-members") {
-            const data = methods.getValues();
-            if (
-                !data.boardOfDirectors?.additionalBoardMembers?.length
-            ) {
-                toast.error("Please add at least one board member.");
-                return;
-            }
-        }
-
-        if (!isLastStep) {
-            setStep(steps[currentIndex + 1].id);
-        }
-    };
-        //assset submoit logic
-
-    const onSubmit: SubmitHandler<any> = async (data: any) => {
-        const payload = { ...data };
-        console.log("paylaod is here @##$#", payload);
-        try {
-          if (id) {
-            payload.completedSteps = completedSteps.includes(step)
-              ? completedSteps
-              : [...completedSteps, step];
-            await updateSpv(id as string, payload);
-          } else {
-            payload.completedSteps = [step];
-            await createSpv(payload);
-          }
-        } catch (error: any) {
-          console.error(error.response?.data?.message || "SPV save failed");
-        } 
-      };
-
-  
     return (
-        <div className="container mx-auto   px-6 py-8 space-y-4">
-            {createLoading && (
+        <div className="container mx-auto px-6 py-8 space-y-4">
+            {isSaving && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-                    <LoadingSpinner size="h-12 w-12" />
+                    <div className="bg-background rounded-lg p-8 shadow-xl flex flex-col items-center gap-4">
+                        <LoadingSpinner size="h-12 w-12" />
+                        <p className="text-lg font-medium">
+                            {id ? "Updating SPV..." : "Creating SPV..."}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Please wait</p>
+                    </div>
                 </div>
             )}
+
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
                     {id ? "Update" : "Create"} SPV
@@ -216,7 +250,7 @@ const SpvFormPage = () => {
                 <Button
                     onClick={() => router.push("/spv")}
                     variant="outline"
-                    disabled={createLoading}
+                    disabled={isSaving}
                 >
                     <span className="flex items-center gap-2">
                         <ArrowLeft className="h-4 w-4" />
@@ -227,19 +261,17 @@ const SpvFormPage = () => {
 
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
-                    <Stepper steps={steps} currentStepId={step} onStepChange={setStep} />
+                    <Stepper steps={steps} currentStepId={step} onStepChange={changeStep} />
 
                     <div className="border rounded-lg mt-4 p-4">
-                        <Suspense fallback={<Loading />}>
-                            {renderStepContent}
-                        </Suspense>
+                        <Suspense fallback={<Loading />}>{renderStepContent}</Suspense>
                     </div>
 
                     <div className="flex justify-between items-center mt-6">
                         <Button
                             type="button"
                             variant="outline"
-                            disabled={isFirstStep}
+                            disabled={isFirstStep || isSaving}
                             onClick={handleBack}
                         >
                             <ArrowLeft className="mr-2" />
@@ -250,9 +282,9 @@ const SpvFormPage = () => {
                             <Button
                                 type="submit"
                                 className="px-3 text-white transition-colors duration-200 flex items-center gap-2"
-                                disabled={createLoading || !isDirty}
+                                disabled={isSaving || !isDirty}
                             >
-                                {createLoading ? (
+                                {isSaving ? (
                                     <>
                                         <LoadingSpinner size="h-4 w-4" className="mr-2" />
                                         {id ? "Updating..." : "Creating..."}
@@ -268,7 +300,7 @@ const SpvFormPage = () => {
                             <Button
                                 type="button"
                                 variant="outline"
-                                disabled={isLastStep}
+                                disabled={isLastStep || !id || isDirty || isSaving}
                                 onClick={handleNext}
                             >
                                 Next
