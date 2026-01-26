@@ -73,7 +73,7 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
       fileSize: file.size,
       refId: meta?.refId || '',
       belongsTo: meta?.belongsTo || '',
-      isPubilc: meta?.isPublic || false,
+      isPublic: meta?.isPublic || false,
     }).then(async (res: any) => {
       await uploadFile({ url: res.uploadUrl, file }).then(async (r: any) => {
         if (r.status === 200) {

@@ -10,9 +10,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-// import useSinglePresignedUrl from "@/hooks/file/useSinglePresignedUrl";
-// import useSingleFileUpload from "@/hooks/file/useSingleFileUpload";
-// import useGetSingleFileUrl from "@/hooks/file/useGetSingleFileUrl";
+import useSinglePresignedUrl from "../../../modules/FileUpload/useSinglePresignedUrl";
+import useSingleFileUpload from "../../../modules/FileUpload/useSingleFileUpload";
+import useGetSingleFileUrl from "../../../modules/FileUpload/useGetSingleFileUrl";
 
 interface FileUploadProps {
   name: string;
@@ -39,9 +39,9 @@ function FileUploadController({
   meta,
   isDirty = true,
 }: FileUploadProps) {
-//   const { getSinglePresignedUrl } = useSinglePresignedUrl();
-//   const { uploadFile } = useSingleFileUpload();
-//   const { getFileUrl } = useGetSingleFileUrl();
+  const { getSinglePresignedUrl } = useSinglePresignedUrl();
+  const { uploadFile } = useSingleFileUpload();
+  const { getFileUrl } = useGetSingleFileUrl();
   const {
     setValue,
     watch,
@@ -53,55 +53,56 @@ function FileUploadController({
   const file = values?.name;
   const fileUrl = values?.url;
 
-//   const handleFileChange = async (
-//     e: React.ChangeEvent<HTMLInputElement>,
-//     onChange: (value: File | null) => void
-//   ) => {
-//     const selectedFile = e.target.files?.[0];
-//     if (!selectedFile) return;
-//     // Validate file size if maxSize is provided
-//     if (maxSize && selectedFile.size > maxSize) {
-//       setError(
-//         name,
-//         {
-//           type: "manual",
-//           message: `File size exceeds the limit of ${maxSize / 1024 / 1024} MB`,
-//         },
-//         { shouldFocus: true }
-//       );
-//       return;
-//     }
-//     await getSinglePresignedUrl({
-//       fileName: selectedFile.name,
-//       mimeType: selectedFile.type,
-//       fileSize: selectedFile.size,
-//       refId: meta?.refId || "",
-//       belongsTo: meta?.belongsTo || "",
-//       isPubilc: meta?.isPublic || false,
-//     }).then(async (res) => {
-//       await uploadFile({ url: res.uploadUrl, file: selectedFile }).then(
-//         async (r) => {
-//           if (r.status === 200) {
-//             await getFileUrl(res.savedS3Object._id).then((fileReponse) => {
-//               setValue(
-//                 name,
-//                 {
-//                   name: selectedFile.name,
-//                   url: fileReponse.s3Url,
-//                 },
-//                 {
-//                   shouldDirty: isDirty,
-//                   shouldTouch: isDirty,
-//                   shouldValidate: isDirty,
-//                 }
-//               );
-//             });
-//           }
-//         }
-//       );
-//     });
-//     // onChange(selectedFile);
-//   };
+  const handleFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    onChange: (value: File | null) => void
+  ) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    // Validate file size if maxSize is provided
+    if (maxSize && selectedFile.size > maxSize) {
+      setError(
+        name,
+        {
+          type: "manual",
+          message: `File size exceeds the limit of ${maxSize / 1024 / 1024} MB`,
+        },
+        { shouldFocus: true }
+      );
+      return;
+    }
+    await getSinglePresignedUrl({
+      fileName: selectedFile.name,
+      mimeType: selectedFile.type,
+      fileSize: selectedFile.size,
+      refId: meta?.refId || "",
+      belongsTo: meta?.belongsTo || "",
+      isPublic: meta?.isPublic || false,
+    }).then(async (res) => {
+      await uploadFile({ url: res.data.uploadUrl, file: selectedFile }).then(
+        async (r) => {
+          if (r.status === 200) {
+            await getFileUrl(res.data.assetS3Object._id).then((fileReponse) => {
+              console.log("fileReponse", fileReponse.data);
+              setValue(
+                name,
+                {
+                  name: selectedFile.name,
+                  url: fileReponse.data.url,
+                },
+                {
+                  shouldDirty: isDirty,
+                  shouldTouch: isDirty,
+                  shouldValidate: isDirty,
+                }
+              );
+            });
+          }
+        }
+      );
+    });
+    // onChange(selectedFile);
+  };
 
   const handleRemove = (onChange: (value: null) => void) => {
     setValue(
@@ -222,7 +223,7 @@ function FileUploadController({
                   className="sr-only"
                   id={`file-${name}`}
                   accept={accept?.map((ext) => `.${ext}`).join(",")}
-                //   onChange={(e) => handleFileChange(e, onChange)}
+                  onChange={(e) => handleFileChange(e, onChange)}
                   aria-describedby={`${name}-error`}
                 />
               </div>
