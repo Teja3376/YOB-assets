@@ -12,7 +12,7 @@ export default function useCreateExpense() {
       expenseData: any;
       assetId: string;
     }) => {
-      const response = await api.post(`/expense`, expenseData);
+      const response = await api.post(`/expense?assetId=${assetId}`, expenseData);
       return response.data.data;
     },
     onSuccess: () => {

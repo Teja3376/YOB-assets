@@ -42,7 +42,7 @@ const Index = ({ asset }: { asset: any }) => {
               {FormGenerator(formConfig(asset))}
             </div>
             <div>
-              <Investor />
+              <Investor  />
             </div>
             </div>
           ) : (

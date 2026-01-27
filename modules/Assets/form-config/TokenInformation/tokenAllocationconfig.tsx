@@ -138,14 +138,14 @@ const formConfig = (asset: Asset): FormFieldConfig[] => {
       label: `Token Price (${asset?.currency})`,
       type: "number",
       control: control,
-      disabled: disable,
+      disabled: true,
     },
     {
       name: "basePropertyValue",
       label: `Base Property Value (${asset?.currency })`,
       type: "number",
       control: control,
-      disabled: disable,
+      disabled: true,
     },
   ];
 };

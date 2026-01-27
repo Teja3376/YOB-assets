@@ -10,9 +10,9 @@ import DeleteTenantDialog from "./DeleteTenantDialog";
 import { tenantConfig } from "@/modules/Assets/form-config/AssetInformation/tenant-configs/tenantConfig";
 import { useWatch } from "react-hook-form";
 import { useCreateTenant } from "@/modules/Assets/hooks/tenant/useCreateTenant";
-import { useUpdateTenant } from "@/modules/Assets/hooks/tenant/useUpdateTenant";
 import useDeleteTenant from "@/modules/Assets/hooks/tenant/useDeleteTenant";
 import useGetAssetById from "@/modules/Assets/hooks/useGetAssetById";
+import useUpdateTenant from "@/modules/Assets/hooks/tenant/useUpdateTenant";
 import { toast } from "sonner";
 
 const TenantManagement = () => {

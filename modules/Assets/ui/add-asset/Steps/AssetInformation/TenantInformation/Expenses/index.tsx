@@ -1,6 +1,9 @@
 import { useState } from "react";
 import FormGenerator from "@/components/use-form/FormGenerator";
-import { expenseFormConfig, formConfig } from "@/modules/Assets/form-config/AssetInformation/expensesConfig";
+import {
+  expenseFormConfig,
+  formConfig,
+} from "@/modules/Assets/form-config/AssetInformation/expensesConfig";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 // import { useExpenses } from "@/hooks/asset/useExpenses";
@@ -10,13 +13,19 @@ import DeleteDialog from "./DeleteDialog";
 import ExpenseTable from "./ExpenseTable";
 import { formatCompactNumber } from "@/lib/format.utils";
 import Expenses from "./Expenses";
+import useCreateExpense from "@/modules/Assets/hooks/expenses/useCreateExpense";
+import { toast } from "sonner";
+import useUpdateExpense from "@/modules/Assets/hooks/expenses/useUpdateExpense";
+import useDeleteExpense from "@/modules/Assets/hooks/expenses/useDeleteExpense";
 
 const index = ({ asset }: { asset?: any }) => {
   const { assetId } = useParams<{ assetId?: string }>();
   // const { updateExpenses, createExpenses, deleteExpenses } = useExpenses();
-  const [updateExpenses, setUpdateExpenses] = useState<any>(null);
-  const [createExpenses, setCreateExpenses] = useState<any>(null);
-  const [deleteExpenses, setDeleteExpenses] = useState<any>(null);
+
+  const { mutate: createExpense, isPending: isCreating } = useCreateExpense();
+  const { mutate: updateExpense, isPending: isUpdating } = useUpdateExpense();
+  const { mutate: deleteExpense, isPending: isDeleting } = useDeleteExpense();
+
   const {
     watch,
     control,
@@ -33,36 +42,90 @@ const index = ({ asset }: { asset?: any }) => {
   });
 
   const onSubmit = async () => {
-    trigger(`expenses.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.expenses[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateExpenses(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          const data = {
-            name: values.name,
-            value: values.value,
-            isPercentage: values.isPercentage ? values.isPercentage : false,
-            status: values.status ? values.status : false,
-          };
-          await createExpenses({ ...data, assetId: assetId ?? "" }).then((res: any) => {
-            append({ ...data, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+    const valid = await trigger(`expenses.${index}`);
+
+    if (!valid) return;
+    const data = formGetValues();
+    console.log("Submitting expense data:", data.expenses);
+    const values = data.expenses[index ?? -1];
+    if (isEdit && index !== null) {
+      const { expense_id, ...data } = values;
+      updateExpense(
+        { expenseData: data, expenseId: values._id },
+        {
+          onSuccess: (res: any) => {
+            console.log("Expense updated successfully:", res);
+            update(index ?? -1, { ...values });
+            toast.success("Expense updated successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error updating expense:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update expense",
+            );
+          },
+        },
+      );
+    } else {
+      const data = {
+        name: values.name,
+        value: values.value,
+        isPercentage: values.isPercentage ? values.isPercentage : false,
+        status: values.status ? values.status : false,
+      };
+      createExpense(
+        { expenseData: data, assetId: assetId ?? "" },
+        {
+          onSuccess: (res: any) => {
+            console.log("Expense created successfully:", res);
+            append({ ...data, expense_id: res._id });
+            toast.success("Expense created successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error creating expense:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to create expense",
+            );
+          },
+        },
+      );
+    }
+    // trigger(`expenses.${index}`).then(async (isValid) => {
+    //   if (isValid) {
+    //     const data = formGetValues();
+    //     const values = data.expenses[index ?? -1];
+    //     if (isEdit) {
+    //       if (index !== null) {
+    //         await updateExpenses(values._id, { ...values });
+    //       }
+    //       update(index ?? -1, { ...values });
+    //     } else {
+    //       const data = {
+    //         name: values.name,
+    //         value: values.value,
+    //         isPercentage: values.isPercentage ? values.isPercentage : false,
+    //         status: values.status ? values.status : false,
+    //       };
+    //       await createExpenses({ ...data, assetId: assetId ?? "" }).then(
+    //         (res: any) => {
+    //           append({ ...data, _id: res._id });
+    //         },
+    //       );
+    //     }
+    //     setIndex(null);
+    //     clearErrors();
+    //   }
+    // });
   };
 
   const totalNumberOfSfts = watch("totalNumberOfSfts");
   const vacancyRate = watch("rentalInformation.vacancyRate");
   const rentPerSft = watch("rentalInformation.rentPerSft");
-  console.log(asset, "asset", asset.currency, "currency")
+  console.log(asset, "asset", asset.currency, "currency");
 
   let rentNumberOfSfts =
     totalNumberOfSfts - (vacancyRate / 100) * totalNumberOfSfts || 0;
@@ -92,13 +155,32 @@ const index = ({ asset }: { asset?: any }) => {
   };
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
+    // setDeleteIndex(null);
+    // const data = formGetValues();
+    // const values = data.expenses[deleteIndex ?? -1];
+    // if (deleteIndex !== null) {
+    //   remove(deleteIndex);
+    //   await deleteExpenses(values._id);
+    // }
+    if (deleteIndex === null) return;
+
     const data = formGetValues();
-    const values = data.expenses[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteExpenses(values._id);
-    }
+    const values = data.expenses[deleteIndex];
+
+    deleteExpense(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Fee deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete fee. Please try again.",
+        );
+      },
+    });
   };
 
   const expenses = fields
@@ -139,13 +221,13 @@ const index = ({ asset }: { asset?: any }) => {
             actionHandlers={{
               onEdit: (item) => {
                 const findIndex = fields.findIndex(
-                  (field) => field.expense_id === item.expense_id
+                  (field) => field.expense_id === item.expense_id,
                 );
                 setIndex(findIndex);
               },
               onDelete: (item) => {
                 const findIndex = fields.findIndex(
-                  (field) => field.expense_id === item.expense_id
+                  (field) => field.expense_id === item.expense_id,
                 );
                 setDeleteIndex(findIndex);
               },
@@ -171,7 +253,6 @@ const index = ({ asset }: { asset?: any }) => {
             netRent={formatCompactNumber(netRent * 12)}
             extraText="Monthly x12"
             currency={asset?.currency ?? ""}
-
           />
         </div>
 

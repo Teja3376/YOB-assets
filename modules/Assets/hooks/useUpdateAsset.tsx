@@ -14,7 +14,30 @@ export default function useUpdateAsset() {
       assetData: any;
       assetId: string;
     }) => {
-      const cleanedData = cleanUpdateData(assetData);
+      const {
+        assumpationsEsclation,
+        assumptionInterestRateonDeposit,
+        totalDeposit,
+        ...rest
+      } = assetData;
+
+      console.log(
+        "RAW DATE:",
+        assetData.investorRequirementsAndTimeline.distributionStartDate,
+      );
+      console.log(
+        "IS DATE:",
+        assetData.investorRequirementsAndTimeline.distributionStartDate instanceof
+          Date,
+      );
+      console.log(
+        "STRINGIFIED:",
+        JSON.stringify(
+          assetData.investorRequirementsAndTimeline.distributionStartDate,
+        ),
+      );
+
+      const cleanedData = cleanUpdateData(rest);
       const response = await api.put(`/real-estate/${assetId}`, cleanedData);
       return response.data.data;
     },

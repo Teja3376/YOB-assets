@@ -16,7 +16,7 @@ export const maskId = (id: string, tag: string) => {
 };
 export function removeKeyFromObject<T extends Record<string, any>>(
   obj: T | null | undefined,
-  keys: string | string[]
+  keys: string | string[],
 ): T {
   // Handle null or undefined input
   if (!obj || typeof obj !== "object") {
@@ -58,17 +58,33 @@ export const CURRENCY_OPTIONS = [
   { label: "USD", value: "USD" },
 ];
 
-
-export const EXCLUDED_FIELDS = ['_id', 'userId', 'issuerId','createdAt', 'updatedAt', '__v', 'lastModified' , "webkitRelativePath" , "size" , "type" , "lastModifiedDate"];
+export const EXCLUDED_FIELDS = [
+  "_id",
+  "userId",
+  "issuerId",
+  "createdAt",
+  "updatedAt",
+  "__v",
+  "lastModified",
+  "webkitRelativePath",
+  "size",
+  "type",
+  "lastModifiedDate",
+];
 
 export const cleanUpdateData = (data: any): any => {
   if (data === null || data === undefined) return data;
-  
-  if (Array.isArray(data)) {
-    return data.map(item => cleanUpdateData(item));
+
+  // ✅ KEEP DATES
+  if (data instanceof Date) {
+    return data.toISOString(); // or return data if backend supports Date
   }
-  
-  if (typeof data === 'object') {
+
+  if (Array.isArray(data)) {
+    return data.map((item) => cleanUpdateData(item));
+  }
+
+  if (typeof data === "object") {
     const cleaned: any = {};
     for (const key in data) {
       if (!EXCLUDED_FIELDS.includes(key)) {
@@ -77,6 +93,6 @@ export const cleanUpdateData = (data: any): any => {
     }
     return cleaned;
   }
-  
+
   return data;
 };

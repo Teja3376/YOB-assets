@@ -238,7 +238,7 @@ export default function AssetPage() {
       <FormProvider {...methods}>
         <FormModeProvider isReadOnly={isReadOnly}>
           <form
-            className="bg-white rounded-lg ml-2 py-2 px-4 w-full"
+            className="bg-white rounded-lg ml-2 py-2 px-2 w-full"
             onSubmit={methods.handleSubmit(onSubmit)}
           >
             <Suspense fallback={<LoadingSpinner />}>

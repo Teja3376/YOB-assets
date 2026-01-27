@@ -6,14 +6,16 @@ import {
 import { useFormContext } from "react-hook-form";
 
 const investorConfig = (): FormFieldConfig[] => {
-  const { control, watch } = useFormContext();
+  const { control, watch, getValues } = useFormContext();
   const totalPropertyValueAfterFees = watch("totalPropertyValueAfterFees");
   const totalNumberOfSfts = watch("totalNumberOfSfts");
   const vacancyRate = watch("rentalInformation.vacancyRate");
   const rentPerSft = watch("rentalInformation.rentPerSft");
   const startDate = watch(
-    `investorRequirementsAndTimeline.distributionStartDate`
+    `investorRequirementsAndTimeline.distributionStartDate`,
   );
+
+  console.log("startDate", getValues("investorRequirementsAndTimeline"));
 
   const fields = watch("expenses") || [];
 
@@ -51,13 +53,13 @@ const investorConfig = (): FormFieldConfig[] => {
     "totalPropertyValueAfterFees",
     totalPropertyValueAfterFees,
     "netAnnualRent",
-    netAnnualRent
+    netAnnualRent,
   );
 
   const rentalYield = parseFloat(
     totalPropertyValueAfterFees && netAnnualRent
       ? ((netAnnualRent / totalPropertyValueAfterFees) * 100).toFixed(2)
-      : "0"
+      : "0",
   );
 
   return [

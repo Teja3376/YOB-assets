@@ -52,6 +52,8 @@ const DateController: React.FC<DateControllerProps> = ({
       disabled={disabled}
       rules={rules}
       render={({ field }) => {
+        console.log("Rendering DateController for:", name, field.value);
+
         return (
           <FormItem>
             <FormLabel>
@@ -111,7 +113,13 @@ const DateController: React.FC<DateControllerProps> = ({
 
                 <Calendar
                   mode="single"
-                  selected={field.value ? new Date(field.value) : undefined}
+                  selected={
+                    field.value instanceof Date
+                      ? field.value
+                      : field.value
+                        ? new Date(field.value)
+                        : undefined
+                  }
                   captionLayout="dropdown" // ✅ enables month + year dropdown
                   startMonth={new Date(1900, 0)} // replaces fromYear/fromDate
                   endMonth={allowFutureDates ? new Date(2100, 11) : today} // replaces toYear/toDate
@@ -119,6 +127,13 @@ const DateController: React.FC<DateControllerProps> = ({
                     before: allowFutureDates ? undefined : new Date(1900, 0, 1),
                     after: allowFutureDates ? new Date(2100, 11, 31) : today,
                   }}
+                  month={
+                    field.value
+                      ? field.value instanceof Date
+                        ? field.value
+                        : new Date(field.value)
+                      : today
+                  }
                   disabled={(date) => {
                     const blockedByFutureFlag = allowFutureDates
                       ? false
@@ -133,6 +148,7 @@ const DateController: React.FC<DateControllerProps> = ({
                   }}
                   onSelect={(date) => {
                     if (date) {
+                      console.log("Selected date:", date);
                       field.onChange(date);
                       field.onBlur();
                       if (autoClose) {
