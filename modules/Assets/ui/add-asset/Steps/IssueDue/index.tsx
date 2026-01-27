@@ -8,6 +8,7 @@ import Loading from '@/components/ui/Loading';
 import AssetHostedBy from './AssetHostedBy';
 import IssueDueDeligence from './IssueDueDeligence';
 import { useRouter } from 'next/navigation';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Props {
   tab: string;
@@ -60,12 +61,12 @@ const IssuesDue = memo(({ tab, step, asset }: Props) => {
 
     const componentMap: Record<string, JSX.Element> = {
       'asseet-hosted-by': (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <AssetHostedBy countryCode={countryCode} />
         </Suspense>
       ),
       'asseet-due-diligence': (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <IssueDueDeligence />
         </Suspense>
       ),

@@ -3,9 +3,9 @@ import get from 'lodash/get';
 import { X, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Controller, useFormContext } from 'react-hook-form';
-// import useMultiplePresignedUrl from '@/hooks/file/useMultiplePresignedUrl';
-// import useMultipleFileUpload from '@/hooks/file/useMultipleFileUpload';
-// import useGetMultipleFileUrl from '@/hooks/file/useGetMultipleFileUrl';
+import useMultiplePresignedUrl from '../../../modules/FileUpload/useMultiplePresignedUrl';
+import useMultipleFileUpload from '../../../modules/FileUpload/useMultipleFileUpload';
+import useGetMultipleFileUrl from '../../../modules/FileUpload/useGetMultipleFileUrl';
 
 interface MultiImageUploaderProps {
   name: string;
@@ -30,12 +30,6 @@ export default function MultiImageUploader({
   maxSize = 5 * 1024 * 1024,
   meta,
 }: MultiImageUploaderProps) {
-    // const { getMultiplePresignedUrl } = useMultiplePresignedUrl();
-    // const { uploadFile } = useMultipleFileUpload();
-    // const { getFileUrl } = useGetMultipleFileUrl();
-    const [getMultiplePresignedUrl, setGetMultiplePresignedUrl] = useState<any>(null);
-    const [uploadFile, setUploadFile] = useState<any>(null);
-    const [getFileUrl, setGetFileUrl] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -51,43 +45,45 @@ export default function MultiImageUploader({
 
   const error = get(errors, name)?.message as string;
 
+  const { mutateAsync: getMultiplePresignedUrl } = useMultiplePresignedUrl();
+  const { mutateAsync: uploadFile } = useMultipleFileUpload();
+  const { mutateAsync: getFileUrl } = useGetMultipleFileUrl();
+
   const processFiles = async (selectedFiles: File[]) => {
-  const fileInputs = selectedFiles.map((file) => ({
-    fileName: file.name,
-    mimeType: file.type,
-    fileSize: file.size,
-    refId: meta?.refId || '',
-    belongsTo: meta?.belongsTo || '',
-    isPublic: meta?.isPublic || false,
-    metadata: {}, // optional metadata if needed
-  }));
+    const fileInputs = selectedFiles.map((file) => ({
+      fileName: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
+      refId: meta?.refId || '',
+      belongsTo: meta?.belongsTo || '',
+      isPublic: meta?.isPublic || false,
+      metadata: {}, 
+    }));
 
-  try {
-    const presignedResponses = await getMultiplePresignedUrl(fileInputs); // returns array
+    try {
+      const presignedResponses = await getMultiplePresignedUrl(fileInputs);
+      console.log(presignedResponses, 'presignedResponses');
+      const uploadedUrls: string[] = [];
 
-    const uploadedUrls: string[] = [];
+      await Promise.all(
+        (presignedResponses as any).data.map(async (res: any, index: number) => {
+          await uploadFile({ url: res.uploadUrl, file: selectedFiles[index] });
+          const fileUrlRes = await getFileUrl(res.assetS3Object._id);
+          uploadedUrls.push(fileUrlRes.s3Url ?? fileUrlRes.url ?? fileUrlRes.data?.url);
+        })
+      );
 
-    await Promise.all(
-      presignedResponses.map(async (res: any, index: number) => {
-        const uploadRes = await uploadFile({ url: res.uploadUrl, file: selectedFiles[index] });
-        if (uploadRes.status === 200) {
-          const fileUrlRes = await getFileUrl(res.savedS3Object._id);
-          uploadedUrls.push(fileUrlRes.s3Url);
-        }
-      })
-    );
-
-    if (uploadedUrls.length > 0) {
-      setValue(name, [...files, ...uploadedUrls]);
-      clearErrors(name);
+      if (uploadedUrls.length > 0) {
+        setValue(name, [...files, ...uploadedUrls]);
+        clearErrors(name);
+      }
+    } catch (error) {
+      setError(name, {
+        type: 'manual',
+        message: 'Upload failed. Try again.',
+      });
     }
-  } catch (error) {
-    setError(name, {
-      type: 'manual',
-      message: 'Upload failed. Try again.',
-    });
-  }
-};
+  };
 
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {

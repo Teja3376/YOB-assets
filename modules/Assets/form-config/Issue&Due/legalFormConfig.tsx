@@ -4,8 +4,11 @@ import { useFormContext } from 'react-hook-form';
 import { useParams } from 'next/navigation';
 
 export const legalFormConfig = (index: number) => {
-  const { control } = useFormContext();
+  const { control , watch} = useFormContext();
   const { assetId } = useParams<{ assetId?: string }>();
+  console.log(assetId, 'assetId');
+  const meta = watch('dueDiligence.legal.${index}.logoUrl');
+  console.log(meta, 'meta');
   return [
     {
       name: `dueDiligence.legal.${index}.name`,

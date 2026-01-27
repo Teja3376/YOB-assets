@@ -1,14 +1,13 @@
-import { useRef, type ChangeEvent, type DragEvent, useState } from "react";
-import get from "lodash/get";
-import { X, Upload } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Controller, useFormContext } from "react-hook-form";
-import useGetSingleFileUrl from "@/modules/FileUpload/useGetSingleFileUrl";
-import useSingleFileUpload from "@/modules/FileUpload/useSingleFileUpload";
-import useSinglePresignedUrl from "@/modules/FileUpload/useSinglePresignedUrl";
-// import useSinglePresignedUrl from '@/hooks/file/useSinglePresignedUrl';
-// import useSingleFileUpload from '@/hooks/file/useSingleFileUpload';
-// import useGetSingleFileUrl from '@/hooks/file/useGetSingleFileUrl';
+
+
+import { useRef, type ChangeEvent, type DragEvent, useState } from 'react';
+import get from 'lodash/get';
+import { X, Upload } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Controller, useFormContext } from 'react-hook-form';
+import useSinglePresignedUrl from "../../../modules/FileUpload/useSinglePresignedUrl";
+import useSingleFileUpload from "../../../modules/FileUpload/useSingleFileUpload";
+import useGetSingleFileUrl from "../../../modules/FileUpload/useGetSingleFileUrl";
 
 interface ImageUploaderProps {
   name: string;
@@ -36,9 +35,6 @@ export default function ImageUploader({
   const { getSinglePresignedUrl } = useSinglePresignedUrl();
   const { uploadFile } = useSingleFileUpload();
   const { getFileUrl } = useGetSingleFileUrl();
-  // const [getSinglePresignedUrl, setGetSinglePresignedUrl] = useState<any>(null);
-  // const [uploadFile, setUploadFile] = useState<any>(null);
-  // const [getFileUrl, setGetFileUrl] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     setError,
@@ -67,7 +63,6 @@ export default function ImageUploader({
       });
       return;
     }
-
     await getSinglePresignedUrl({
       fileName: file.name,
       mimeType: file.type,
@@ -76,17 +71,15 @@ export default function ImageUploader({
       belongsTo: meta?.belongsTo || "",
       isPublic: meta?.isPublic || false,
     }).then(async (res: any) => {
-      console.log("Presigned URL response:", res);
-      await uploadFile({ url: res.data.uploadUrl, file }).then(
-        async (r: any) => {
-          console.log("File upload response:", res);
-          if (r.status === 200) {
-            await getFileUrl(res.data.assetS3Object._id).then((fileReponse: any) => {
-              setValue(name, fileReponse.data.url);
-            });
-          }
-        },
-      );
+      await uploadFile({ url: res.data?.uploadUrl, file }).then(async (r: any) => {
+        console.log(res.data.assetS3Object._id);
+        if (r.status === 200) {
+          await getFileUrl(res.data?.assetS3Object?._id).then((fileReponse: any) => {
+            setValue(name, fileReponse.data.url);
+            console.log(fileReponse.data.url);
+          });
+        }
+      });
     });
   };
 

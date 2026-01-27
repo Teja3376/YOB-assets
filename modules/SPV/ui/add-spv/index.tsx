@@ -222,7 +222,7 @@ const SpvFormPage = () => {
         return (
             <div className="container mx-auto px-6 py-8 flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
-                    <LoadingSpinner size="h-16 w-16" />
+                    <LoadingSpinner/>
                     <p className="mt-4 text-muted-foreground">Loading SPV data...</p>
                 </div>
             </div>
@@ -234,7 +234,7 @@ const SpvFormPage = () => {
             {isSaving && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
                     <div className="bg-background rounded-lg p-8 shadow-xl flex flex-col items-center gap-4">
-                        <LoadingSpinner size="h-12 w-12" />
+                        <LoadingSpinner />
                         <p className="text-lg font-medium">
                             {id ? "Updating SPV..." : "Creating SPV..."}
                         </p>
@@ -264,7 +264,7 @@ const SpvFormPage = () => {
                     <Stepper steps={steps} currentStepId={step} onStepChange={changeStep} />
 
                     <div className="border rounded-lg mt-4 p-4">
-                        <Suspense fallback={<Loading />}>{renderStepContent}</Suspense>
+                        <Suspense fallback={<LoadingSpinner />}>{renderStepContent}</Suspense>
                     </div>
 
                     <div className="flex justify-between items-center mt-6">
@@ -286,7 +286,7 @@ const SpvFormPage = () => {
                             >
                                 {isSaving ? (
                                     <>
-                                        <LoadingSpinner size="h-4 w-4" className="mr-2" />
+                                        <LoadingSpinner/>
                                         {id ? "Updating..." : "Creating..."}
                                     </>
                                 ) : (

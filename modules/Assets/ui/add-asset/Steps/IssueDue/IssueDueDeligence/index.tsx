@@ -33,7 +33,7 @@ const IssueDueDiligence = memo(() => {
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none  rounded-none data-[state=active]:border-b-2 border-black data-[state=active]:shadow-none "
+              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none  rounded-none data-[state=active]:border-b-2  data-[state=active]:shadow-none data-[state=active]:border-b-black"
             >
               {tab.title}
             </TabsTrigger>

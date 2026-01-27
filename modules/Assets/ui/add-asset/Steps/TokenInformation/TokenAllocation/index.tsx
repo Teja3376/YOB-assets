@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import FormGenerator from "@/components/use-form/FormGenerator";
 import formConfig from "@/modules/Assets/form-config/TokenInformation/tokenAllocationconfig";
 import Investor from "../Investor";
 import { useFormContext } from "react-hook-form";
 import TokenSymbolRegistration from "../TokenSymbolRegistration";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface Category {
   category: string;
@@ -35,7 +36,7 @@ const Index = ({ asset }: { asset: any }) => {
         Token Information
       </h2>
       <div className="flex flex-col md:flex-row gap-6 justify-between w-full bg-white">
-        {/* {tokenSymbol ? ( */}
+        {tokenSymbol ? (
           <div className="flex-1 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {FormGenerator(formConfig(asset))}
@@ -43,11 +44,11 @@ const Index = ({ asset }: { asset: any }) => {
             <div>
               <Investor />
             </div>
-          </div>
-      {/*}  ) : (
-          <TokenSymbolRegistration />
+            </div>
+          ) : (
+            <TokenSymbolRegistration />
         )
-        } */}
+        }
       </div>
     </div>
   );

@@ -213,7 +213,7 @@ export default function AssetPage() {
   if (isLoadingAsset && assetId) {
     return (
       <div className="flex items-center justify-center min-h-150">
-        <Loading />
+        <LoadingSpinner />
       </div>
     );
   }
@@ -241,7 +241,7 @@ export default function AssetPage() {
             className="bg-white rounded-lg ml-2 py-2 px-4 w-full"
             onSubmit={methods.handleSubmit(onSubmit)}
           >
-            <Suspense fallback={<Loading />}>
+            <Suspense fallback={<LoadingSpinner />}>
               {{
                 "asset-information": (
                   <AssetInformation step={step} tab={tab} asset={asset || {}} />
