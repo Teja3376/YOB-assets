@@ -7,12 +7,19 @@ import { useParams } from "next/navigation";
 import StructureDialog from "./StructureDialog";
 import DeleteStructureDialog from "./DeleteStructureDialog";
 import StructureHeader from "./StructureHeader";
+import { useCreateStructure } from "@/modules/Assets/hooks/Issuer&Due/DueDiligence/Structure/useCreateStructure";
+import { useUpdateStructure } from "@/modules/Assets/hooks/Issuer&Due/DueDiligence/Structure/useUpdateStructure";
+import useDeleteStructure from "@/modules/Assets/hooks/Issuer&Due/DueDiligence/Structure/useDeleteStructure";
+import { toast } from "sonner";
 
 const Index = () => {
   // const { createStructure, updateStructure, deleteStructure } = useStructure();
-  const [createStructure, setCreateStructure] = useState<any>(null);
-  const [updateStructure, setUpdateStructure] = useState<any>(null);
-  const [deleteStructure, setDeleteStructure] = useState<any>(null);
+  const { mutate: createStructure, isPending: isCreating } =
+    useCreateStructure();
+  const { mutate: updateStructure, isPending: isUpdating } =
+    useUpdateStructure();
+  const { mutate: deleteStructure, isPending: isDeleting } =
+    useDeleteStructure();
   const { assetId } = useParams<{ assetId?: string }>();
   const {
     control,
@@ -38,22 +45,51 @@ const Index = () => {
   };
 
   const onSubmit = async () => {
-    trigger(`dueDiligence.structure.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.dueDiligence.structure[index ?? -1];
-        if (isEdit) {
-          await updateStructure(values._id, { ...values });
-          update(index ?? -1, { ...values });
-        } else {
-          await createStructure({ ...values, assetId: assetId }).then((res: any) => {
+    const valid = await trigger(`dueDiligence.structure.${index}`);
+    if (!valid) return;
+    const data = formGetValues();
+    console.log("Submitting legal data:", data.dueDiligence.structure);
+    const values = data.dueDiligence.structure[index ?? -1];
+    if (isEdit && index !== null) {
+      const { structure_id, ...data } = values;
+      updateStructure(
+        { structureData: data, structureId: data._id },
+        {
+          onSuccess: (res: any) => {
+            console.log("Structure updated successfully:", res);
+            update(index ?? -1, { ...values });
+            toast.success("Structure updated successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error updating structure:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update structure",
+            );
+          },
+        },
+      );
+    } else {
+      createStructure(
+        { structureData: values, assetId: assetId ?? "" },
+        {
+          onSuccess: (res: any) => {
+            console.log("Structure created successfully:", res);
             append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+            toast.success("Structure created successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error creating structure:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to create structure",
+            );
+          },
+        },
+      );
+    }
   };
 
   const onOpenChange = () => {
@@ -65,13 +101,25 @@ const Index = () => {
   };
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
+    if (deleteIndex === null) return;
+
     const data = formGetValues();
-    const values = data.dueDiligence.structure[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteStructure(values._id);
-    }
+    const values = data.dueDiligence.structure[deleteIndex];
+
+    deleteStructure(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Structure deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete structure. Please try again.",
+        );
+      },
+    });
   };
 
   return (
@@ -91,6 +139,7 @@ const Index = () => {
         formConfig={structureFormConfig}
         onSubmit={onSubmit}
         onOpenChange={onOpenChange}
+        isLoading={isCreating || isUpdating}
       />
       <DeleteStructureDialog
         deleteIndex={deleteIndex}

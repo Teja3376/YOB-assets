@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { useParams } from "next/navigation";
 // import { useAssetDocument } from "@/hooks/asset/useAssetDocument";
@@ -7,12 +7,20 @@ import DocumentsDialog from "./DocumentsDialog";
 import DeleteDocumentsDialog from "./DeleteDocumentsDialog";
 import DocumentsHeader from "./DocumentsHeader";
 import DocumentsTable from "./DocumentsTable";
+import { useCreateDocument } from "@/modules/Assets/hooks/MediaDocuments/documents/useCreateDocument";
+import useDeleteDocument from "@/modules/Assets/hooks/MediaDocuments/documents/useDeleteDocument";
+import useUpdateDocument from "@/modules/Assets/hooks/MediaDocuments/documents/useUpdateDocument";
+import { toast } from "sonner";
 
 const Index = () => {
   // const { createDocument, updateDocument, deleteDocument } = useAssetDocument();
-  const [createDocument, setCreateDocument] = useState<any>(null);
-  const [updateDocument, setUpdateDocument] = useState<any>(null);
-  const [deleteDocument, setDeleteDocument] = useState<any>(null);
+  // const [createDocument, setCreateDocument] = useState<any>(null);
+  // const [updateDocument, setUpdateDocument] = useState<any>(null);
+  // const [deleteDocument, setDeleteDocument] = useState<any>(null);
+
+  const { mutate: createDocument, isPending: isCreating } = useCreateDocument();
+  const { mutate: deleteDocument, isPending: isDeleting } = useDeleteDocument();
+  const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
   const { assetId } = useParams<{ assetId?: string }>();
   const {
     control,
@@ -36,26 +44,57 @@ const Index = () => {
   };
 
   const onSubmit = async () => {
-    trigger(`documents.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.documents[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateDocument(values._id, {
-              ...values,
-            });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createDocument({ ...values, assetId: assetId }).then((res: any) => {
+    const valid = await trigger(`documents.${index}`);
+    if (!valid) return;
+    const data = formGetValues();
+    console.log("Submitting document data:", data.documents);
+    const values = data.documents[index ?? -1];
+    if (isEdit && index !== null) {
+      const { document_id, ...data } = values;
+      updateDocument(
+        { documentData: data, documentId: values._id },
+        {
+          onSuccess: (res: any) => {
+            console.log("Document updated successfully:", res);
+            update(index ?? -1, { ...values });
+            toast.success("Document updated successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error updating document:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update document",
+            );
+          },
+        },
+      );
+    } else {
+      // const data = {
+      //   name: values.name,
+      //   value: values.value,
+      //   isPercentage: values.isPercentage ? values.isPercentage : false,
+      //   status: values.status ? values.status : false,
+      // };
+      createDocument(
+        { documentData: values, assetId: assetId ?? "" },
+        {
+          onSuccess: (res: any) => {
+            console.log("Document created successfully:", res);
             append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+            toast.success("Document created successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error creating document:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to create document",
+            );
+          },
+        },
+      );
+    }
   };
 
   const isOpen = index !== null;
@@ -70,13 +109,25 @@ const Index = () => {
   };
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
+    if (deleteIndex === null) return;
+
     const data = formGetValues();
-    const values = data.documents[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      await deleteDocument(values._id);
-      remove(deleteIndex);
-    }
+    const values = data.documents[deleteIndex];
+
+    deleteDocument(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Document deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete document. Please try again.",
+        );
+      },
+    });
   };
 
   return (
@@ -98,6 +149,7 @@ const Index = () => {
         formConfig={formConfig}
         onSubmit={onSubmit}
         onOpenChange={onOpenChange}
+        isLoading={isCreating || isUpdating}
       />
       <DeleteDocumentsDialog
         deleteIndex={deleteIndex}

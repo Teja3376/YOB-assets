@@ -156,8 +156,8 @@ function FileUploadController({
               <div className="flex flex-1 items-center gap-2 min-w-0">
                 {file ? (
                   <>
-                    <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
-                    <span className="truncate text-sm">{file}</span>
+                    <Check className="h-5 w-5 shrink-0 text-green-500" />
+                    <p className="truncate text-sm max-w-75">{file}</p>
                     {fileUrl && (
                       <TooltipProvider>
                         <Tooltip>
@@ -181,7 +181,7 @@ function FileUploadController({
                   </>
                 ) : (
                   <>
-                    <FileIcon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                    <FileIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
                       No file selected
                     </span>

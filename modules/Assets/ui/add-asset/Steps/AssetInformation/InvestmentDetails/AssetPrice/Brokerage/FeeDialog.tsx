@@ -1,7 +1,12 @@
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/components/ui/dialog';
-import { DialogHeader } from '@/components/ui/CustomDialog';
-import FormGenerator from '@/components/use-form/FormGenerator';
-import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DialogHeader } from "@/components/ui/CustomDialog";
+import FormGenerator from "@/components/use-form/FormGenerator";
+import { Button } from "@/components/ui/button";
 
 interface FeeDialogProps {
   isOpen: boolean;
@@ -10,6 +15,7 @@ interface FeeDialogProps {
   formConfig: any;
   onSubmit: () => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 const FeeDialog: React.FC<FeeDialogProps> = ({
@@ -19,23 +25,32 @@ const FeeDialog: React.FC<FeeDialogProps> = ({
   formConfig,
   onSubmit,
   onCancel,
+  isLoading = false,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onCancel}>
-      <DialogContent className="w-[1000px] max-w-3xl max-h-[95vh] overflow-y-scroll">
+      <DialogContent className="w-250 max-w-3xl max-h-[95vh] overflow-y-scroll">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit' : 'Add'} Fee</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit" : "Add"} Fee</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {FormGenerator(formConfig({ index: index ?? -1, type: 'brokerage' }))}
+            {FormGenerator(
+              formConfig({ index: index ?? -1, type: "brokerage" }),
+            )}
           </div>
           <DialogFooter className="flex justify-end w-full mt-4">
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="button" onClick={onSubmit}>
-              Submit
+            <Button type="button" onClick={onSubmit} disabled={isLoading}>
+              {isLoading
+                ? isEdit
+                  ? "Updating..."
+                  : "Submitting..."
+                : isEdit
+                  ? "Update"
+                  : "Submit"}
             </Button>
           </DialogFooter>
         </div>

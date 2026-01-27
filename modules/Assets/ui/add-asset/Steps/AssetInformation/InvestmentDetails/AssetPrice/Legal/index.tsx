@@ -7,9 +7,9 @@ import AccordionComponent from "./AccordionComponent";
 import DialogComponent from "./DialogComponent";
 import DeleteDialogComponent from "./DeleteDialogComponent";
 import { toast } from "sonner";
-import { useCreateFee } from "@/modules/Assets/hooks/fees/useCreateFee";
-import { useUpdateFee } from "@/modules/Assets/hooks/fees/useUpdateFee";
-import useDeleteFee from "@/modules/Assets/hooks/fees/useDeleteFee";
+import { useCreateFee } from "@/modules/Assets/hooks/AssetInformation/fees/useCreateFee";
+import { useUpdateFee } from "@/modules/Assets/hooks/AssetInformation/fees/useUpdateFee";
+import useDeleteFee from "@/modules/Assets/hooks/AssetInformation/fees/useDeleteFee";
 
 const Index = () => {
   // const { createFee, updateFee, deleteFee } = useFee();
@@ -157,6 +157,7 @@ const Index = () => {
         formConfig={formConfig}
         onOpenChange={onOpenChange}
         onSubmit={onSubmit}
+        isLoading={isUpdatePending || isCreatePending}
       />
       <DeleteDialogComponent
         deleteIndex={deleteIndex}

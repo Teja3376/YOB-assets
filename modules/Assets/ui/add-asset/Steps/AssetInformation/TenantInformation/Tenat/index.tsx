@@ -9,10 +9,10 @@ import AddEditTenantDialog from "./AddEditTenantDialog";
 import DeleteTenantDialog from "./DeleteTenantDialog";
 import { tenantConfig } from "@/modules/Assets/form-config/AssetInformation/tenant-configs/tenantConfig";
 import { useWatch } from "react-hook-form";
-import { useCreateTenant } from "@/modules/Assets/hooks/tenant/useCreateTenant";
-import useDeleteTenant from "@/modules/Assets/hooks/tenant/useDeleteTenant";
+import { useCreateTenant } from "@/modules/Assets/hooks/AssetInformation/tenant/useCreateTenant";
+import useDeleteTenant from "@/modules/Assets/hooks/AssetInformation/tenant/useDeleteTenant";
 import useGetAssetById from "@/modules/Assets/hooks/useGetAssetById";
-import useUpdateTenant from "@/modules/Assets/hooks/tenant/useUpdateTenant";
+import useUpdateTenant from "@/modules/Assets/hooks/AssetInformation/tenant/useUpdateTenant";
 import { toast } from "sonner";
 
 const TenantManagement = () => {
@@ -275,6 +275,7 @@ const TenantManagement = () => {
         index={index ?? -1}
         onSubmit={onSubmit}
         onCancel={onOpenChange}
+        isLoading={isCreatingTenant || isUpdatingTenant}
       />
       <DeleteTenantDialog
         isOpen={deleteIndex !== null}

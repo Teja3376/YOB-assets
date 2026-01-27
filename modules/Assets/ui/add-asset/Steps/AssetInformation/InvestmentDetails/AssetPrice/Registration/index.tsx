@@ -13,10 +13,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { formConfig } from "@/modules/Assets/form-config/AssetInformation/feeconfig";
-import { useCreateFee } from "@/modules/Assets/hooks/fees/useCreateFee";
-import { useUpdateFee } from "@/modules/Assets/hooks/fees/useUpdateFee";
+import { useCreateFee } from "@/modules/Assets/hooks/AssetInformation/fees/useCreateFee";
+import { useUpdateFee } from "@/modules/Assets/hooks/AssetInformation/fees/useUpdateFee";
 import { toast } from "sonner";
-import useDeleteFee from "@/modules/Assets/hooks/fees/useDeleteFee";
+import useDeleteFee from "@/modules/Assets/hooks/AssetInformation/fees/useDeleteFee";
 
 const Index = () => {
   const { mutate: createFee, isPending: isCreatePending } = useCreateFee();
@@ -183,6 +183,7 @@ const Index = () => {
         formConfig={formConfig}
         onSubmit={onSubmit}
         onCancel={onOpenChange}
+        isLoading={isCreatePending || isUpdatePending}
       />
 
       <DeleteFeeDialog

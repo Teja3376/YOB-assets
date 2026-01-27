@@ -16,6 +16,7 @@ interface ExpenseDialogProps {
   onClose: () => void;
   onSubmit: () => void;
   formConfig: (index: number) => any;
+  isLoading?: boolean;
 }
 
 const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
@@ -25,6 +26,7 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
   onClose,
   onSubmit,
   formConfig,
+  isLoading = false,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -38,8 +40,14 @@ const ExpenseDialog: React.FC<ExpenseDialogProps> = ({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="button" onClick={onSubmit}>
-              Submit
+            <Button type="button" onClick={onSubmit} disabled={isLoading}>
+              {isLoading
+                ? isEdit
+                  ? "Updating..."
+                  : "Submitting..."
+                : isEdit
+                  ? "Update"
+                  : "Submit"}
             </Button>
           </DialogFooter>
         </div>

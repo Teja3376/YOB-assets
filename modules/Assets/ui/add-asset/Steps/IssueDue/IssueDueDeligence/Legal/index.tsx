@@ -6,12 +6,23 @@ import { useParams } from "next/navigation";
 import { LegalDialog } from "./LegalDialog";
 import { DeleteDialog } from "./DeleteDialog";
 import { LegalTable } from "./LegalTable";
+import { useCreateLegal } from "@/modules/Assets/hooks/Issuer&Due/DueDiligence/Legal/useCreateLegal";
+import { useUpdateLegal } from "@/modules/Assets/hooks/Issuer&Due/DueDiligence/Legal/useUpdateLegal";
+import useDeleteLegal from "@/modules/Assets/hooks/Issuer&Due/DueDiligence/Legal/useDeleteLegal";
+import { toast } from "sonner";
 
 const Index = () => {
   // const { createLegal, updateLegal, deleteLegal } = useLegal();
-  const [createLegal, setCreateLegal] = useState<any>(null);
-  const [updateLegal, setUpdateLegal] = useState<any>(null);
-  const [deleteLegal, setDeleteLegal] = useState<any>(null);
+  // const [createLegal, setCreateLegal] = useState<any>(null);
+  // const [updateLegal, setUpdateLegal] = useState<any>(null);
+  // const [deleteLegal, setDeleteLegal] = useState<any>(null);
+
+  const { mutate: createLegal, isPending: createLegalPending } =
+    useCreateLegal();
+  const { mutate: updateLegal, isPending: updateLegalPending } =
+    useUpdateLegal();
+  const { mutate: deleteLegal, isPending: deleteLegalPending } =
+    useDeleteLegal();
   const { assetId } = useParams<{ assetId?: string }>();
   const {
     control,
@@ -37,24 +48,53 @@ const Index = () => {
   };
 
   const onSubmit = async () => {
-    trigger(`dueDiligence.legal.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.dueDiligence.legal[index ?? -1];
-        if (isEdit) {
-          await updateLegal(values._id, { ...values });
-          update(index ?? -1, { ...values });
-        } else {
-          await createLegal({ ...values, assetId: assetId }).then((res: any) => {
+    const valid = await trigger(`dueDiligence.legal.${index}`);
+    if (!valid) return;
+    const data = formGetValues();
+    console.log("Submitting legal data:", data.dueDiligence.legal);
+    const values = data.dueDiligence.legal[index ?? -1];
+    if (isEdit && index !== null) {
+      const { legal_id, ...data } = values;
+      console.log("Updating legal with ID:", data);
+      updateLegal(
+        { legalData: data, legalId: data._id },
+        {
+          onSuccess: (res: any) => {
+            console.log("Legal updated successfully:", res);
+            update(index ?? -1, { ...values });
+            toast.success("Legal updated successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error updating legal:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update legal",
+            );
+          },
+        },
+      );
+    } else {
+      createLegal(
+        { legalData: values, assetId: assetId ?? "" },
+        {
+          onSuccess: (res: any) => {
+            console.log("Legal created successfully:", res);
             append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+            toast.success("Legal created successfully");
+            clearErrors();
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.error("Error creating legal:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to create legal",
+            );
+          },
+        },
+      );
+    }
   };
-
   const onOpenChange = () => {
     const previousValues = index !== null ? fields[index] : {};
     if (index !== null) {
@@ -64,13 +104,25 @@ const Index = () => {
   };
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
+    if (deleteIndex === null) return;
+
     const data = formGetValues();
-    const values = data.dueDiligence.legal[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteLegal(values._id);
-    }
+    const values = data.dueDiligence.legal[deleteIndex];
+
+    deleteLegal(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Legal deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete legal. Please try again.",
+        );
+      },
+    });
   };
 
   return (
@@ -100,13 +152,13 @@ const Index = () => {
         assetId={assetId}
         onSubmit={onSubmit}
         onOpenChange={onOpenChange}
+        isLoading={createLegalPending || updateLegalPending}
       />
       <DeleteDialog
         isOpen={deleteIndex !== null}
         onConfirm={handleOnDelete}
         onCancel={() => setDeleteIndex(null)}
       />
-      
     </div>
   );
 };

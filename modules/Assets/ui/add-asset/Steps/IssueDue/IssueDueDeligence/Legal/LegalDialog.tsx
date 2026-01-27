@@ -14,18 +14,20 @@ interface LegalDialogProps {
   isOpen: boolean;
   isEdit: boolean;
   index: number | null;
-  assetId?: string;
   onSubmit: () => void;
   onOpenChange: () => void;
+  assetId?: string;
+  isLoading?: boolean;
 }
 
 export const LegalDialog: React.FC<LegalDialogProps> = ({
   isOpen,
   isEdit,
   index,
-  assetId = '',
+  assetId = "",
   onSubmit,
   onOpenChange,
+  isLoading = false,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -35,14 +37,20 @@ export const LegalDialog: React.FC<LegalDialogProps> = ({
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            {FormGenerator(legalFormConfig(index ?? -1, assetId ?? ''))}
+            {FormGenerator(legalFormConfig(index ?? -1))}
           </div>
           <DialogFooter className="flex justify-end w-full mt-4">
             <Button type="button" variant="outline" onClick={onOpenChange}>
               Cancel
             </Button>
-            <Button type="button" onClick={onSubmit}>
-              Submit
+            <Button type="button" onClick={onSubmit} disabled={isLoading}>
+              {isLoading
+                ? isEdit
+                  ? "Updating..."
+                  : "Submitting..."
+                : isEdit
+                  ? "Update"
+                  : "Submit"}
             </Button>
           </DialogFooter>
         </div>

@@ -21,6 +21,7 @@ interface AddEditTenantDialogProps {
   index?: number | null;
   onSubmit: () => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 const AddEditTenantDialog: React.FC<AddEditTenantDialogProps> = ({
@@ -29,6 +30,7 @@ const AddEditTenantDialog: React.FC<AddEditTenantDialogProps> = ({
   onSubmit,
   onCancel,
   index,
+  isLoading = false,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onCancel}>
@@ -68,8 +70,14 @@ const AddEditTenantDialog: React.FC<AddEditTenantDialogProps> = ({
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="button" onClick={onSubmit}>
-              Submit
+            <Button type="button" onClick={onSubmit} disabled={isLoading}>
+              {isLoading
+                ? isEdit
+                  ? "Updating..."
+                  : "Submitting..."
+                : isEdit
+                  ? "Update"
+                  : "Submit"}
             </Button>
           </DialogFooter>
         </div>

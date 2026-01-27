@@ -13,10 +13,10 @@ import DeleteDialog from "./DeleteDialog";
 import ExpenseTable from "./ExpenseTable";
 import { formatCompactNumber } from "@/lib/format.utils";
 import Expenses from "./Expenses";
-import useCreateExpense from "@/modules/Assets/hooks/expenses/useCreateExpense";
+import useCreateExpense from "@/modules/Assets/hooks/AssetInformation/expenses/useCreateExpense";
 import { toast } from "sonner";
-import useUpdateExpense from "@/modules/Assets/hooks/expenses/useUpdateExpense";
-import useDeleteExpense from "@/modules/Assets/hooks/expenses/useDeleteExpense";
+import useUpdateExpense from "@/modules/Assets/hooks/AssetInformation/expenses/useUpdateExpense";
+import useDeleteExpense from "@/modules/Assets/hooks/AssetInformation/expenses/useDeleteExpense";
 
 const index = ({ asset }: { asset?: any }) => {
   const { assetId } = useParams<{ assetId?: string }>();
@@ -80,7 +80,7 @@ const index = ({ asset }: { asset?: any }) => {
         {
           onSuccess: (res: any) => {
             console.log("Expense created successfully:", res);
-            append({ ...data, expense_id: res._id });
+            append({ ...data, _id: res._id });
             toast.success("Expense created successfully");
             clearErrors();
             setIndex(null);
@@ -155,13 +155,6 @@ const index = ({ asset }: { asset?: any }) => {
   };
 
   const handleOnDelete = async () => {
-    // setDeleteIndex(null);
-    // const data = formGetValues();
-    // const values = data.expenses[deleteIndex ?? -1];
-    // if (deleteIndex !== null) {
-    //   remove(deleteIndex);
-    //   await deleteExpenses(values._id);
-    // }
     if (deleteIndex === null) return;
 
     const data = formGetValues();
@@ -263,6 +256,7 @@ const index = ({ asset }: { asset?: any }) => {
           onClose={onOpenChange}
           onSubmit={onSubmit}
           formConfig={expenseFormConfig}
+          isLoading={isCreating || isUpdating}
         />
         <DeleteDialog
           isOpen={deleteIndex !== null}

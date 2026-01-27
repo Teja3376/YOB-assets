@@ -1,8 +1,13 @@
-import React from 'react';
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/components/ui/dialog';
-import { DialogHeader } from '@/components/ui/CustomDialog';
-import FormGenerator from '@/components/use-form/FormGenerator';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DialogHeader } from "@/components/ui/CustomDialog";
+import FormGenerator from "@/components/use-form/FormGenerator";
+import { Button } from "@/components/ui/button";
 
 interface DocumentsDialogProps {
   isOpen: boolean;
@@ -11,6 +16,7 @@ interface DocumentsDialogProps {
   formConfig: (args: { index: number }) => any;
   onSubmit: () => void;
   onOpenChange: () => void;
+  isLoading?: boolean;
 }
 
 const DocumentsDialog: React.FC<DocumentsDialogProps> = ({
@@ -20,23 +26,30 @@ const DocumentsDialog: React.FC<DocumentsDialogProps> = ({
   formConfig,
   onSubmit,
   onOpenChange,
+  isLoading = false,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className='w-full max-w-2xl'>
+      <DialogContent className="w-full max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit' : 'Add'} Document</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit" : "Add"} Document</DialogTitle>
         </DialogHeader>
-        <div className='space-y-4'>
-          <div className='grid gap-2'>
+        <div className="space-y-4">
+          <div className="grid gap-2">
             {FormGenerator(formConfig({ index: index ?? -1 }))}
           </div>
-          <DialogFooter className='flex justify-end w-full mt-4'>
-            <Button type='button' variant='outline' onClick={onOpenChange}>
+          <DialogFooter className="flex justify-end w-full mt-4">
+            <Button type="button" variant="outline" onClick={onOpenChange}>
               Cancel
             </Button>
-            <Button type='button' onClick={onSubmit}>
-              Submit
+            <Button type="button" onClick={onSubmit} disabled={isLoading}>
+              {isLoading
+                ? isEdit
+                  ? "Updating..."
+                  : "Submitting..."
+                : isEdit
+                  ? "Update"
+                  : "Submit"}
             </Button>
           </DialogFooter>
         </div>
