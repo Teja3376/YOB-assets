@@ -17,13 +17,12 @@ import FormGenerator from "@/components/use-form/FormGenerator";
 import { Button } from "@/components/ui/button";
 // import { useFeature } from "@/hooks/asset/useFeature";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import useFeature from "@/modules/Assets/hooks/FeaturesAndAmenties/useFeature";
 
 const TenantManagement = () => {
-  // const { createFeature, updateFeature, deleteFeature } = useFeature();
-  const [createFeature, setCreateFeature] = useState<any>(null);
-  const [updateFeature, setUpdateFeature] = useState<any>(null);
-  const [deleteFeature, setDeleteFeature] = useState<any>(null);
-  const { id } = useParams<{ id: string }>();
+  const { createFeature, updateFeature, deleteFeature } = useFeature();
+  const { assetId } = useParams<{ assetId: string }>();
   const {
     watch,
     control,
@@ -70,38 +69,91 @@ const TenantManagement = () => {
   ];
 
   const onSubmit = async () => {
-    trigger(`features.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.features[index ?? -1];
+    const isValid = await trigger(`features.${index}`);
 
-        if (isEdit) {
-          if (index !== null) {
-            const { name, description, image, status } = values;
-            await updateFeature(values._id, {
+    if (!isValid) return;
+
+    const data = formGetValues();
+    const values = data.features[index ?? -1];
+
+    if (isEdit) {
+      if (index !== null) {
+        const { name, description, image, status } = values;
+        await updateFeature.mutate(
+          {
+            id: values._id,
+            payload: {
               name,
               description,
               image,
               status,
-            });
+            },
+          },
+          {
+            onSuccess: (res: any) => {
+              console.log(res);
+              update(index ?? -1, { ...values, _id: res._id });
+              toast.success("Feature updated successfully");
+              setIndex(null);
+            },
+            onError: (error: any) => {
+              console.log(error);
+              toast.error("Failed to update feature");
+            },
           }
-          update(index ?? -1, { ...values });
-        } else {
-          const payload = {
-            name: values.name,
-            description: values.description,
-            image: values.image || "https://picsum.photos/200/300",
-            status: values.status,
-          };
-          await createFeature({ ...payload, assetId: id }).then((res: any) => {
-            append({ ...payload, _id: res._id });
-          });
-        }
-
-        setIndex(null);
-        clearErrors();
+        );
       }
-    });
+    } else {
+      const payload = {
+        name: values.name,
+        description: values.description,
+        image: values.image || "https://picsum.photos/200/300",
+        status: values.status,
+      };
+      await createFeature.mutate(
+        { assetId: assetId ?? "", payload: { ...payload } },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            append({ ...values, _id: res._id });
+            toast.success("Feature created successfully");
+            setIndex(null);
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error("Failed to create feature");
+          },
+        }
+      );
+    }
+
+    setIndex(null);
+    clearErrors();
+  };
+
+  const handleStatusChange = async  (e: any, rowData: any) => {
+    updateFeature.mutate(
+      {
+        id: rowData._id,
+        payload: {
+          name: rowData.name,
+          description: rowData.description,
+          image: rowData.image,
+          status: e,
+        },
+      },
+      {
+        onSuccess: (res: any) => {
+          console.log(res);
+          update(rowData.index, { ...rowData, status: e });
+          toast.success("Feature updated successfully status");
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error("Failed to update feature status");
+        },
+      }
+    );
   };
 
   const isOpen = index !== null;
@@ -120,8 +172,17 @@ const TenantManagement = () => {
     const data = formGetValues();
     const values = data.features[deleteIndex ?? -1];
     if (deleteIndex !== null) {
-      await deleteFeature(values._id);
-      remove(deleteIndex);
+      await deleteFeature.mutate(values._id, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          remove(deleteIndex);
+          toast.success('Feature deleted successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to delete feature');
+        }
+      });
     }
   };
 
@@ -157,9 +218,7 @@ const TenantManagement = () => {
         return (
           <Switch
             checked={rowData.status}
-            onCheckedChange={(e) =>
-              update(row.index, { ...rowData, status: e })
-            }
+            onCheckedChange={(e) => handleStatusChange(e, rowData)}
           />
         );
       },

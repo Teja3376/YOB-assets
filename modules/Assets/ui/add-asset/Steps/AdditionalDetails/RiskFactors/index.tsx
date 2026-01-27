@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import FormGenerator from "@/components/use-form/FormGenerator";
 import { useParams } from "next/navigation";
 import { riskFactorFormConfig } from "@/modules/Assets/form-config/AdditionalDetails/riskFactorFormConfig";
-// import { useRiskFactorApi } from "@/hooks/asset/useRiskFactorApi";
+import useRiskFactors from "@/modules/Assets/hooks/additionalDetails/useRiskFactors";
+import { toast } from "sonner";
 
 const RiskFactor = memo(() => {
   const { assetId = null } = useParams<{ assetId?: string }>();
@@ -17,11 +18,7 @@ const RiskFactor = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-    // const { createRiskFactor, updateRiskFactor, deleteRiskFactor } =
-    //   useRiskFactorApi();
-  const [createRiskFactor, setCreateRiskFactor] = useState<any>(null);
-  const [updateRiskFactor, setUpdateRiskFactor] = useState<any>(null);
-  const [deleteRiskFactor, setDeleteRiskFactor] = useState<any>(null);
+  const { createRiskFactors, updateRiskFactors, deleteRiskFactors } = useRiskFactors();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "riskFactors",
@@ -46,24 +43,46 @@ const RiskFactor = memo(() => {
   };
 
   const onSubmit = async () => {
-    trigger(`riskFactors.${index}`).then(async (isValid) => {
+    const isValid = await trigger(`riskFactors.${index}`);
       if (isValid) {
         const data = formGetValues();
         const values = data.riskFactors[index ?? -1];
         if (isEdit) {
           if (index !== null) {
-            await updateRiskFactor(values._id, { ...values });
+            await updateRiskFactors.mutate({ id: values._id, payload: { ...values } },
+              {
+                onSuccess: (res: any) => {
+                  console.log(res);
+                  update(index ?? -1, { ...values, _id: res._id });
+                  toast.success('Risk Factor updated successfully');
+                },
+                onError: (error: any) => {
+                  console.log(error);
+                  toast.error('Failed to update Risk Factor');
+                }
+              }
+            );
           }
           update(index ?? -1, { ...values });
         } else {
-          await createRiskFactor({ ...values, assetId: assetId }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
+          await createRiskFactors.mutate({ assetId: assetId ?? "", payload: { ...values } },
+            {
+              onSuccess: (res: any) => {
+                console.log(res);
+                append({ ...values, _id: res._id });
+                toast.success('Risk Factor created successfully');
+              },
+              onError: (error: any) => {
+                console.log(error);
+                toast.error('Failed to create Risk Factor');
+              }
+            }
+          );
         }
         setIndex(null);
         clearErrors();
       }
-    });
+      
   };
 
   const handleOnDelete = async () => {
@@ -72,7 +91,16 @@ const RiskFactor = memo(() => {
     const values = data.riskFactors[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteRiskFactor(values._id);
+      await deleteRiskFactors.mutate(values._id, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          toast.success('Risk Factor deleted successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to delete Risk Factor');
+        }
+      });
     }
   };
 

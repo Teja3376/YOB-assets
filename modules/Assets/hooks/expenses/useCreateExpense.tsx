@@ -2,7 +2,7 @@ import api from "@/lib/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function useCreateExpense() {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["create-expense"],
     mutationFn: async ({

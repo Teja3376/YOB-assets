@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import FormGenerator from "@/components/use-form/FormGenerator";
 import { useParams } from "next/navigation";
 import { exitOpportunityFormConfig } from "@/modules/Assets/form-config/AdditionalDetails/exitOpportunityFormConfig";
-// import { useExitOpportunity } from "@/hooks/asset/useExitOpportunity";
+import useExitOpportunity from "@/modules/Assets/hooks/additionalDetails/useOppurtunity";
+import { toast } from "sonner";
 
 const ExitOpportunity = memo(() => {
   const { assetId = null } = useParams<{ assetId?: string }>();
@@ -17,14 +18,7 @@ const ExitOpportunity = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  // const {
-  //   createExitOpportunity,
-  //   updateExitOpportunity,
-  //   deleteExitOpportunity,
-  // } = useExitOpportunity();
-  const [createExitOpportunity, setCreateExitOpportunity] = useState<any>(null);
-  const [updateExitOpportunity, setUpdateExitOpportunity] = useState<any>(null);
-  const [deleteExitOpportunity, setDeleteExitOpportunity] = useState<any>(null);
+  const { createExitOpportunity, updateExitOpportunity, deleteExitOpportunity } = useExitOpportunity();
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -50,26 +44,47 @@ const ExitOpportunity = memo(() => {
   };
 
   const onSubmit = async () => {
-    trigger(`exitOpportunities.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.exitOpportunities[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateExitOpportunity(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createExitOpportunity({ ...values, assetId: assetId }).then(
-            (res: any) => {
-              append({ ...values, _id: res._id });
-            }
-          );
+    const isValid = await trigger(`exitOpportunities.${index}`);
+
+    if (!isValid) return;
+
+    const data = formGetValues();
+    const values = data.exitOpportunities[index ?? -1];
+
+    if (isEdit && index !== null) {
+      updateExitOpportunity.mutate(
+        { id: values._id, payload: { ...values } },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            update(index ?? -1, { ...values, _id: res._id });
+            toast.success('Exit Opportunity updated successfully');
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error('Failed to update Exit Opportunity');
+          },
         }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+      );
+    } else {
+      createExitOpportunity.mutate(
+        { assetId: assetId ?? "", payload: { ...values } },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            append({ ...values, _id: res._id });
+            toast.success('Exit Opportunity created successfully');
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error('Failed to create Exit Opportunity');
+          },
+        }
+      );
+    }
+
+    setIndex(null);
+    clearErrors();
   };
 
   const handleOnDelete = async () => {
@@ -78,7 +93,16 @@ const ExitOpportunity = memo(() => {
     const values = data.exitOpportunities[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteExitOpportunity(values._id);
+      await deleteExitOpportunity.mutate(values._id, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          toast.success('Exit Opportunity deleted successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to delete Exit Opportunity');
+        }
+      });
     }
   };
 

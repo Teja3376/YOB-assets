@@ -8,6 +8,8 @@ import FormGenerator from "@/components/use-form/FormGenerator";
 import { faqFormConfig } from "@/modules/Assets/form-config/TermsAndConditions/faqFormConfig";
 // import { useFaqApi } from "@/hooks/asset/useFqsApi";
 import { useParams } from "next/navigation";
+import useFAQ from "@/modules/Assets/hooks/TermsAndConditions/useFAQ";
+import { toast } from "sonner";
 
 const Faq = memo(() => {
   const { assetId = null } = useParams<{ assetId?: string }>();
@@ -17,10 +19,7 @@ const Faq = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  // const { createFaq, updateFaq, deleteFaq } = useFaqApi();
-  const [createFaq, setCreateFaq] = useState<any>(null);
-  const [updateFaq, setUpdateFaq] = useState<any>(null);
-  const [deleteFaq, setDeleteFaq] = useState<any>(null);
+  const { createFAQ, updateFAQ, deleteFAQ } = useFAQ();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "faqs",
@@ -45,24 +44,50 @@ const Faq = memo(() => {
   };
 
   const onSubmit = async () => {
-    trigger(`faqs.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.faqs[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateFaq(values._id, { ...values });
+    const isValid = await trigger(`faqs.${index}`);
+
+    if (!isValid) return;
+
+    const data = formGetValues();
+    const values = data.faqs[index ?? -1];
+
+    if (isEdit) {
+      if (index !== null) {
+        await updateFAQ.mutateAsync({
+          id: values._id ?? "",
+          payload: { ...values },
+        }, {
+          onSuccess: (res: any) => {
+            console.log(res);
+            update(index ?? -1, { ...values, _id: res._id });
+            toast.success('Faq updated successfully');
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error('Failed to update Faq');
           }
-          update(index ?? -1, { ...values });
-        } else {
-          await createFaq({ ...values, assetId: assetId }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
+        });
       }
-    });
+      update(index ?? -1, { ...values });
+    } else {
+      const res: any = await createFAQ.mutateAsync({
+        assetId: assetId ?? "",
+        payload: { ...values },
+      }, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          append({ ...values, _id: res._id });
+          toast.success('Faq created successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to create Faq');
+        }
+      });
+    }
+
+    setIndex(null);
+    clearErrors();
   };
 
   const handleOnDelete = async () => {
@@ -71,7 +96,16 @@ const Faq = memo(() => {
     const values = data.faqs[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteFaq(values._id);
+      await deleteFAQ.mutate(values._id ?? '', {
+        onSuccess: (res: any) => {
+          console.log(res);
+          toast.success('Faq deleted successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to delete Faq');
+        }
+      });
     }
   };
 

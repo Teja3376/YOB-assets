@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import FormGenerator from "@/components/use-form/FormGenerator";
 import { useParams } from "next/navigation";
 import { additionalTaxesFormConfig } from "@/modules/Assets/form-config/AdditionalDetails/additionalTaxesFormConfig";
-// import { useAdditionalTaxes } from "@/hooks/asset/useAdditionalTaxes";
+import useAdditionalTaxes from "@/modules/Assets/hooks/additionalDetails/useAdditionalTaxes";
+import { toast } from "sonner";
 
 const AdditionalTaxes = memo(() => {
   const { assetId = null } = useParams<{ assetId?: string }>();
@@ -17,14 +18,7 @@ const AdditionalTaxes = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  // const {
-  //   createAdditionalTaxes,
-  //   updateAdditionalTaxes,
-  //   deleteAdditionalTaxes,
-  // } = useAdditionalTaxes();
-  const [createAdditionalTaxes, setCreateAdditionalTaxes] = useState<any>(null);
-  const [updateAdditionalTaxes, setUpdateAdditionalTaxes] = useState<any>(null);
-  const [deleteAdditionalTaxes, setDeleteAdditionalTaxes] = useState<any>(null);
+  const { createAdditionalTaxes, updateAdditionalTaxes, deleteAdditionalTaxes } = useAdditionalTaxes();
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -50,37 +44,61 @@ const AdditionalTaxes = memo(() => {
   };
 
   const onSubmit = async () => {
-    trigger(`additionalTaxes.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.additionalTaxes[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateAdditionalTaxes(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createAdditionalTaxes({ ...values, assetId: assetId }).then(
-            (res: any) => {
-              append({ ...values, _id: res._id });
+    const isValid = await trigger(`additionalTaxes.${index}`);
+    if (!isValid) return;
+    if (isValid) {
+      const data = formGetValues();
+      const values = data.additionalTaxes[index ?? -1];
+      if (isEdit) {
+        if (index !== null) {
+          await updateAdditionalTaxes.mutate({ id: values._id, payload: { ...values } }, {
+            onSuccess: (res: any) => {
+              console.log(res);
+              update(index ?? -1, { ...values, _id: res._id });
+              toast.success('Additional Taxes updated successfully');
+            },
+            onError: (error: any) => {
+              console.log(error);
+              toast.error('Failed to update Additional Taxes');
             }
-          );
+          });
         }
-        setIndex(null);
-        clearErrors();
+      } else {
+        await createAdditionalTaxes.mutate({ assetId: assetId ?? "", payload: { ...values } }, {
+          onSuccess: (res: any) => {
+            console.log(res);
+            append({ ...values, _id: res._id });
+            toast.success('Additional Taxes created successfully');
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error('Failed to create Additional Taxes');
+          }
+        });
       }
-    });
-  };
+      setIndex(null);
+      clearErrors();
+    };
+  }
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
+    if (deleteIndex === null) return;
     const data = formGetValues();
-    const values = data.additionalTaxes[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteAdditionalTaxes(values._id);
-    }
+    const values = data.additionalTaxes[deleteIndex];
+    await deleteAdditionalTaxes.mutate(values._id, {
+      onSuccess: (res: any) => {
+        console.log(res);
+        remove(deleteIndex);
+        toast.success('Additional Taxes deleted successfully');
+      },
+      onError: (error: any) => {
+        console.log(error);
+        toast.error('Failed to delete Additional Taxes');
+      }
+    });
+    setDeleteIndex(null);
   };
+
 
   const handleDelete = (item: any) => {
     setDeleteIndex(item);
@@ -148,6 +166,6 @@ const AdditionalTaxes = memo(() => {
       </div>
     </Suspense>
   );
-});
+})
 
 export default AdditionalTaxes;

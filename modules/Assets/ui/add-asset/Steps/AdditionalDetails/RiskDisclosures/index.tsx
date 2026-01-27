@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import FormGenerator from "@/components/use-form/FormGenerator";
 import { useParams } from "next/navigation";
 import { riskDisclosureFormConfig } from "@/modules/Assets/form-config/AdditionalDetails/riskDisclosureFormConfig";
-// import { useRiskDisclosures } from "@/hooks/asset/useRiskDisclosure";
+import useRiskDisclosure from "@/modules/Assets/hooks/additionalDetails/useRiskDisclosure";
+import { toast } from "sonner";
 
 const RiskDisclosure = memo(() => {
   const { assetId = null } = useParams<{ assetId?: string }>();
@@ -17,11 +18,7 @@ const RiskDisclosure = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  // const { createRiskDisclosure, updateRiskDisclosure, deleteRiskDisclosure } =
-  //   useRiskDisclosures();
-  const [createRiskDisclosure, setCreateRiskDisclosure] = useState<any>(null);
-  const [updateRiskDisclosure, setUpdateRiskDisclosure] = useState<any>(null);
-  const [deleteRiskDisclosure, setDeleteRiskDisclosure] = useState<any>(null);
+  const { createRiskDisclosure, updateRiskDisclosure, deleteRiskDisclosure } = useRiskDisclosure();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "riskDisclosures",
@@ -46,24 +43,38 @@ const RiskDisclosure = memo(() => {
   };
 
   const onSubmit = async () => {
-    trigger(`riskDisclosures.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.riskDisclosures[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateRiskDisclosure(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createRiskDisclosure({ ...values, assetId: assetId }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
+    const isValid = await trigger(`riskDisclosures.${index}`);
+    if (!isValid) return;
+    const data = formGetValues();
+    const values = data.riskDisclosures[index ?? -1];
+    if (isEdit) {
+      await updateRiskDisclosure.mutate({ id: values._id, payload: { ...values } }, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          update(index ?? -1, { ...values, _id: res._id });
+          toast.success('Risk Disclosure updated successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to update Risk Disclosure');
         }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+      });
+    }
+    else {
+      await createRiskDisclosure.mutate({ assetId: assetId ?? "", payload: { ...values } }, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          append({ ...values, _id: res._id });
+          toast.success('Risk Disclosure created successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to create Risk Disclosure');
+        }
+      });
+    }
+    setIndex(null);
+    clearErrors();
   };
 
   const handleOnDelete = async () => {
@@ -72,7 +83,16 @@ const RiskDisclosure = memo(() => {
     const values = data.riskDisclosures[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteRiskDisclosure(values._id);
+      await deleteRiskDisclosure.mutate(values._id, {
+        onSuccess: (res: any) => {
+          console.log(res);
+          toast.success('Risk Disclosure deleted successfully');
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error('Failed to delete Risk Disclosure');
+        }
+      });
     }
   };
 
