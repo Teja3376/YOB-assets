@@ -232,14 +232,8 @@ const SpvFormPage = () => {
     return (
         <div className="container mx-auto px-6 py-8 space-y-4">
             {isSaving && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-                    <div className="bg-background rounded-lg p-8 shadow-xl flex flex-col items-center gap-4">
-                        <LoadingSpinner />
-                        <p className="text-lg font-medium">
-                            {id ? "Updating SPV..." : "Creating SPV..."}
-                        </p>
-                        <p className="text-sm text-muted-foreground">Please wait</p>
-                    </div>
+                <div className="flex items-center justify-center">
+                    <LoadingSpinner/>
                 </div>
             )}
 
