@@ -112,7 +112,7 @@ const Index = () => {
               />
               <Button
                 type="button"
-                disabled={!totalNumberOfSfts || !pricePerSft}
+                disabled={true}
                 variant="secondary"
                 onClick={handleAdd}
                 className="mx-2"

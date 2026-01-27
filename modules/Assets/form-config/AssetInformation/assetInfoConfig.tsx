@@ -22,24 +22,20 @@ interface Asset {
   currency?: string;
 }
 
-export const assetInfoConfig = ({
-  asset,
-}: {
-  asset: Asset;
-}): FormFieldConfig[] => {
-
+export const assetInfoConfig = ({ asset }: { asset: Asset }): FormFieldConfig[] => {
   const param = useParams();
+  const disable = !!param.id;
 
-  let disable = false;
+  const { control, setValue, watch } = useFormContext();
 
-  if (param.id) {
-    disable = true;
-  }
-  const { getCountries, getStates, getCities, countries, states, cities } =
-    useLocations();
-  const { watch, control, setValue } = useFormContext();
+  const selectedCountry = watch("country");
+  const selectedState = watch("state");
 
-  console.log(asset, "asset 122");
+  const { countries, useStates, useCities } = useLocations();
+
+  const { data: states = [] } = useStates(selectedCountry);
+  const { data: cities = [] } = useCities(selectedCountry, selectedState);
+
   const country = asset?.country ?? "";
   const state = asset?.state ?? "";
   const city = asset?.city ?? "";
@@ -54,10 +50,6 @@ export const assetInfoConfig = ({
     value: country,
     label: places?.[country] ?? country,
   };
-  // console.log("Countries:", countries);
-  // console.log("States:", states);
-
-  // console.log("Cities:", cities);
 
   return [
     {
@@ -68,6 +60,7 @@ export const assetInfoConfig = ({
       rules: { required: "Asset name is required" },
       disabled: disable,
     },
+
     {
       type: "select",
       name: "style",
@@ -77,16 +70,18 @@ export const assetInfoConfig = ({
       rules: { required: "Asset style is required" },
       disabled: disable,
     },
+
     {
       type: "select",
       name: "currency",
       control,
       label: "Currency",
       options: CURRENCY_OPTIONS,
-      defaultValue: asset ? asset?.company?.currency : "",
+      defaultValue: asset?.company?.currency ?? "",
       rules: { required: "Currency is required" },
-      disabled: true
+      disabled: true,
     },
+
     {
       type: "select",
       name: "instrumentType",
@@ -95,65 +90,55 @@ export const assetInfoConfig = ({
       options: INSTRUMENT_TYPE,
       rules: { required: "Instrument type is required" },
       disabled: disable,
-
     },
+    
+
     {
       type: "select",
       name: "country",
       control,
       label: "Country",
-      options:
+options:
         COUNTRY_OPTIONS.length > 0
           ? COUNTRY_OPTIONS
           : country
-            ? [defaultCountry]
-            : [],
-      rules: { required: "Country is required" },
+          ? [defaultCountry]
+          : [],      rules: { required: "Country is required" },
+
       onChange: async (value) => {
-        await getStates(value);
+        setValue("country", value);
         setValue("state", "");
-        // setValue("city", "");
+        setValue("city", "");
       },
-      onBlur: async () => {
-        await getCountries();
-      },
+
       disabled: disable,
     },
+
     {
       type: "select",
       name: "state",
       control,
       label: "State",
-      options: states.length > 0 ? states : state ? [defaultState] : [],
-      disabled: !watch("country") || disable,
+      options: states.length ? states : state ? [defaultState] : [],
+      disabled: !selectedCountry || disable,
       rules: { required: "State is required" },
+
       onChange: async (value) => {
-        // Removed city setValue call
-      },
-      onBlur: async () => {
-        const selectedCountry = watch("country");
-        await getStates(selectedCountry);
+        setValue("state", value);
+        setValue("city", "");
       },
     },
+
     {
       type: "select",
       name: "city",
       control,
       label: "City",
-      disabled: !watch("state") || disable,
-      options:
-        cities.length > 0 ? cities : city ? [{ label: city, value: city }] : [],
+      disabled: !selectedState || disable,
+      options: cities.length ? cities : city ? [{ label: city, value: city }] : [],
       rules: { required: "City is required" },
-      onBlur: async () => {
-        const selectedCountry = watch("country");
-        const selectedState = watch("state");
-        await getCities({
-          countryCode: selectedCountry,
-          stateCode: selectedState,
-        });
-      },
-      // rules: { required: "City is required" },
     },
+
     {
       type: "text",
       name: "landmark",
@@ -161,18 +146,17 @@ export const assetInfoConfig = ({
       label: "Landmark",
       rules: { required: "Landmark is required" },
       disabled: disable,
-
     },
+
     {
       type: "textarea",
       name: "about",
       control,
       label: "Asset Description",
-      className: "w-full col-span-1",
       fullWidth: true,
       rules: { required: "Asset description is required" },
       disabled: disable,
-
     },
   ];
 };
+

@@ -1,17 +1,21 @@
 import api from "@/lib/api-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export default function useCreateAsset() {
+export default function useUpdateAsset() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["create-asset"],
-
-    mutationFn: async (assetData) => {
-      const response = await api.post("/real-estate", assetData);
+    mutationKey: ["update-asset"],
+    mutationFn: async ({
+      assetData,
+      assetId,
+    }: {
+      assetData: any;
+      assetId: string;
+    }) => {
+      const response = await api.put(`/real-estate/${assetId}`, assetData);
       return response.data.data;
     },
-
     onSuccess: async (data) => {
       const assetId = data?._id;
 

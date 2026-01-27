@@ -13,12 +13,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { formConfig } from "@/modules/Assets/form-config/AssetInformation/feeconfig";
+import { useCreateFee } from "@/modules/Assets/hooks/fees/useCreateFee";
+import { useUpdateFee } from "@/modules/Assets/hooks/fees/useUpdateFee";
+import useDeleteFee from "@/modules/Assets/hooks/fees/useDeleteFee";
+import { toast } from "sonner";
 
 const Index = () => {
   // const { createFee, updateFee, deleteFee } = useFee();
-  const [createFee, setCreateFee] = useState<any>(null);
-  const [updateFee, setUpdateFee] = useState<any>(null);
-  const [deleteFee, setDeleteFee] = useState<any>(null);
+  const { mutate: createFee, isPending: isCreatePending } = useCreateFee();
+  const { mutate: updateFee, isPending: isUpdatePending } = useUpdateFee();
+  const { mutate: deleteFee, isPending: isDeletePending } = useDeleteFee();
   const { assetId = null } = useParams<{ assetId?: string }>();
   const {
     control,
@@ -42,34 +46,66 @@ const Index = () => {
     reset();
   };
 
-  const onSubmit = async () => {
-    trigger(`fees.brokerage.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        console.log(data);
-        const values = data.fees.brokerage[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateFee(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createFee({
-            ...data,
-            assetId: assetId ?? "",
-            name: values.name ?? "",
-            isPercentage: values.isPercentage ?? false,
-            value: values.value ?? 0,
-            type: "brokerage",
-            status: values.status ?? false,
-          }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+ const onSubmit = async () => {
+    const valid = await trigger(`fees.brokerage.${index}`);
+
+    if (!valid) return;
+
+    const data = formGetValues();
+    console.log("Submitting fee data:", data.fees.brokerage);
+
+    const values = data.fees.brokerage[index ?? -1];
+    console.log("Submitting fee values:", values);
+
+    // EDIT MODE
+    if (isEdit && index !== null) {
+      const { assetId, issuerId, createdAt, updatedAt, __v, _id, ...feeData } =
+        values;
+      updateFee(
+        {
+          feeData: { ...feeData, type: "brokerage" },
+          feeId: values._id ?? "",
+        },
+        {
+          onSuccess: (res: any) => {
+            update(index, values);
+            setIndex(null);
+            clearErrors();
+            toast.success("Fee updated successfully");
+          },
+          onError: (error: any) => {
+            toast.error(
+              error?.response?.data?.message ||
+                "Failed to update fee. Please try again.",
+            );
+          },
+        },
+      );
+
+      return;
+    }
+
+    // CREATE MODE
+    createFee(
+      {
+        feeData: { ...values, type: "brokerage" },
+        assetId: assetId ?? "",
+      },
+      {
+        onSuccess: (res: any) => {
+          append({ ...values, _id: res._id });
+          setIndex(null);
+          clearErrors();
+          toast.success("Fee added successfully");
+        },
+        onError: (error: any) => {
+          toast.error(
+            error?.response?.data?.message ||
+              "Failed to add fee. Please try again.",
+          );
+        },
+      },
+    );
   };
 
   const isOpen = index !== null;
@@ -83,14 +119,26 @@ const Index = () => {
     setIndex(null);
   };
 
-  const handleOnDelete = async () => {
-    setDeleteIndex(null);
+ const handleOnDelete = async () => {
+    if (deleteIndex === null) return;
+
     const data = formGetValues();
-    const values = data.fees.brokerage[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteFee(values._id);
-    }
+    const values = data.fees.brokerage[deleteIndex];
+
+    deleteFee(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Fee deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete fee. Please try again.",
+        );
+      },
+    });
   };
 
   const totalNumberOfSfts = formGetValues("totalNumberOfSfts");

@@ -44,7 +44,7 @@ const Index = () => {
     trigger(`fees.reserve.${index}`).then(async (isValid) => {
       if (isValid) {
         const data = formGetValues();
-        console.log(data)
+        console.log(data);
         const values = data.fees.reserve[index ?? -1];
         if (isEdit) {
           if (index !== null) {
@@ -112,7 +112,7 @@ const Index = () => {
               />
               <Button
                 type="button"
-                disabled={!totalNumberOfSfts || !pricePerSft}
+                disabled={true}
                 variant="secondary"
                 onClick={handleAdd}
                 className="mx-2"

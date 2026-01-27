@@ -6,11 +6,11 @@ import useGetSpvNames from "@/modules/SPV/hooks/useGetSpvNames";
 import useGetSpvById from "@/modules/SPV/hooks/useGetSpvById";
 
 export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
-  const { spvId } = useParams<{ spvId?: string }>();
+    // const { spvId } = useParams<{ spvId?: string }>();
   const { control, setValue } = useFormContext();
 
   const [selectedSpvId, setSelectedSpvId] = useState<string | undefined>(
-    asset?.companyId,
+    asset?.spvId,
   );
 
   // Fetch SPV dropdown names
@@ -26,25 +26,25 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
   // Sync SPV data into form when fetched
   useEffect(() => {
     if (!selectedSpv) return;
-
+    console.log("selectedSpv", selectedSpv);
     setValue("company", selectedSpv);
     setValue("currency", selectedSpv.currency ?? "INR");
   }, [selectedSpv, setValue]);
 
-  const { companyId, company } = asset || {};
+  const { spvId, company } = asset || {};
 
   // Edit Mode (locked company)
-  if (spvId && companyId) {
+  if (spvId && spvId) {
     return [
       {
-        name: "companyId",
+        name: "spvId",
         control,
         type: "select",
         label: "Company",
         options: [
           {
-            label: company?.name,
-            value: companyId,
+            label: company ? company?.name : selectedSpv?.name,
+            value: spvId,
           },
         ],
         rules: { required: "Company is required" },
@@ -56,23 +56,26 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
   // Create Mode
   return [
     {
-      name: "companyId",
+      name: "spvId",
       control,
       type: "select",
       label: "Company",
 
       options: names.map((spv: any) => ({
         label: spv.name,
-        value: spv.id,
+        value: spv._id,
       })),
 
       rules: { required: "Company is required" },
 
-      // loading: isNamesLoading,
-
       onChange: (value) => {
+        console.log("selected spv id 123", value);
         setSelectedSpvId(value);
-        setValue("companyId", value);
+        setValue("spvId", value, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
       },
 
       onBlur: () => {

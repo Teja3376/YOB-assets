@@ -2,8 +2,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { formConfig } from '../../../../../../form-config/AssetInformation/investmentConfig'
 import FormGenerator from '@/components/use-form/FormGenerator'
-import Collapseble from '@/components/ui/collapse'
-import InfoTag from '@/components/cards/asset/InfoTag'
+
 import { ChartLine } from 'lucide-react';
 
 const index = () => {

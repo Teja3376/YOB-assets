@@ -13,20 +13,22 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { formConfig } from "@/modules/Assets/form-config/AssetInformation/feeconfig";
+import { useCreateFee } from "@/modules/Assets/hooks/fees/useCreateFee";
+import { useUpdateFee } from "@/modules/Assets/hooks/fees/useUpdateFee";
+import { toast } from "sonner";
+import useDeleteFee from "@/modules/Assets/hooks/fees/useDeleteFee";
 
 const Index = () => {
-  // const { createFee, updateFee, deleteFee } = useFee();
-  const [createFee, setCreateFee] = useState<any>(null);
-  const [updateFee, setUpdateFee] = useState<any>(null);
-  const [deleteFee, setDeleteFee] = useState<any>(null);
+  const { mutate: createFee, isPending: isCreatePending } = useCreateFee();
+
+  const { mutate: updateFee, isPending: isUpdatePending } = useUpdateFee();
+  const { mutate: deleteFee, isPending: isDeletePending } = useDeleteFee();
+  // const [deleteFeeData, setDeleteFeeData] = useState<any>(null);
+
   const { assetId = null } = useParams<{ assetId?: string }>();
-  const {
-    control,
-    getValues: formGetValues,
-    clearErrors,
-    trigger,
-    reset,
-  } = useFormContext();
+  console.log("Asset ID in Registration Fees:", assetId);
+  const { control, getValues, clearErrors, trigger, resetField } =
+    useFormContext();
 
   const { fields, append, update, remove } = useFieldArray({
     control,
@@ -37,64 +39,110 @@ const Index = () => {
   const [index, setIndex] = useState<number | null>(null);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
-  const handleAdd = () => {
-    setIndex(-1);
-    reset();
-  };
-
-  const onSubmit = async () => {
-    trigger(`fees.registration.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        console.log(data);
-        const values = data.fees.registration[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateFee(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createFee({
-            ...data,
-            assetId: assetId ?? "",
-            name: values.name ?? "",
-            isPercentage: values.isPercentage ?? false,
-            value: values.value ?? 0,
-            type: "registration",
-            status: values.status ?? false,
-          }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
-  };
-
   const isOpen = index !== null;
   const isEdit = index !== -1;
 
+  const handleAdd = () => {
+    setIndex(-1);
+    resetField("fees.registration");
+  };
+
+  const onSubmit = async () => {
+    const valid = await trigger(`fees.registration.${index}`);
+
+    if (!valid) return;
+
+    const data = getValues();
+    console.log("Submitting fee data:", data.fees.registration);
+
+    const values = data.fees.registration[index ?? -1];
+    console.log("Submitting fee values:", values);
+
+    // EDIT MODE
+    if (isEdit && index !== null) {
+      const { assetId, issuerId, createdAt, updatedAt, __v, _id, ...feeData } =
+        values;
+      updateFee(
+        {
+          feeData: { ...feeData, type: "registration" },
+          feeId: values._id ?? "",
+        },
+        {
+          onSuccess: (res: any) => {
+            update(index, values);
+            setIndex(null);
+            clearErrors();
+            toast.success("Fee updated successfully");
+          },
+          onError: (error: any) => {
+            toast.error(
+              error?.response?.data?.message ||
+                "Failed to update fee. Please try again.",
+            );
+          },
+        },
+      );
+
+      return;
+    }
+
+    // CREATE MODE
+    createFee(
+      {
+        feeData: { ...values, type: "registration" },
+        assetId: assetId ?? "",
+      },
+      {
+        onSuccess: (res: any) => {
+          append({ ...values, _id: res._id });
+          setIndex(null);
+          clearErrors();
+          toast.success("Fee added successfully");
+        },
+        onError: (error: any) => {
+          toast.error(
+            error?.response?.data?.message ||
+              "Failed to add fee. Please try again.",
+          );
+        },
+      },
+    );
+  };
+
   const onOpenChange = () => {
-    const previousValues = index !== null ? fields[index] : {};
     if (index !== null) {
-      update(index, previousValues);
+      update(index, fields[index]);
     }
     setIndex(null);
   };
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
-    const data = formGetValues();
-    const values = data.fees.registration[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteFee(values._id);
-    }
+    if (deleteIndex === null) return;
+
+    const data = getValues();
+    const values = data.fees.registration[deleteIndex];
+
+    deleteFee(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Fee deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete fee. Please try again.",
+        );
+      },
+    });
+
+    // TODO: call delete API here
+    // await deleteFee(values._id);
   };
 
-  const totalNumberOfSfts = formGetValues("totalNumberOfSfts");
-  const pricePerSft = formGetValues("pricePerSft");
+  const totalNumberOfSfts = getValues("totalNumberOfSfts");
+  const pricePerSft = getValues("pricePerSft");
 
   return (
     <div className="flex flex-col w-full">
@@ -104,6 +152,7 @@ const Index = () => {
             <AccordionTrigger className="p-4 text-lg font-bold text-gray-800">
               Registration
             </AccordionTrigger>
+
             <AccordionContent className="bg-white mx-2 my-3 space-y-2">
               <FeeTable
                 fields={fields}
@@ -111,6 +160,7 @@ const Index = () => {
                 setIndex={setIndex}
                 setDeleteIndex={setDeleteIndex}
               />
+
               <Button
                 type="button"
                 disabled={!totalNumberOfSfts || !pricePerSft}
@@ -125,6 +175,7 @@ const Index = () => {
           </AccordionItem>
         </Accordion>
       </div>
+
       <FeeDialog
         isOpen={isOpen}
         isEdit={isEdit}
@@ -133,6 +184,7 @@ const Index = () => {
         onSubmit={onSubmit}
         onCancel={onOpenChange}
       />
+
       <DeleteFeeDialog
         isOpen={deleteIndex !== null}
         onDelete={handleOnDelete}

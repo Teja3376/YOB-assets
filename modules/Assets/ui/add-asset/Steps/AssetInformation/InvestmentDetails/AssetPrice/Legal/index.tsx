@@ -6,12 +6,16 @@ import { formConfig } from "@/modules/Assets/form-config/AssetInformation/feecon
 import AccordionComponent from "./AccordionComponent";
 import DialogComponent from "./DialogComponent";
 import DeleteDialogComponent from "./DeleteDialogComponent";
+import { toast } from "sonner";
+import { useCreateFee } from "@/modules/Assets/hooks/fees/useCreateFee";
+import { useUpdateFee } from "@/modules/Assets/hooks/fees/useUpdateFee";
+import useDeleteFee from "@/modules/Assets/hooks/fees/useDeleteFee";
 
 const Index = () => {
   // const { createFee, updateFee, deleteFee } = useFee();
-  const [createFee, setCreateFee] = useState<any>(null);
-  const [updateFee, setUpdateFee] = useState<any>(null);
-  const [deleteFee, setDeleteFee] = useState<any>(null);
+  const { mutate: createFee, isPending: isCreatePending } = useCreateFee();
+  const { mutate: updateFee, isPending: isUpdatePending } = useUpdateFee();
+  const { mutate: deleteFee, isPending: isDeletePending } = useDeleteFee();
   const { assetId = null } = useParams<{ assetId?: string }>();
   const {
     control,
@@ -36,32 +40,65 @@ const Index = () => {
   };
 
   const onSubmit = async () => {
-    trigger(`fees.legal.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.fees.legal[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateFee(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createFee({
-            ...data,
-            assetId: assetId ?? "",
-            name: values.name ?? "",
-            isPercentage: values.isPercentage ?? false,
-            value: values.value ?? 0,
-            type: "legal",
-            status: values.status ?? false,
-          }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
-        }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+    const valid = await trigger(`fees.legal.${index}`);
+
+    if (!valid) return;
+
+    const data = formGetValues();
+    console.log("Submitting fee data:", data.fees.legal);
+
+    const values = data.fees.legal[index ?? -1];
+    console.log("Submitting fee values:", values);
+
+    // EDIT MODE
+    if (isEdit && index !== null) {
+      const { assetId, issuerId, createdAt, updatedAt, __v, _id, ...feeData } =
+        values;
+      updateFee(
+        {
+          feeData: { ...feeData, type: "legal" },
+          feeId: values._id ?? "",
+        },
+        {
+          onSuccess: (res: any) => {
+            update(index, values);
+            setIndex(null);
+            clearErrors();
+            toast.success("Fee updated successfully");
+          },
+          onError: (error: any) => {
+            toast.error(
+              error?.response?.data?.message ||
+                "Failed to update fee. Please try again.",
+            );
+          },
+        },
+      );
+
+      return;
+    }
+
+    // CREATE MODE
+    createFee(
+      {
+        feeData: { ...values, type: "legal" },
+        assetId: assetId ?? "",
+      },
+      {
+        onSuccess: (res: any) => {
+          append({ ...values, _id: res._id });
+          setIndex(null);
+          clearErrors();
+          toast.success("Fee added successfully");
+        },
+        onError: (error: any) => {
+          toast.error(
+            error?.response?.data?.message ||
+              "Failed to add fee. Please try again.",
+          );
+        },
+      },
+    );
   };
 
   const isOpen = index !== null;
@@ -76,13 +113,25 @@ const Index = () => {
   };
 
   const handleOnDelete = async () => {
-    setDeleteIndex(null);
+    if (deleteIndex === null) return;
+
     const data = formGetValues();
-    const values = data.fees.legal[deleteIndex ?? -1];
-    if (deleteIndex !== null) {
-      remove(deleteIndex);
-      await deleteFee(values._id);
-    }
+    const values = data.fees.legal[deleteIndex];
+
+    deleteFee(values._id ?? "", {
+      onSuccess: (res: any) => {
+        remove(deleteIndex);
+        setIndex(null);
+        setDeleteIndex(null);
+        toast.success("Fee deleted successfully");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to delete fee. Please try again.",
+        );
+      },
+    });
   };
 
   const totalNumberOfSfts = formGetValues("totalNumberOfSfts");

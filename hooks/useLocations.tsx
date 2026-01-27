@@ -1,99 +1,85 @@
 import api from "@/lib/api-client";
-import { useState, useRef } from "react";
 import { toast } from "sonner";
-
+import { useQuery } from "@tanstack/react-query";
 
 interface Location {
   label: string;
   value: string;
 }
 
-const useLocations = () => {
-  const [countries, setCountries] = useState<Location[]>([]);
-  const [states, setStates] = useState<Location[]>([]);
-  const [cities, setCities] = useState<Location[]>([]);
+const handleError = (error: any, defaultMessage: string) => {
+  console.error(defaultMessage, error);
+  toast.error(
+    `${error.response?.data?.message || error.message || defaultMessage}`
+  );
+};
 
-  // Use useRef for cache persistence
-  const cache = useRef(new Map<string, Location[]>()).current;
+const fetchCountries = async (): Promise<Location[]> => {
+  try {
+    const response = await api.get("/locations");
+    return response.data.data;
+  } catch (error) {
+    handleError(error, "Failed to fetch countries");
+    throw error;
+  }
+};
 
-  const handleError = (error: any, defaultMessage: string) => {
-    console.error(defaultMessage, error);
-    toast.error(
-      `${error.response?.data?.message || error.message || defaultMessage}`
+const fetchStates = async (countryCode: string): Promise<Location[]> => {
+  try {
+    const response = await api.get(`/locations?country=${countryCode}`);
+    return response.data.data;
+  } catch (error) {
+    handleError(error, "Failed to fetch states");
+    throw error;
+  }
+};
+
+const fetchCities = async ({
+  countryCode,
+  stateCode,
+}: {
+  countryCode: string;
+  stateCode: string;
+}): Promise<Location[]> => {
+  try {
+    const response = await api.get(
+      `/locations?country=${countryCode}&state=${stateCode}`
     );
-  };
+    return response.data.data;
+  } catch (error) {
+    handleError(error, "Failed to fetch cities");
+    throw error;
+  }
+};
 
-  const getCountries = async (): Promise<Location[] | undefined> => {
-    if (cache.has("countries")) {
-      setCountries(cache.get("countries")!);
-      console.log(countries)
-      return cache.get("countries");
-    }
-    try {
-      const response = await api.get("/locations");
-      const data: Location[] = response.data.data;
-      cache.set("countries", data);
-      setCountries(data);
-      return data;
-    } catch (error) {
-      handleError(error, "Failed to fetch countries");
-      return undefined;
-    }
-  };
+const useLocations = () => {
+  const countriesQuery = useQuery({
+    queryKey: ["countries"],
+    queryFn: fetchCountries,
+    staleTime: Infinity,
+  });
 
-  const getStates = async (countryCode: string): Promise<Location[] | undefined> => {
-    const cacheKey = `states-${countryCode}`;
-    if (cache.has(cacheKey)) {
-      setStates(cache.get(cacheKey)!);
-      return cache.get(cacheKey);
-    }
-    try {
-      const response = await api.get(`/locations?country=${countryCode}`);
-      const data: Location[] = response.data.data;
-      console.log("data", data);
-      cache.set(cacheKey, data);
-      setStates(data);
-      return data;
-    } catch (error) {
-      handleError(error, "Failed to fetch states");
-      return undefined;
-    }
-  };
+  const useStates = (countryCode?: string) =>
+    useQuery({
+      queryKey: ["states", countryCode],
+      queryFn: () => fetchStates(countryCode!),
+      enabled: !!countryCode,
+      staleTime: Infinity,
+    });
 
-  const getCities = async ({
-    countryCode,
-    stateCode,
-  }: {
-    countryCode: string;
-    stateCode: string;
-  }): Promise<Location[] | undefined> => {
-    const cacheKey = `cities-${countryCode}-${stateCode}`;
-    if (cache.has(cacheKey)) {
-      setCities(cache.get(cacheKey)!);
-      return cache.get(cacheKey);
-    }
-    try {
-      // Remove extra slash for consistency
-      const response = await api.get(
-        `/locations?country=${countryCode}&state=${stateCode}`
-      );
-      const data: Location[] = response.data.data;
-      cache.set(cacheKey, data);
-      setCities(data);
-      return data;
-    } catch (error) {
-      handleError(error, "Failed to fetch cities");
-      return undefined;
-    }
-  };
+  const useCities = (countryCode?: string, stateCode?: string) =>
+    useQuery({
+      queryKey: ["cities", countryCode, stateCode],
+      queryFn: () => fetchCities({ countryCode: countryCode!, stateCode: stateCode! }),
+      enabled: !!countryCode && !!stateCode,
+      staleTime: Infinity,
+    });
 
   return {
-    countries,
-    states,
-    cities,
-    getCountries,
-    getStates,
-    getCities,
+    countries: countriesQuery.data ?? [],
+    countriesQuery,
+    useStates,
+    useCities,
   };
 };
 

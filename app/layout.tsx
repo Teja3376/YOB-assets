@@ -49,7 +49,7 @@ export default function RootLayout({
         className={`font-sans ${poppins.variable} antialiased text-gray-900 overflow-x-hidden overflow-y-hidden`}
       >
         <QueryProvider>{children}</QueryProvider>
-        <Toaster />
+        <Toaster richColors theme="light" />
         <Analytics />
       </body>
     </html>
