@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 
 export const featureFormConfig = (index: number): FormFieldConfig[] => {
   const { control } = useFormContext();
-  const { id } = useParams<{ id: string }>();
+  const { assetId } = useParams<{ assetId: string }>();
 
   return [
     {
@@ -40,7 +40,7 @@ export const featureFormConfig = (index: number): FormFieldConfig[] => {
       fullWidth: true,
       placeholder: 'Upload Image',
       meta: {
-        refId: id || '',
+        refId: assetId || '',
         belongsTo: 'asset',
         isPublic: true,
       },

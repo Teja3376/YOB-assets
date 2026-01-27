@@ -8,6 +8,8 @@ import FormGenerator from "@/components/use-form/FormGenerator";
 import { useParams } from "next/navigation";
 import { termsFormConfig } from "@/modules/Assets/form-config/TermsAndConditions/termsFormConfig";
 // import { useTermsApi } from "@/hooks/asset/useTermsApi";
+import useTermsAndConditions from "@/modules/Assets/hooks/TermsAndConditions/useTermsAndConditions";
+import { toast } from "sonner";
 
 const Terms = memo(() => {
   const { assetId = null } = useParams<{ assetId?: string }>();
@@ -18,9 +20,7 @@ const Terms = memo(() => {
     trigger,
   } = useFormContext();
   // const { createTerms, updateTerms, deleteTerms } = useTermsApi();
-  const [createTerms, setCreateTerms] = useState<any>(null);
-  const [updateTerms, setUpdateTerms] = useState<any>(null);
-  const [deleteTerms, setDeleteTerms] = useState<any>(null);
+  const { createTermsAndConditions, updateTermsAndConditions, deleteTermsAndConditions } = useTermsAndConditions();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "termsAndConditions",
@@ -45,25 +45,53 @@ const Terms = memo(() => {
   };
 
   const onSubmit = async () => {
-    trigger(`termsAndConditions.${index}`).then(async (isValid) => {
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.termsAndConditions[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateTerms(values._id, { ...values });
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createTerms({ ...values, assetId: assetId }).then((res: any) => {
-            append({ ...values, _id: res._id });
-          });
+    const isValid = await trigger(`termsAndConditions.${index}`);
+
+    if (!isValid) return;
+
+    const data = formGetValues();
+    const values = data.termsAndConditions[index ?? -1];
+
+    if (isEdit && index !== null) {
+      await updateTermsAndConditions.mutateAsync(
+        { id: values._id, payload: { ...values } },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            update(index ?? -1, { ...values, _id: res._id });
+            toast.success("Terms and Conditions updated successfully");
+          },
+          onError: (error: any) => {
+            toast.error("Failed to update Terms and Conditions");
+            console.log(error);
+          },
         }
-        setIndex(null);
-        clearErrors();
-      }
-    });
+      );
+    } else {
+      const res: any = await createTermsAndConditions.mutateAsync(
+        {
+          assetId: assetId ?? "",
+          payload: { ...values },
+        },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            append({ ...values, _id: res._id });  
+            toast.success('Terms and Conditions created successfully');
+          },
+          onError: (error: any) => {
+            toast.error("Failed to Create Terms and Conditions");
+            console.log(error);
+          },
+        }
+      );
+      
+    }
+
+    setIndex(null);
+    clearErrors();
   };
+
 
   const handleOnDelete = async () => {
     setDeleteIndex(null);
@@ -71,7 +99,16 @@ const Terms = memo(() => {
     const values = data.termsAndConditions[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteTerms(values._id);
+      await deleteTermsAndConditions.mutate(values._id ?? '', {
+        onSuccess: (res: any) => {
+          console.log(res);
+          toast.success('Terms and Conditions deleted successfully');
+        },
+        onError: (error: any) => {
+          toast.error('Failed to delete Terms and Conditions');
+          console.log(error);
+        },
+      });
     }
   };
 

@@ -16,13 +16,18 @@ type AmenityTableProps = {
   data: Amenity[];
   onEdit: (item: Amenity) => void;
   onDelete: (item: Amenity) => void;
+  handleStatusChange: (e: boolean, rowData: Amenity) => void;
 };
 
-const AmenityTable: React.FC<AmenityTableProps> = ({ data =[], onEdit, onDelete }) => {
+const AmenityTable: React.FC<AmenityTableProps> = ({ data = [], onEdit, onDelete, handleStatusChange }) => {
   const columns = [
     {
       header: 'Image',
       accessorKey: 'image',
+      cell: ({ row }: any) => {
+        const rowData = row.original;
+        return <img src={rowData.image} alt={rowData.name} className='w-16 h-16 rounded-md' />;
+      },
     },
     {
       header: 'Amenity',
@@ -37,7 +42,7 @@ const AmenityTable: React.FC<AmenityTableProps> = ({ data =[], onEdit, onDelete 
       accessorKey: 'status',
       cell: ({ row }: any) => {
         const rowData = row.original;
-        return <Switch checked={rowData.status} disabled />;
+        return <Switch checked={rowData.status} onCheckedChange={(e) => handleStatusChange(e, rowData)} />;
       },
     },
     {

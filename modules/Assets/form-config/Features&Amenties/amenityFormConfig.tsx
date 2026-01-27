@@ -6,7 +6,7 @@ import { useFormContext } from 'react-hook-form';
 import { useParams } from 'next/navigation';
 
 export const amenityFormConfig = (index: number): FormFieldConfig[] => {
-  const { id } = useParams<{ id: string }>();
+  const { assetId } = useParams<{ assetId: string }>();
   const { control } = useFormContext();
   return [
     {
@@ -34,7 +34,7 @@ export const amenityFormConfig = (index: number): FormFieldConfig[] => {
       label: 'Image',
       accept: ['png', 'jpg', 'jpeg', 'webp', 'gif'],
       meta: {
-        refId: id || '',
+        refId: assetId ?? '',
         belongsTo: 'asset',
         isPublic: true,
       },
