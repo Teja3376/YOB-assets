@@ -50,7 +50,7 @@ const TenantManagement = () => {
       icon: <EditIcon />,
       onClick: (item: any) => {
         const findIndex = fields.findIndex(
-          (field) => field.features_id === item.features_id
+          (field) => field.features_id === item.features_id,
         );
         setIndex(findIndex);
       },
@@ -61,7 +61,7 @@ const TenantManagement = () => {
       icon: <TrashIcon />,
       onClick: (item: any) => {
         const findIndex = fields.findIndex(
-          (field) => field.features_id === item.features_id
+          (field) => field.features_id === item.features_id,
         );
         setDeleteIndex(findIndex);
       },
@@ -100,7 +100,7 @@ const TenantManagement = () => {
               console.log(error);
               toast.error("Failed to update feature");
             },
-          }
+          },
         );
       }
     } else {
@@ -123,7 +123,7 @@ const TenantManagement = () => {
             console.log(error);
             toast.error("Failed to create feature");
           },
-        }
+        },
       );
     }
 
@@ -131,7 +131,7 @@ const TenantManagement = () => {
     clearErrors();
   };
 
-  const handleStatusChange = async  (e: any, rowData: any) => {
+  const handleStatusChange = async (e: any, rowData: any) => {
     updateFeature.mutate(
       {
         id: rowData._id,
@@ -152,7 +152,7 @@ const TenantManagement = () => {
           console.log(error);
           toast.error("Failed to update feature status");
         },
-      }
+      },
     );
   };
 
@@ -176,12 +176,12 @@ const TenantManagement = () => {
         onSuccess: (res: any) => {
           console.log(res);
           remove(deleteIndex);
-          toast.success('Feature deleted successfully');
+          toast.success("Feature deleted successfully");
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error('Failed to delete feature');
-        }
+          toast.error("Failed to delete feature");
+        },
       });
     }
   };
@@ -277,8 +277,18 @@ const TenantManagement = () => {
               <Button type="button" variant="outline" onClick={onOpenChange}>
                 Cancel
               </Button>
-              <Button type="button" onClick={onSubmit}>
-                Submit
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={createFeature.isPending || updateFeature.isPending}
+              >
+                {createFeature.isPending || updateFeature.isPending
+                  ? isEdit
+                    ? "Updating..."
+                    : "Submitting..."
+                  : isEdit
+                    ? "Update"
+                    : "Submit"}
               </Button>
             </DialogFooter>
           </div>

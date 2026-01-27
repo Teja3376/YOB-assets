@@ -18,7 +18,8 @@ const RiskDisclosure = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  const { createRiskDisclosure, updateRiskDisclosure, deleteRiskDisclosure } = useRiskDisclosure();
+  const { createRiskDisclosure, updateRiskDisclosure, deleteRiskDisclosure } =
+    useRiskDisclosure();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "riskDisclosures",
@@ -48,30 +49,35 @@ const RiskDisclosure = memo(() => {
     const data = formGetValues();
     const values = data.riskDisclosures[index ?? -1];
     if (isEdit) {
-      await updateRiskDisclosure.mutate({ id: values._id, payload: { ...values } }, {
-        onSuccess: (res: any) => {
-          console.log(res);
-          update(index ?? -1, { ...values, _id: res._id });
-          toast.success('Risk Disclosure updated successfully');
+      await updateRiskDisclosure.mutate(
+        { id: values._id, payload: { ...values } },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            update(index ?? -1, { ...values, _id: res._id });
+            toast.success("Risk Disclosure updated successfully");
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error("Failed to update Risk Disclosure");
+          },
         },
-        onError: (error: any) => {
-          console.log(error);
-          toast.error('Failed to update Risk Disclosure');
-        }
-      });
-    }
-    else {
-      await createRiskDisclosure.mutate({ assetId: assetId ?? "", payload: { ...values } }, {
-        onSuccess: (res: any) => {
-          console.log(res);
-          append({ ...values, _id: res._id });
-          toast.success('Risk Disclosure created successfully');
+      );
+    } else {
+      await createRiskDisclosure.mutate(
+        { assetId: assetId ?? "", payload: { ...values } },
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            append({ ...values, _id: res._id });
+            toast.success("Risk Disclosure created successfully");
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error("Failed to create Risk Disclosure");
+          },
         },
-        onError: (error: any) => {
-          console.log(error);
-          toast.error('Failed to create Risk Disclosure');
-        }
-      });
+      );
     }
     setIndex(null);
     clearErrors();
@@ -86,12 +92,12 @@ const RiskDisclosure = memo(() => {
       await deleteRiskDisclosure.mutate(values._id, {
         onSuccess: (res: any) => {
           console.log(res);
-          toast.success('Risk Disclosure deleted successfully');
+          toast.success("Risk Disclosure deleted successfully");
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error('Failed to delete Risk Disclosure');
-        }
+          toast.error("Failed to delete Risk Disclosure");
+        },
       });
     }
   };
@@ -125,8 +131,22 @@ const RiskDisclosure = memo(() => {
                 <Button type="button" variant="outline" onClick={onOpenChange}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={onSubmit}>
-                  Submit
+                <Button
+                  type="button"
+                  onClick={onSubmit}
+                  disabled={
+                    createRiskDisclosure.isPending ||
+                    updateRiskDisclosure.isPending
+                  }
+                >
+                  {createRiskDisclosure.isPending ||
+                  updateRiskDisclosure.isPending
+                    ? isEdit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : isEdit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </div>
             </div>

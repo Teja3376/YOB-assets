@@ -18,7 +18,11 @@ const AdditionalTaxes = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  const { createAdditionalTaxes, updateAdditionalTaxes, deleteAdditionalTaxes } = useAdditionalTaxes();
+  const {
+    createAdditionalTaxes,
+    updateAdditionalTaxes,
+    deleteAdditionalTaxes,
+  } = useAdditionalTaxes();
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -51,35 +55,41 @@ const AdditionalTaxes = memo(() => {
       const values = data.additionalTaxes[index ?? -1];
       if (isEdit) {
         if (index !== null) {
-          await updateAdditionalTaxes.mutate({ id: values._id, payload: { ...values } }, {
+          await updateAdditionalTaxes.mutate(
+            { id: values._id, payload: { ...values } },
+            {
+              onSuccess: (res: any) => {
+                console.log(res);
+                update(index ?? -1, { ...values, _id: res._id });
+                toast.success("Additional Taxes updated successfully");
+              },
+              onError: (error: any) => {
+                console.log(error);
+                toast.error("Failed to update Additional Taxes");
+              },
+            },
+          );
+        }
+      } else {
+        await createAdditionalTaxes.mutate(
+          { assetId: assetId ?? "", payload: { ...values } },
+          {
             onSuccess: (res: any) => {
               console.log(res);
-              update(index ?? -1, { ...values, _id: res._id });
-              toast.success('Additional Taxes updated successfully');
+              append({ ...values, _id: res._id });
+              toast.success("Additional Taxes created successfully");
             },
             onError: (error: any) => {
               console.log(error);
-              toast.error('Failed to update Additional Taxes');
-            }
-          });
-        }
-      } else {
-        await createAdditionalTaxes.mutate({ assetId: assetId ?? "", payload: { ...values } }, {
-          onSuccess: (res: any) => {
-            console.log(res);
-            append({ ...values, _id: res._id });
-            toast.success('Additional Taxes created successfully');
+              toast.error("Failed to create Additional Taxes");
+            },
           },
-          onError: (error: any) => {
-            console.log(error);
-            toast.error('Failed to create Additional Taxes');
-          }
-        });
+        );
       }
       setIndex(null);
       clearErrors();
-    };
-  }
+    }
+  };
 
   const handleOnDelete = async () => {
     if (deleteIndex === null) return;
@@ -89,16 +99,15 @@ const AdditionalTaxes = memo(() => {
       onSuccess: (res: any) => {
         console.log(res);
         remove(deleteIndex);
-        toast.success('Additional Taxes deleted successfully');
+        toast.success("Additional Taxes deleted successfully");
       },
       onError: (error: any) => {
         console.log(error);
-        toast.error('Failed to delete Additional Taxes');
-      }
+        toast.error("Failed to delete Additional Taxes");
+      },
     });
     setDeleteIndex(null);
   };
-
 
   const handleDelete = (item: any) => {
     setDeleteIndex(item);
@@ -129,8 +138,22 @@ const AdditionalTaxes = memo(() => {
                 <Button type="button" variant="outline" onClick={onOpenChange}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={onSubmit}>
-                  Submit
+                <Button
+                  type="button"
+                  onClick={onSubmit}
+                  disabled={
+                    createAdditionalTaxes.isPending ||
+                    updateAdditionalTaxes.isPending
+                  }
+                >
+                  {createAdditionalTaxes.isPending ||
+                  updateAdditionalTaxes.isPending
+                    ? isEdit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : isEdit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </div>
             </div>
@@ -166,6 +189,6 @@ const AdditionalTaxes = memo(() => {
       </div>
     </Suspense>
   );
-})
+});
 
 export default AdditionalTaxes;

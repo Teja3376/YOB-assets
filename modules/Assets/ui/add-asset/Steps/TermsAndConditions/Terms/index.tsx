@@ -20,7 +20,11 @@ const Terms = memo(() => {
     trigger,
   } = useFormContext();
   // const { createTerms, updateTerms, deleteTerms } = useTermsApi();
-  const { createTermsAndConditions, updateTermsAndConditions, deleteTermsAndConditions } = useTermsAndConditions();
+  const {
+    createTermsAndConditions,
+    updateTermsAndConditions,
+    deleteTermsAndConditions,
+  } = useTermsAndConditions();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "termsAndConditions",
@@ -65,7 +69,7 @@ const Terms = memo(() => {
             toast.error("Failed to update Terms and Conditions");
             console.log(error);
           },
-        }
+        },
       );
     } else {
       const res: any = await createTermsAndConditions.mutateAsync(
@@ -76,22 +80,20 @@ const Terms = memo(() => {
         {
           onSuccess: (res: any) => {
             console.log(res);
-            append({ ...values, _id: res._id });  
-            toast.success('Terms and Conditions created successfully');
+            append({ ...values, _id: res._id });
+            toast.success("Terms and Conditions created successfully");
           },
           onError: (error: any) => {
             toast.error("Failed to Create Terms and Conditions");
             console.log(error);
           },
-        }
+        },
       );
-      
     }
 
     setIndex(null);
     clearErrors();
   };
-
 
   const handleOnDelete = async () => {
     setDeleteIndex(null);
@@ -99,13 +101,13 @@ const Terms = memo(() => {
     const values = data.termsAndConditions[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteTermsAndConditions.mutate(values._id ?? '', {
+      await deleteTermsAndConditions.mutate(values._id ?? "", {
         onSuccess: (res: any) => {
           console.log(res);
-          toast.success('Terms and Conditions deleted successfully');
+          toast.success("Terms and Conditions deleted successfully");
         },
         onError: (error: any) => {
-          toast.error('Failed to delete Terms and Conditions');
+          toast.error("Failed to delete Terms and Conditions");
           console.log(error);
         },
       });
@@ -141,8 +143,22 @@ const Terms = memo(() => {
                 <Button type="button" variant="outline" onClick={onOpenChange}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={onSubmit}>
-                  Submit
+                <Button
+                  type="button"
+                  onClick={onSubmit}
+                  disabled={
+                    createTermsAndConditions.isPending ||
+                    updateTermsAndConditions.isPending
+                  }
+                >
+                  {createTermsAndConditions.isPending ||
+                  updateTermsAndConditions.isPending
+                    ? isEdit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : isEdit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </div>
             </div>

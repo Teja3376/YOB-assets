@@ -49,7 +49,7 @@ const Amenities = () => {
       icon: <EditIcon />,
       onClick: (item: any) => {
         const findIndex = fields.findIndex(
-          (field) => field.amenities_id === item.amenities_id
+          (field) => field.amenities_id === item.amenities_id,
         );
         setIndex(findIndex);
       },
@@ -60,7 +60,7 @@ const Amenities = () => {
       icon: <TrashIcon />,
       onClick: (item: any) => {
         const findIndex = fields.findIndex(
-          (field) => field.amenities_id === item.amenities_id
+          (field) => field.amenities_id === item.amenities_id,
         );
         setDeleteIndex(findIndex);
       },
@@ -98,7 +98,7 @@ const Amenities = () => {
               console.log(error);
               toast.error("Failed to update amenity");
             },
-          }
+          },
         );
       }
     } else {
@@ -121,7 +121,7 @@ const Amenities = () => {
             console.log(error);
             toast.error("Failed to create amenity");
           },
-        }
+        },
       );
     }
 
@@ -129,7 +129,7 @@ const Amenities = () => {
     clearErrors();
   };
 
-  const handleStatusChange = async  (e: any, rowData: any) => {
+  const handleStatusChange = async (e: any, rowData: any) => {
     updateAmenity.mutate(
       {
         id: rowData._id,
@@ -150,7 +150,7 @@ const Amenities = () => {
           console.log(error);
           toast.error("Failed to update amenity status");
         },
-      }
+      },
     );
   };
 
@@ -174,12 +174,12 @@ const Amenities = () => {
         onSuccess: (res: any) => {
           console.log(res);
           remove(deleteIndex);
-          toast.success('Amenity deleted successfully');
+          toast.success("Amenity deleted successfully");
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error('Failed to delete amenity');
-        }
+          toast.error("Failed to delete amenity");
+        },
       });
     }
   };
@@ -275,8 +275,18 @@ const Amenities = () => {
               <Button type="button" variant="outline" onClick={onOpenChange}>
                 Cancel
               </Button>
-              <Button type="button" onClick={onSubmit}>
-                Submit
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={createAmenity.isPending || updateAmenity.isPending}
+              >
+                {createAmenity.isPending || updateAmenity.isPending
+                  ? isEdit
+                    ? "Updating..."
+                    : "Submitting..."
+                  : isEdit
+                    ? "Update"
+                    : "Submit"}
               </Button>
             </DialogFooter>
           </div>

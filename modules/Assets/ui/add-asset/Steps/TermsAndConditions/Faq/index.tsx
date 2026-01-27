@@ -53,37 +53,43 @@ const Faq = memo(() => {
 
     if (isEdit) {
       if (index !== null) {
-        await updateFAQ.mutateAsync({
-          id: values._id ?? "",
-          payload: { ...values },
-        }, {
-          onSuccess: (res: any) => {
-            console.log(res);
-            update(index ?? -1, { ...values, _id: res._id });
-            toast.success('Faq updated successfully');
+        await updateFAQ.mutateAsync(
+          {
+            id: values._id ?? "",
+            payload: { ...values },
           },
-          onError: (error: any) => {
-            console.log(error);
-            toast.error('Failed to update Faq');
-          }
-        });
+          {
+            onSuccess: (res: any) => {
+              console.log(res);
+              update(index ?? -1, { ...values, _id: res._id });
+              toast.success("Faq updated successfully");
+            },
+            onError: (error: any) => {
+              console.log(error);
+              toast.error("Failed to update Faq");
+            },
+          },
+        );
       }
       update(index ?? -1, { ...values });
     } else {
-      const res: any = await createFAQ.mutateAsync({
-        assetId: assetId ?? "",
-        payload: { ...values },
-      }, {
-        onSuccess: (res: any) => {
-          console.log(res);
-          append({ ...values, _id: res._id });
-          toast.success('Faq created successfully');
+      const res: any = await createFAQ.mutateAsync(
+        {
+          assetId: assetId ?? "",
+          payload: { ...values },
         },
-        onError: (error: any) => {
-          console.log(error);
-          toast.error('Failed to create Faq');
-        }
-      });
+        {
+          onSuccess: (res: any) => {
+            console.log(res);
+            append({ ...values, _id: res._id });
+            toast.success("Faq created successfully");
+          },
+          onError: (error: any) => {
+            console.log(error);
+            toast.error("Failed to create Faq");
+          },
+        },
+      );
     }
 
     setIndex(null);
@@ -96,15 +102,15 @@ const Faq = memo(() => {
     const values = data.faqs[deleteIndex ?? -1];
     if (deleteIndex !== null) {
       remove(deleteIndex);
-      await deleteFAQ.mutate(values._id ?? '', {
+      await deleteFAQ.mutate(values._id ?? "", {
         onSuccess: (res: any) => {
           console.log(res);
-          toast.success('Faq deleted successfully');
+          toast.success("Faq deleted successfully");
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error('Failed to delete Faq');
-        }
+          toast.error("Failed to delete Faq");
+        },
       });
     }
   };
@@ -138,8 +144,18 @@ const Faq = memo(() => {
                 <Button type="button" variant="outline" onClick={onOpenChange}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={onSubmit}>
-                  Submit
+                <Button
+                  type="button"
+                  onClick={onSubmit}
+                  disabled={createFAQ.isPending || updateFAQ.isPending}
+                >
+                  {createFAQ.isPending || updateFAQ.isPending
+                    ? isEdit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : isEdit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </div>
             </div>

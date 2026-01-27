@@ -18,7 +18,11 @@ const ExitOpportunity = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  const { createExitOpportunity, updateExitOpportunity, deleteExitOpportunity } = useExitOpportunity();
+  const {
+    createExitOpportunity,
+    updateExitOpportunity,
+    deleteExitOpportunity,
+  } = useExitOpportunity();
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -58,13 +62,13 @@ const ExitOpportunity = memo(() => {
           onSuccess: (res: any) => {
             console.log(res);
             update(index ?? -1, { ...values, _id: res._id });
-            toast.success('Exit Opportunity updated successfully');
+            toast.success("Exit Opportunity updated successfully");
           },
           onError: (error: any) => {
             console.log(error);
-            toast.error('Failed to update Exit Opportunity');
+            toast.error("Failed to update Exit Opportunity");
           },
-        }
+        },
       );
     } else {
       createExitOpportunity.mutate(
@@ -73,13 +77,13 @@ const ExitOpportunity = memo(() => {
           onSuccess: (res: any) => {
             console.log(res);
             append({ ...values, _id: res._id });
-            toast.success('Exit Opportunity created successfully');
+            toast.success("Exit Opportunity created successfully");
           },
           onError: (error: any) => {
             console.log(error);
-            toast.error('Failed to create Exit Opportunity');
+            toast.error("Failed to create Exit Opportunity");
           },
-        }
+        },
       );
     }
 
@@ -96,12 +100,12 @@ const ExitOpportunity = memo(() => {
       await deleteExitOpportunity.mutate(values._id, {
         onSuccess: (res: any) => {
           console.log(res);
-          toast.success('Exit Opportunity deleted successfully');
+          toast.success("Exit Opportunity deleted successfully");
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error('Failed to delete Exit Opportunity');
-        }
+          toast.error("Failed to delete Exit Opportunity");
+        },
       });
     }
   };
@@ -135,8 +139,22 @@ const ExitOpportunity = memo(() => {
                 <Button type="button" variant="outline" onClick={onOpenChange}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={onSubmit}>
-                  Submit
+                <Button
+                  type="button"
+                  onClick={onSubmit}
+                  disabled={
+                    createExitOpportunity.isPending ||
+                    updateExitOpportunity.isPending
+                  }
+                >
+                  {createExitOpportunity.isPending ||
+                  updateExitOpportunity.isPending
+                    ? isEdit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : isEdit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </div>
             </div>

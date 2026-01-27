@@ -18,7 +18,8 @@ const RiskFactor = memo(() => {
     clearErrors,
     trigger,
   } = useFormContext();
-  const { createRiskFactors, updateRiskFactors, deleteRiskFactors } = useRiskFactors();
+  const { createRiskFactors, updateRiskFactors, deleteRiskFactors } =
+    useRiskFactors();
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "riskFactors",
@@ -44,45 +45,46 @@ const RiskFactor = memo(() => {
 
   const onSubmit = async () => {
     const isValid = await trigger(`riskFactors.${index}`);
-      if (isValid) {
-        const data = formGetValues();
-        const values = data.riskFactors[index ?? -1];
-        if (isEdit) {
-          if (index !== null) {
-            await updateRiskFactors.mutate({ id: values._id, payload: { ...values } },
-              {
-                onSuccess: (res: any) => {
-                  console.log(res);
-                  update(index ?? -1, { ...values, _id: res._id });
-                  toast.success('Risk Factor updated successfully');
-                },
-                onError: (error: any) => {
-                  console.log(error);
-                  toast.error('Failed to update Risk Factor');
-                }
-              }
-            );
-          }
-          update(index ?? -1, { ...values });
-        } else {
-          await createRiskFactors.mutate({ assetId: assetId ?? "", payload: { ...values } },
+    if (isValid) {
+      const data = formGetValues();
+      const values = data.riskFactors[index ?? -1];
+      if (isEdit) {
+        if (index !== null) {
+          await updateRiskFactors.mutate(
+            { id: values._id, payload: { ...values } },
             {
               onSuccess: (res: any) => {
                 console.log(res);
-                append({ ...values, _id: res._id });
-                toast.success('Risk Factor created successfully');
+                update(index ?? -1, { ...values, _id: res._id });
+                toast.success("Risk Factor updated successfully");
               },
               onError: (error: any) => {
                 console.log(error);
-                toast.error('Failed to create Risk Factor');
-              }
-            }
+                toast.error("Failed to update Risk Factor");
+              },
+            },
           );
         }
-        setIndex(null);
-        clearErrors();
+        update(index ?? -1, { ...values });
+      } else {
+        await createRiskFactors.mutate(
+          { assetId: assetId ?? "", payload: { ...values } },
+          {
+            onSuccess: (res: any) => {
+              console.log(res);
+              append({ ...values, _id: res._id });
+              toast.success("Risk Factor created successfully");
+            },
+            onError: (error: any) => {
+              console.log(error);
+              toast.error("Failed to create Risk Factor");
+            },
+          },
+        );
       }
-      
+      setIndex(null);
+      clearErrors();
+    }
   };
 
   const handleOnDelete = async () => {
@@ -94,12 +96,12 @@ const RiskFactor = memo(() => {
       await deleteRiskFactors.mutate(values._id, {
         onSuccess: (res: any) => {
           console.log(res);
-          toast.success('Risk Factor deleted successfully');
+          toast.success("Risk Factor deleted successfully");
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error('Failed to delete Risk Factor');
-        }
+          toast.error("Failed to delete Risk Factor");
+        },
       });
     }
   };
@@ -133,8 +135,20 @@ const RiskFactor = memo(() => {
                 <Button type="button" variant="outline" onClick={onOpenChange}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={onSubmit}>
-                  Submit
+                <Button
+                  type="button"
+                  onClick={onSubmit}
+                  disabled={
+                    createRiskFactors.isPending || updateRiskFactors.isPending
+                  }
+                >
+                  {createRiskFactors.isPending || updateRiskFactors.isPending
+                    ? isEdit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : isEdit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </div>
             </div>
