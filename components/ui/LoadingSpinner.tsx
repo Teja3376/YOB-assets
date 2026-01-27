@@ -2,40 +2,16 @@
 
 import React from "react";
 
-interface LoadingSpinnerProps {
-  size?: string; // e.g., 'h-5 w-5'
-  color?: string; // e.g., 'text-white' | 'text-blue-600'
-  className?: string;
-}
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  size = "h-5 w-5",
-  color = "text-current",
-  className = "",
-}) => {
+
+const LoadingSpinner: React.FC = () => {
   return (
-    <svg
-      className={`animate-spin ${size} ${color} ${className}`}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      role="status"
-      aria-label="Loading"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v8h8a8 8 0 01-16 0z"
-      />
-    </svg>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF6B00] mx-auto mb-4" />
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
   );
 };
 

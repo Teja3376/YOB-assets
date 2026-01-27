@@ -2,13 +2,13 @@
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Copy, Edit, Eye, Maximize } from "lucide-react";
-import {  handleCopy, maskId } from "@/helpers/global";
+import { handleCopy, maskId } from "@/helpers/global";
 import { formatCompactNumber } from "@/lib/format.utils";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 
 const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
-    
+
   {
     header: "Asset Id",
     accessorKey: "_id",
@@ -218,7 +218,7 @@ const getColumns = (setAsset: (asset: any) => void, setNewStatus: any) => [
     header: "Actions",
     accessorKey: "actions",
     cell: (info: any) => {
-        const router = useRouter();
+      const router = useRouter();
       return (
         <div className="flex items-center gap-2">
           <Button

@@ -19,7 +19,7 @@ export default function StepIndicator({
   disabledSteps = [],
 }: StepIndicatorProps) {
   return (
-    <div className='w-48 '>
+    <div className='w-56 '>
       <ul className='space-y-4'>
         {steps.map((step) => {
           const isDisabled = disabledSteps.includes(step.id);

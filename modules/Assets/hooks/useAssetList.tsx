@@ -1,27 +1,52 @@
-import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api-client";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-type GetAssetListParams = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: string;
+export interface Asset {
+  _id: string;
+  status: string;
+  name: string;
+  country: string;
+  state: string;
+  city: string;
+  landmark: string;
+  createdAt: string;
+  updatedAt: string;
+  completedSteps: string[];
+  completedStepsCount: number;
+  totalSteps: number;
+  totalTokens: number;
+  availableTokensToBuy: number;
+  blockchainProjectAddress: string | null;
+  percentageOfTokensSold: number;
+  orderCount: number;
+  uniqueInvestorCount: number;
+}
+
+export interface AssetResponse {
+  data: Asset[];
+  pagination: {
+    page: number;
+    limit: number;
+    currentPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    totalCount: number;
+    totalPages: number;
+  };
+  message: string;
+}
+
+const fetchAdminAssets = async (status: string, page: number, limit: number): Promise<AssetResponse> => {
+  const res = await api.get(
+    `/real-estate/asset-list?status=${status}&page=${page}&limit=${limit}`
+  );
+  return res.data;
 };
 
-export const useAssetList = ({
-  page = 1,
-  limit = 10,
-  search = "",
-  status = "active",
-}: GetAssetListParams) => {
+export const useAssetList = ({ status, page, limit }: { status: string; page: number; limit: number }) => {
   return useQuery({
-    queryKey: ["assetList", page, limit, search, status],
-    queryFn: async () => {
-      const res = await api.get(
-        `/real-estate?page=${page}&limit=${limit}&search=${search}&status=${status}`
-      );
-      return res.data;
-    },
-    keepPreviousData: true,
+    queryKey: ["assetList", status, page, limit],
+    queryFn: () => fetchAdminAssets(status, page, limit),
   });
 };

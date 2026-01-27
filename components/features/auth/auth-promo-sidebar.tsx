@@ -21,7 +21,7 @@ export default function AuthPromoSidebar() {
     },
     {
       icon: DollarSign,
-      text: "Starting from AED 2,000",
+      text: "Starting from 2,000",
       bgColor: "bg-gradient-to-br from-[#FF8A33] to-[#FFB366]"
     },
     {
