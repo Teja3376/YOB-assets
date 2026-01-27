@@ -1,10 +1,11 @@
-
-
-import { useRef, type ChangeEvent, type DragEvent, useState } from 'react';
-import get from 'lodash/get';
-import { X, Upload } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useRef, type ChangeEvent, type DragEvent, useState } from "react";
+import get from "lodash/get";
+import { X, Upload } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Controller, useFormContext } from "react-hook-form";
+import useGetSingleFileUrl from "@/modules/FileUpload/useGetSingleFileUrl";
+import useSingleFileUpload from "@/modules/FileUpload/useSingleFileUpload";
+import useSinglePresignedUrl from "@/modules/FileUpload/useSinglePresignedUrl";
 // import useSinglePresignedUrl from '@/hooks/file/useSinglePresignedUrl';
 // import useSingleFileUpload from '@/hooks/file/useSingleFileUpload';
 // import useGetSingleFileUrl from '@/hooks/file/useGetSingleFileUrl';
@@ -24,7 +25,7 @@ interface ImageUploaderProps {
 }
 
 export default function ImageUploader({
-  label = 'Featured Image',
+  label = "Featured Image",
   name,
   accept = [],
   rules,
@@ -32,12 +33,12 @@ export default function ImageUploader({
   maxSize = 5 * 1024 * 1024,
   meta,
 }: ImageUploaderProps) {
-//   const { getSinglePresignedUrl } = useSinglePresignedUrl();
-//   const { uploadFile } = useSingleFileUpload();
-//   const { getFileUrl } = useGetSingleFileUrl();
-const [getSinglePresignedUrl, setGetSinglePresignedUrl] = useState<any>(null);
-const [uploadFile, setUploadFile] = useState<any>(null);
-const [getFileUrl, setGetFileUrl] = useState<any>(null);
+  const { getSinglePresignedUrl } = useSinglePresignedUrl();
+  const { uploadFile } = useSingleFileUpload();
+  const { getFileUrl } = useGetSingleFileUrl();
+  // const [getSinglePresignedUrl, setGetSinglePresignedUrl] = useState<any>(null);
+  // const [uploadFile, setUploadFile] = useState<any>(null);
+  // const [getFileUrl, setGetFileUrl] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     setError,
@@ -51,17 +52,17 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
   const processFile = async (file: File | null) => {
     if (!file) return;
 
-    if (!accept.includes(file.type.split('/')[1])) {
+    if (!accept.includes(file.type.split("/")[1])) {
       setError(name, {
-        type: 'manual',
-        message: `Unsupported format. Allowed: ${accept.join(', ')}`,
+        type: "manual",
+        message: `Unsupported format. Allowed: ${accept.join(", ")}`,
       });
       return;
     }
 
     if (file.size > maxSize) {
       setError(name, {
-        type: 'manual',
+        type: "manual",
         message: `File exceeds ${maxSize / 1024 / 1024} MB`,
       });
       return;
@@ -71,17 +72,21 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
       fileName: file.name,
       mimeType: file.type,
       fileSize: file.size,
-      refId: meta?.refId || '',
-      belongsTo: meta?.belongsTo || '',
+      refId: meta?.refId || "",
+      belongsTo: meta?.belongsTo || "",
       isPublic: meta?.isPublic || false,
     }).then(async (res: any) => {
-      await uploadFile({ url: res.uploadUrl, file }).then(async (r: any) => {
-        if (r.status === 200) {
-          await getFileUrl(res.savedS3Object._id).then((fileReponse: any) => {
-            setValue(name, fileReponse.s3Url);
-          });
-        }
-      });
+      console.log("Presigned URL response:", res);
+      await uploadFile({ url: res.data.uploadUrl, file }).then(
+        async (r: any) => {
+          console.log("File upload response:", res);
+          if (r.status === 200) {
+            await getFileUrl(res.data.assetS3Object._id).then((fileReponse: any) => {
+              setValue(name, fileReponse.data.url);
+            });
+          }
+        },
+      );
     });
   };
 
@@ -99,21 +104,21 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
 
   const removeImage = () => {
     setValue(name, null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const error = get(errors, name)?.message as string;
 
   return (
-    <div className='space-y-2'>
+    <div className="space-y-2">
       <label
         htmlFor={name}
-        className={cn('text-sm font-medium', error && 'text-destructive')}
+        className={cn("text-sm font-medium", error && "text-destructive")}
       >
-        {label} {rules?.required && <span className='ml-1'>*</span>}
+        {label} {rules?.required && <span className="ml-1">*</span>}
       </label>
 
-      <div className='grid grid-cols-2 gap-4'>
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <Controller
             name={name}
@@ -122,59 +127,59 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
             render={() => (
               <div
                 className={cn(
-                  'h-32 border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center cursor-pointer transition-colors',
-                  errors[name] && 'border-destructive',
-                  error && 'border-destructive'
+                  "h-32 border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center cursor-pointer transition-colors",
+                  errors[name] && "border-destructive",
+                  error && "border-destructive",
                 )}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input
-                  type='file'
+                  type="file"
                   ref={fileInputRef}
                   onChange={handleFileChange}
-                  accept={accept.map((ext) => `.${ext}`).join(',')}
-                  className='hidden'
+                  accept={accept.map((ext) => `.${ext}`).join(",")}
+                  className="hidden"
                   disabled={disabled}
                 />
-                <Upload className='h-10 w-10 mb-2 text-gray-400' />
-                <p className='text-sm text-center'>
+                <Upload className="h-10 w-10 mb-2 text-gray-400" />
+                <p className="text-sm text-center">
                   Drag & drop or click to upload
                 </p>
-                <p className='text-xs text-muted-foreground'>
-                  Max: {maxSize / 1024 / 1024}MB | Formats: {accept.join(', ')}
+                <p className="text-xs text-muted-foreground">
+                  Max: {maxSize / 1024 / 1024}MB | Formats: {accept.join(", ")}
                 </p>
               </div>
             )}
           />
           {error && (
-            <p id={`${name}-error`} className='text-sm text-destructive mt-1'>
+            <p id={`${name}-error`} className="text-sm text-destructive mt-1">
               {error}
             </p>
           )}
         </div>
 
-        <div className='relative w-full border rounded-md overflow-hidden h-32'>
+        <div className="relative w-full border rounded-md overflow-hidden h-32">
           {file ? (
             <img
-              src={file || ''}
-              alt='Preview'
-              className='w-full h-full object-contain'
+              src={file || ""}
+              alt="Preview"
+              className="w-full h-full object-contain"
             />
           ) : (
-            <div className='flex items-center justify-center w-full h-full bg-gray-100'>
-              <p className='text-sm text-gray-500'>No image selected</p>
+            <div className="flex items-center justify-center w-full h-full bg-gray-100">
+              <p className="text-sm text-gray-500">No image selected</p>
             </div>
           )}
           {file && (
             <button
-              className='absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 
-                         text-white flex items-center justify-center text-sm transition-colors'
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 
+                         text-white flex items-center justify-center text-sm transition-colors"
               onClick={removeImage}
-              type='button'
+              type="button"
             >
-              <X className='h-5 w-5' />
+              <X className="h-5 w-5" />
             </button>
           )}
         </div>

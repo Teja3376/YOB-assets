@@ -57,3 +57,26 @@ export const CURRENCY_OPTIONS = [
   { label: "GBP", value: "GBP" },
   { label: "USD", value: "USD" },
 ];
+
+
+export const EXCLUDED_FIELDS = ['_id', 'userId', 'issuerId','createdAt', 'updatedAt', '__v', 'lastModified' , "webkitRelativePath" , "size" , "type" , "lastModifiedDate"];
+
+export const cleanUpdateData = (data: any): any => {
+  if (data === null || data === undefined) return data;
+  
+  if (Array.isArray(data)) {
+    return data.map(item => cleanUpdateData(item));
+  }
+  
+  if (typeof data === 'object') {
+    const cleaned: any = {};
+    for (const key in data) {
+      if (!EXCLUDED_FIELDS.includes(key)) {
+        cleaned[key] = cleanUpdateData(data[key]);
+      }
+    }
+    return cleaned;
+  }
+  
+  return data;
+};

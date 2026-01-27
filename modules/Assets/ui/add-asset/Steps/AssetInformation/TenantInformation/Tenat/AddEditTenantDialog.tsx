@@ -32,7 +32,7 @@ const AddEditTenantDialog: React.FC<AddEditTenantDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onCancel}>
-      <DialogContent className="w-[1000px] max-w-3xl max-h-[95vh] overflow-y-scroll">
+      <DialogContent className="w-250 max-w-3xl max-h-[95vh] overflow-y-scroll">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             {isEdit ? "Edit" : "Add"} Tenant

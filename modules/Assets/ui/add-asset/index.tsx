@@ -170,7 +170,7 @@ export default function AssetPage() {
 
   /* ------------------ Submit ------------------ */
   const onSubmit: SubmitHandler<any> = async (data) => {
-    const { nearByLocations, company, ...rest } = data;
+    const { nearByLocations, company, bookmarks, ...rest } = data;
     const payload = { ...rest, spvId: rest.spvId };
     console.log("Submitting asset data:", payload);
 

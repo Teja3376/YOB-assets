@@ -1,3 +1,4 @@
+import { cleanUpdateData } from "@/helpers/global";
 import api from "@/lib/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -13,7 +14,8 @@ export default function useUpdateAsset() {
       assetData: any;
       assetId: string;
     }) => {
-      const response = await api.put(`/real-estate/${assetId}`, assetData);
+      const cleanedData = cleanUpdateData(assetData);
+      const response = await api.put(`/real-estate/${assetId}`, cleanedData);
       return response.data.data;
     },
     onSuccess: async (data) => {

@@ -3,31 +3,14 @@ import { SpvPayload } from "../utils/global";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SPVType } from "../utils/global";
+import { cleanUpdateData, EXCLUDED_FIELDS } from "@/helpers/global";
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 // Fields that should be excluded from update requests (MongoDB internal fields)
-const EXCLUDED_FIELDS = ['_id', 'userId', 'createdAt', 'updatedAt', '__v', 'lastModified' , "webkitRelativePath" , "size" , "type" , "lastModifiedDate"];
+
 
 // Helper function to clean data by removing MongoDB internal fields
-const cleanUpdateData = (data: any): any => {
-  if (data === null || data === undefined) return data;
-  
-  if (Array.isArray(data)) {
-    return data.map(item => cleanUpdateData(item));
-  }
-  
-  if (typeof data === 'object') {
-    const cleaned: any = {};
-    for (const key in data) {
-      if (!EXCLUDED_FIELDS.includes(key)) {
-        cleaned[key] = cleanUpdateData(data[key]);
-      }
-    }
-    return cleaned;
-  }
-  
-  return data;
-};
+
 
 const useUpdateSpv = () => {
   const [status, setStatus] = useState<Status>('idle');
