@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button";
 interface UpdateAssetStatusDialogProps {
   asset: any;
   setAsset: (asset: any) => void;
-  updateStatus: (newStatus: "active" | "waitlist" | "") => Promise<void>;
+  updateStatus: (
+    newStatus: "active" | "pending" | "draft" | "",
+  ) => Promise<void>;
   status: string;
   setStatusUpdate: any;
-  newStatus: "active" | "waitlist" | "";
+  newStatus: "active" | "pending" | "draft" | "";
 }
 
 const UpdateAssetStatusDialog: React.FC<UpdateAssetStatusDialogProps> = ({
@@ -36,14 +38,15 @@ const UpdateAssetStatusDialog: React.FC<UpdateAssetStatusDialogProps> = ({
 
   const isIncomplete = asset && asset?.completedStepsCount !== 9;
 
-
   return (
     <Dialog open={isStatusOpen} onOpenChange={handleOnClose}>
       <DialogContent>
         {isIncomplete && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-lg font-bold">Incomplete Asset Setup</DialogTitle>
+              <DialogTitle className="text-lg font-bold">
+                Incomplete Asset Setup
+              </DialogTitle>
               <DialogDescription className="text-sm text-gray-500">
                 Please wait while we update the asset status. This may take a
                 few moments.
@@ -92,9 +95,9 @@ const UpdateAssetStatusDialog: React.FC<UpdateAssetStatusDialogProps> = ({
                 {/* {asset?.status === "active" ? "Inactive" : "Active"}. */}
                 {newStatus === "active"
                   ? "Active"
-                  : newStatus === "waitlist"
-                  ? "Waitlist"
-                  : "Draft"}
+                  : newStatus === "pending"
+                    ? "Pending"
+                    : "Draft"}
                 .
               </DialogDescription>
             </DialogHeader>

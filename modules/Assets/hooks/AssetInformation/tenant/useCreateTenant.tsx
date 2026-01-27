@@ -1,7 +1,8 @@
 import api from "@/lib/api-client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateTenant() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["create-tenant"],
     mutationFn: async ({
@@ -13,6 +14,9 @@ export function useCreateTenant() {
     }) => {
       const response = await api.post(`/tenant?assetId=${assetId}`, tenantData);
       return response.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["asset"] });
     },
   });
 }

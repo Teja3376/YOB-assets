@@ -120,20 +120,9 @@ const DateController: React.FC<DateControllerProps> = ({
                         ? new Date(field.value)
                         : undefined
                   }
-                  captionLayout="dropdown" // ✅ enables month + year dropdown
-                  startMonth={new Date(1900, 0)} // replaces fromYear/fromDate
-                  endMonth={allowFutureDates ? new Date(2100, 11) : today} // replaces toYear/toDate
-                  hidden={{
-                    before: allowFutureDates ? undefined : new Date(1900, 0, 1),
-                    after: allowFutureDates ? new Date(2100, 11, 31) : today,
-                  }}
-                  month={
-                    field.value
-                      ? field.value instanceof Date
-                        ? field.value
-                        : new Date(field.value)
-                      : today
-                  }
+                  captionLayout="dropdown"
+                  startMonth={new Date(1900, 0)}
+                  endMonth={allowFutureDates ? new Date(2100, 11) : today}
                   disabled={(date) => {
                     const blockedByFutureFlag = allowFutureDates
                       ? false
@@ -151,9 +140,7 @@ const DateController: React.FC<DateControllerProps> = ({
                       console.log("Selected date:", date);
                       field.onChange(date);
                       field.onBlur();
-                      if (autoClose) {
-                        setOpen(false);
-                      }
+                      if (autoClose) setOpen(false);
                     }
                   }}
                 />
