@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import "react-day-picker/style.css";
@@ -65,7 +65,7 @@ const DateController: React.FC<DateControllerProps> = ({
                     variant="outline"
                     className={cn(
                       "w-full h-10 px-3 py-1 text-left font-normal",
-                      !field.value && "text-muted-foreground"
+                      !field.value && "text-muted-foreground",
                     )}
                   >
                     {field.value ? (
@@ -78,7 +78,7 @@ const DateController: React.FC<DateControllerProps> = ({
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
+                {/* <Calendar
                   mode="single"
                   selected={field.value ? new Date(field.value) : undefined}
                   disabled={(date) => {
@@ -102,6 +102,39 @@ const DateController: React.FC<DateControllerProps> = ({
                       field.onChange(date);
                       field.onBlur();
                       // toast.success(`${autoClose}`)
+                      if (autoClose) {
+                        setOpen(false);
+                      }
+                    }
+                  }}
+                /> */}
+
+                <Calendar
+                  mode="single"
+                  selected={field.value ? new Date(field.value) : undefined}
+                  captionLayout="dropdown" // ✅ enables month + year dropdown
+                  startMonth={new Date(1900, 0)} // replaces fromYear/fromDate
+                  endMonth={allowFutureDates ? new Date(2100, 11) : today} // replaces toYear/toDate
+                  hidden={{
+                    before: allowFutureDates ? undefined : new Date(1900, 0, 1),
+                    after: allowFutureDates ? new Date(2100, 11, 31) : today,
+                  }}
+                  disabled={(date) => {
+                    const blockedByFutureFlag = allowFutureDates
+                      ? false
+                      : date > today;
+
+                    const blockedByCustom =
+                      typeof dayDisabled === "function"
+                        ? dayDisabled(date)
+                        : false;
+
+                    return blockedByFutureFlag || blockedByCustom;
+                  }}
+                  onSelect={(date) => {
+                    if (date) {
+                      field.onChange(date);
+                      field.onBlur();
                       if (autoClose) {
                         setOpen(false);
                       }

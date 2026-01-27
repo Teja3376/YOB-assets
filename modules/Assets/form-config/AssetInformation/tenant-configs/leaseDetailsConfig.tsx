@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 export const leaseDetailsConfig = (index: number): FormFieldConfig[] => {
   const { control, watch } = useFormContext();
   const startDate = watch(`tenants.${index}.startDate`);
+  console.log("Start Date in leaseDetailsConfig:", startDate);
 
   return [
     {

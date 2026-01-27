@@ -97,7 +97,7 @@
   --font-mono: var(--font-poppins);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
+  --color-primary:var(--primary-color);
   --color-yob-primary: var(--primary-color);
   --color-yob-primary-light: var(--orange-light);
   --color-card: var(--card);
