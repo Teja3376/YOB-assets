@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { lazy, Suspense, memo, useCallback, useMemo, JSX } from 'react';
 import { ASSET_STEPS_TABS } from '@/modules/Assets/utils/global';
 import Loading from '@/components/ui/Loading';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 const Location = lazy(() => import('./Location'));
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 
 const COMPONENT_MAP: Record<string, JSX.Element> = {
   location: (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <Location />
     </Suspense>
   ),

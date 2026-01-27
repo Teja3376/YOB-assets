@@ -1,6 +1,7 @@
-import api from '@/lib/api-client'; // Or use axios directly if needed
+import api from '@/lib/api-client';
+import { useMutation } from '@tanstack/react-query';
 
-interface FileInput {
+export interface FileInput {
   fileName: string;
   mimeType: string;
   fileSize: number;
@@ -10,33 +11,24 @@ interface FileInput {
   metadata?: Record<string, any>;
 }
 
-interface PresignedResponse {
+export interface PresignedResponse {
   uploadUrl: string;
-  savedS3Object: {
+  assetS3Object: {
     _id: string;
     [key: string]: any;
   };
 }
 
 const useMultiplePresignedUrl = () => {
-  const getMultiplePresignedUrl = async (
-    files: FileInput[]
-  ): Promise<PresignedResponse[]> => {
-    try {
-      const response = await api.post('/s3-file/upload-multiple', {
+  return useMutation<PresignedResponse[], Error, FileInput[]>({
+    mutationFn: async (files: FileInput[]) => {
+      const response = await api.post('/S3-files/bulk-upload', {
         files,
       });
 
       return response.data;
-    } catch (error: any) {
-      console.error('Failed to fetch presigned URLs', error);
-      throw new Error(
-        error?.response?.data?.message || 'Presigned URL request failed'
-      );
-    }
-  };
-
-  return { getMultiplePresignedUrl };
+    },
+  });
 };
 
 export default useMultiplePresignedUrl;

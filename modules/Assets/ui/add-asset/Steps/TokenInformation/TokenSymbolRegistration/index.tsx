@@ -2,18 +2,16 @@ import React, { useState } from "react";
 import TokenSymbolInput from "./TokenSymbolInput";
 import AvailabilityStatus from "./AvailabilityStatus";
 import { useFormContext } from "react-hook-form";
-import { useParams } from "next/navigation"; 
-// import { useTokenSymbolReservation } from "@/hooks/useTokenSymbolReservation";
-import {toast} from "sonner";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import useCheckTokenSymbol from "@/modules/Assets/hooks/TokenInformation/useCheckTokenSymbol";
+import useUpdateTokenSymbol from "@/modules/Assets/hooks/TokenInformation/useUpdateTokenSymbol";
 
-// Define component states
 type ReservationStatus = "idle" | "checking" | "available" | "unavailable" | "reserving" | "completed" | "error";
 
 interface TokenSymbolReservationProps {
   onReservationComplete?: (symbol: string) => void;
 }
-
-// Fee info component (unchanged)
 const FeeInfo: React.FC = () => {
   return (
     <div className="flex items-center justify-between mt-4">
@@ -38,7 +36,7 @@ const FeeInfo: React.FC = () => {
         <span className="text-gray-600 text-sm">Token Symbol Reservation fee</span>
       </div>
       <div className="flex items-center">
-        <span className="text-purple-500 mx-2"> 2000 RyzerX Tokens</span>
+        {/* <span className="text-purple-500 mx-2"> 2000 RyzerX Tokens</span> */}
         <button type='button' className="text-gray-400 cursor-pointer" aria-label="More information">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -73,48 +71,67 @@ const TokenSymbolReservation: React.FC<TokenSymbolReservationProps> = ({
   onReservationComplete,
 }) => {
   const { setValue } = useFormContext();
-  const { id } = useParams<{ id: string }>();
-  console.log("id", id);
-  // const {
-  //   status,
-  //   checkedSymbol,
-  //   error,
-  //   checkAvailability,
-  //   reserveToken,
-  //   reset,
-  // } = useTokenSymbolReservation(id);
+  const params = useParams<{ assetId?: string; id?: string }>();
+  const assetId = params?.assetId ?? params?.id;
+  const { mutateAsync: checkTokenSymbol } = useCheckTokenSymbol();
+  const { mutateAsync: updateTokenSymbol } = useUpdateTokenSymbol();
   const [status, setStatus] = useState<ReservationStatus>("idle");
   const [checkedSymbol, setCheckedSymbol] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [checkAvailability, setCheckAvailability] = useState<any>(null);
-  const [reserveToken, setReserveToken] = useState<any>(null);
-  const [reset, setReset] = useState<any>(null);
 
   const [tokenSymbol, setTokenSymbol] = useState("");
 
-  // 🔍 Check availability
   const handleCheckAvailability = async () => {
     if (!tokenSymbol.trim()) return;
-    await checkAvailability(tokenSymbol);
+
+    setError("");
+    setStatus("checking");
+
+    try {
+      const res = await checkTokenSymbol({ symbol: tokenSymbol });
+      setCheckedSymbol(tokenSymbol);
+
+      if (res?.available) {
+        setStatus("available");
+        return;
+      }
+
+      setStatus("unavailable");
+      setError(res?.message || "Token Symbol is not available");
+    } catch (err: any) {
+      setStatus("error");
+      setError(err?.response?.data?.message || err?.message || "Failed to check token symbol");
+    }
   };
 
- const handleContinueReservation = async () => {
-  const result = await reserveToken(tokenSymbol);
+  const handleContinueReservation = async () => {
+    setError("");
 
-  if (result?.success) {
-    setValue("tokenInformation.tokenSymbol", tokenSymbol);
-    if (onReservationComplete) onReservationComplete(tokenSymbol.toUpperCase());
-    toast.success( "Token reserved successfully");
-    return result.message; 
-  } else {
-    toast.error(result?.message || "Reservation failed");
-    throw new Error(result?.message || "Reservation failed");
-  }
-};
+    try {
+      if (assetId) {
+        setStatus("reserving");
+        const res = await updateTokenSymbol({ assetId, symbol: tokenSymbol });
+        if (!res?.success) {
+          throw new Error(res?.message || "Failed to reserve token symbol");
+        }
+      }
+
+      setValue("tokenInformation.tokenSymbol", tokenSymbol);
+      if (onReservationComplete) onReservationComplete(tokenSymbol.toUpperCase());
+      toast.success("Token symbol reserved");
+      setStatus("completed");
+    } catch (err: any) {
+      setStatus("error");
+      setError(err?.response?.data?.message || err?.message || "Reservation failed");
+      toast.error(err?.response?.data?.message || err?.message || "Reservation failed");
+    }
+  };
 
   const handleTryAnother = () => {
     setTokenSymbol("");
-    reset();
+    setCheckedSymbol("");
+    setError("");
+    setStatus("idle");
   };
 
   return (
@@ -150,13 +167,12 @@ const TokenSymbolReservation: React.FC<TokenSymbolReservationProps> = ({
           />
         )}
 
-        {/* Optional error message */}
         {error && (
           <p className="text-red-500 text-center mt-4 text-sm">{error}</p>
         )}
       </div>
 
-       <FeeInfo />
+      <FeeInfo />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { ASSET_STEPS_TABS } from '@/modules/Assets/utils/global';
 import Loading from '@/components/ui/Loading';
 import Gallery from './Gallery';
 import Documents from './Documents';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Props {
   tab: string;
@@ -15,12 +16,12 @@ interface Props {
 
 const COMPONENT_MAP: Record<string, JSX.Element> = {
   gallery: (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <Gallery />
     </Suspense>
   ),
   documents: (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <Documents />
     </Suspense>
   ),

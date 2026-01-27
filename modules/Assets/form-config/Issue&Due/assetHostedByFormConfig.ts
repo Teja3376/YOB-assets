@@ -40,7 +40,7 @@ const getPhoneValidation = (countryCode: string) => {
 };
 
 const formConfig = (countryCode: string): FormFieldConfig[] => {
-  const { id } = useParams<{ id: string }>();
+  const { assetId } = useParams<{ assetId?: string }>();
   const { control, watch } = useFormContext();
   const phoneValidation = getPhoneValidation(countryCode);
 
@@ -126,7 +126,7 @@ const formConfig = (countryCode: string): FormFieldConfig[] => {
       control,
       fullWidth: true,
       meta: {
-        refId: id || '',
+        refId: assetId ?? '',
         belongsTo: 'asset',
         isPublic: true,
       },

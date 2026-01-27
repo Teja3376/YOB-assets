@@ -4,6 +4,7 @@ import { ASSET_STEPS_TABS } from "@/modules/Assets/utils/global";
 import Loading from "@/components/ui/Loading";
 import TokenInformation from "./TokenAllocation";
 import DAO from "../AssetInformation/AssetType/DAO/index";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 interface Props {
   tab: string;
   step: string;
@@ -16,12 +17,12 @@ const IssuesDue =({ tab, step, asset }: Props) => {
 
   const COMPONENT_MAP: Record<string, JSX.Element> = {
     "token-information": (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<LoadingSpinner />}>
         <TokenInformation asset={asset} />
       </Suspense>
     ),
     "dao-information": (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<LoadingSpinner />}>
         <DAO  asset={asset} />
       </Suspense>
     ),

@@ -8,6 +8,7 @@ import SignatureDialog from "./SignatureDialog";
 import DeleteDialog from "./DeleteDialog";
 // import { useDocumentTemplates } from "@/hooks/documents/useDocusealApi";
 import { toast } from "sonner";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface Props {
   tab: string;
@@ -16,7 +17,7 @@ interface Props {
 
 const COMPONENT_MAP = {
   location: (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <div>Location Component Placeholder</div>
     </Suspense>
   ),

@@ -7,6 +7,7 @@ import { ASSET_STEPS_TABS } from '@/modules/Assets/utils/global';
 import { Spinner } from '@/components/ui/spinner';
 import dynamic from 'next/dynamic';
 import Loading from '@/components/ui/Loading';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Lazy-loaded components
 const AssetType = dynamic(() => import('./AssetType'));
@@ -30,25 +31,25 @@ const getComponentByTabId = (tabId: string): JSX.Element => {
   switch (tabId) {
     case 'asset-type':
       return (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <AssetType asset={asset} />
         </Suspense>
       );
     case 'investment-details':
       return (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <InvestmentDetails asset={asset} />
         </Suspense>
       );
     case 'rent-information':
       return (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <TenantInformation asset={asset} />
         </Suspense>
       );
     case 'escrow-legal':
       return (
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <EscrowLegal asset={asset} />
         </Suspense>
       );

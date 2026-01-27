@@ -1,12 +1,11 @@
-
-
+import api from '@/lib/api-client';
 import axios from 'axios';
 
 const useGetSingleFileUrl = () => {
   const getFileUrl = async (id: string) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5050/api/S3-files/${id}/url`
+      const response = await api.get(
+        `/S3-files/${id}/url`
       );
       return response.data;
     } catch (error) {

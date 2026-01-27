@@ -97,6 +97,7 @@ const Index = () => {
         isOpen={isOpen}
         isEdit={isEdit}
         index={index}
+        assetId={assetId}
         onSubmit={onSubmit}
         onOpenChange={onOpenChange}
       />

@@ -5,9 +5,9 @@ import get from 'lodash/get';
 import { X, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Controller, useFormContext } from 'react-hook-form';
-// import useSinglePresignedUrl from '@/hooks/file/useSinglePresignedUrl';
-// import useSingleFileUpload from '@/hooks/file/useSingleFileUpload';
-// import useGetSingleFileUrl from '@/hooks/file/useGetSingleFileUrl';
+import useSinglePresignedUrl from "../../../modules/FileUpload/useSinglePresignedUrl";
+import useSingleFileUpload from "../../../modules/FileUpload/useSingleFileUpload";
+import useGetSingleFileUrl from "../../../modules/FileUpload/useGetSingleFileUrl";
 
 interface ImageUploaderProps {
   name: string;
@@ -32,12 +32,9 @@ export default function ImageUploader({
   maxSize = 5 * 1024 * 1024,
   meta,
 }: ImageUploaderProps) {
-//   const { getSinglePresignedUrl } = useSinglePresignedUrl();
-//   const { uploadFile } = useSingleFileUpload();
-//   const { getFileUrl } = useGetSingleFileUrl();
-const [getSinglePresignedUrl, setGetSinglePresignedUrl] = useState<any>(null);
-const [uploadFile, setUploadFile] = useState<any>(null);
-const [getFileUrl, setGetFileUrl] = useState<any>(null);
+  const { getSinglePresignedUrl } = useSinglePresignedUrl();
+  const { uploadFile } = useSingleFileUpload();
+  const { getFileUrl } = useGetSingleFileUrl();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     setError,
@@ -66,7 +63,6 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
       });
       return;
     }
-
     await getSinglePresignedUrl({
       fileName: file.name,
       mimeType: file.type,
@@ -75,10 +71,12 @@ const [getFileUrl, setGetFileUrl] = useState<any>(null);
       belongsTo: meta?.belongsTo || '',
       isPublic: meta?.isPublic || false,
     }).then(async (res: any) => {
-      await uploadFile({ url: res.uploadUrl, file }).then(async (r: any) => {
+      await uploadFile({ url: res.data?.uploadUrl, file }).then(async (r: any) => {
+        console.log(res.data.assetS3Object._id);
         if (r.status === 200) {
-          await getFileUrl(res.savedS3Object._id).then((fileReponse: any) => {
-            setValue(name, fileReponse.s3Url);
+          await getFileUrl(res.data?.assetS3Object?._id).then((fileReponse: any) => {
+            setValue(name, fileReponse.data.url);
+            console.log(fileReponse.data.url);
           });
         }
       });

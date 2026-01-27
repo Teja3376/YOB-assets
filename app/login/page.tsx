@@ -102,7 +102,7 @@ export default function LoginPage() {
                             )}
                         />
 
-                        
+
 
                         {/* Error Message */}
                         {error && (
@@ -117,7 +117,7 @@ export default function LoginPage() {
                             {form.formState.isSubmitting
                                 ? "Logging in..."
                                 : "Login →"}
-                        </Button>   
+                        </Button>
                     </form>
                 </Form>
 

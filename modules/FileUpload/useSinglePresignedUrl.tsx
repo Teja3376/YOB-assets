@@ -1,5 +1,6 @@
 
 
+import api from '@/lib/api-client';
 import axios from 'axios';
 
 const useSinglePresignedUrl = () => {
@@ -19,9 +20,9 @@ const useSinglePresignedUrl = () => {
     isPublic: boolean;
   }) => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         // 'https://staging-backend.ryzer.app/api/s3-file/upload-single',
-        "http://localhost:5050/api/S3-files/upload-single",
+        "/S3-files/upload-single",
         {
           fileName,
           mimeType,

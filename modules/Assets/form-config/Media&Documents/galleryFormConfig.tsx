@@ -16,7 +16,7 @@ const galleryFormConfig = (): FormFieldConfig[] => {
         required: "Image is required",
       },
       meta: {
-        refId: assetId || "",
+        refId: assetId ?? "",
         belongsTo: "asset",
         isPublic: true,
       },
