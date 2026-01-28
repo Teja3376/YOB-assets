@@ -135,7 +135,6 @@ export const boardMembersFormConfig = ({
       name: `boardMembers.${index}.role`,
       type: "select",
       options: [
-        { label: "Director", value: "DIRECTOR" },
         { label: "Asset Manager", value: "Asset Manager" },
         { label: "Investor Manager", value: "Investor Manager" },
       ],

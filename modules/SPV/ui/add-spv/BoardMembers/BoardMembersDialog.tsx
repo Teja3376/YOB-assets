@@ -18,8 +18,6 @@ import { useParams } from "next/navigation";
 interface BoardMembersDialogProps {
   index: number | null;
   setIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  openBoardMembersDialog: boolean;
-  setOpenBoardMembersDialog: React.Dispatch<React.SetStateAction<boolean>>;
   fields: any[];
   append: any;
   update: any;
@@ -28,61 +26,58 @@ interface BoardMembersDialogProps {
 
 const BoardMembersDialog = ({
   index,
-  setIndex,
-  openBoardMembersDialog,
-  setOpenBoardMembersDialog,
-  fields,
   append,
   update,
+  setIndex,
+  fields,
   remove,
 }: BoardMembersDialogProps) => {
-  const { createAB, updateAB, status, error } = useABApi();
+  const { createAB, updateAB } = useABApi();
   const {
     getValues: formGetValues,
     clearErrors,
     trigger,
   } = useFormContext();
 
-  const isOpen = openBoardMembersDialog;
-  const isEdit = index !== null && index !== -1;
+  const isOpen = index !== null;
+  const isEdit = index !== -1;
 
-  const handleClose = () => {
+  // const handleClose = () => {
+  //   if (index !== null) {
+  //     // If it's a new item (no _id) and we're closing without saving, remove it
+  //     const currentItem = fields[index];
+  //     if (currentItem && !currentItem._id && !isEdit) {
+  //       remove(index);
+  //     } else if (isEdit) {
+  //       // Restore previous values for edit mode
+  //       const previousValues = fields[index];
+  //       if (previousValues) {
+  //         update(index, previousValues);
+  //       }
+  //     }
+  //   }
+  //   setIndex(null);
+  //   clearErrors();
+  //   setOpenBoardMembersDialog(false);
+  // };
+  const onOpenChange = () => {
+    const previousValues = index !== null ? fields[index] : {};
     if (index !== null) {
-      // If it's a new item (no _id) and we're closing without saving, remove it
-      const currentItem = fields[index];
-      if (currentItem && !currentItem._id && !isEdit) {
-        remove(index);
-      } else if (isEdit) {
-        // Restore previous values for edit mode
-        const previousValues = fields[index];
-        if (previousValues) {
-          update(index, previousValues);
-        }
-      }
+      update(index, previousValues);
     }
     setIndex(null);
     clearErrors();
-    setOpenBoardMembersDialog(false);
   };
 
   const onSubmit = async () => {
-    if (index === null) return;
-    
-    const currentIndex = index;
-    trigger(`boardMembers.${currentIndex}`)
+    trigger(`boardMembers.${index}`)
       .then(async (isValid) => {
         if (isValid) {
           const data = formGetValues();
-          const values = data.boardMembers?.[currentIndex];
-          
-          if (!values) {
-            console.error("Values not found for index:", currentIndex);
-            return;
-          }
-
-          if (isEdit && values._id) {
+          const values = data.boardMembers?.[index ?? -1];
+          if (isEdit) {
             // Update existing board member
-            update(currentIndex, { ...values });
+            update(index ?? -1, { ...values });
             await updateAB(values._id, {
               fullName: values.fullName,
               email: values.email,
@@ -103,8 +98,7 @@ const BoardMembersDialog = ({
               idProof: values.idProof,
               role: values.role,
             }).then((res) => {
-              // Update the temporary item with the response data
-              update(currentIndex, {
+              append({
                 _id: res._id,
                 fullName: values.fullName,
                 email: values.email,
@@ -118,7 +112,6 @@ const BoardMembersDialog = ({
           }
           setIndex(null);
           clearErrors();
-          setOpenBoardMembersDialog(false);
         }
       })
       .catch((error) => {
@@ -127,7 +120,7 @@ const BoardMembersDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-h-[95vh] overflow-y-auto"
         style={{ width: "50vw", maxWidth: "50vw" }}
@@ -150,7 +143,7 @@ const BoardMembersDialog = ({
         </div>
 
         <DialogFooter className="flex justify-end mt-6">
-          <Button type="button" variant="outline" onClick={handleClose}>
+          <Button type="button" variant="outline" onClick={onOpenChange}>
             Cancel
           </Button>
           <Button type="button" onClick={onSubmit}>
