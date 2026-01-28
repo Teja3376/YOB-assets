@@ -52,7 +52,7 @@ const DateController: React.FC<DateControllerProps> = ({
       disabled={disabled}
       rules={rules}
       render={({ field }) => {
-        console.log("Rendering DateController for:", name, field.value);
+        // console.log("Rendering DateController for:", name, field.value);
 
         return (
           <FormItem>
