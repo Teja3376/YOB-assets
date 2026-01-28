@@ -1,23 +1,43 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { handleCopy, maskId } from "@/helpers/global";
 import { ColumnDef } from "@tanstack/react-table";
-import { Copy, Edit, Eye } from "lucide-react";
+import { Copy, Edit, Eye, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatCurrencyFlexible, formatCompactNumber } from "@/lib/format.utils";
 import { SPV_TYPES } from "@/modules/SPV/utils/global";
 import TableComponent from "@/common/TableComponent";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import useSendStatus from "@/modules/SPV/hooks/useSendStatus";
+import { Spinner } from "@/components/ui/spinner";
 
 interface SPVTableProps {
   data?: any[];
+  hideDraftFields?: boolean;
 }
 
-const SPVTable: React.FC<SPVTableProps> = ({ data }) => {
+const SPVTable: React.FC<SPVTableProps> = ({
+  data,
+  hideDraftFields = false,
+}) => {
+  const [selectedDraft, setSelectedDraft] = useState<any | null>(null);
 
-
+  const { mutate: sendStatus, isPending: isSendingStatus } = useSendStatus();
+  const handleSendStatus = (spvId: string) => {
+    sendStatus({ spvId, status: "Pending" });
+    setSelectedDraft(null);
+  };
   const columns: ColumnDef<any, any>[] = [
     {
       header: "Spv Id",
@@ -72,6 +92,7 @@ const SPVTable: React.FC<SPVTableProps> = ({ data }) => {
       cell: (info: any) =>
         formatCompactNumber(info.getValue() || 0),
     },
+
     {
       header: "AUM",
       accessorKey: "aum",
@@ -82,6 +103,7 @@ const SPVTable: React.FC<SPVTableProps> = ({ data }) => {
         return formatCurrencyFlexible(aum, currency);
       },
     },
+
     {
       header: "Last Activity",
       accessorKey: "updatedAt",
@@ -119,6 +141,7 @@ const SPVTable: React.FC<SPVTableProps> = ({ data }) => {
         );
       },
     },
+
     {
       header: "Active",
       accessorKey: "status",
@@ -146,18 +169,77 @@ const SPVTable: React.FC<SPVTableProps> = ({ data }) => {
                 <Edit className="h-5 w-5" />
               </Button>
             </Link>
-            <Link href={`/spv/${id}/overview`}>
-              <Button variant="outline" size="icon">
-                <Eye className="h-5 w-5" />
+            {info.row.original.status !== "Draft" && (
+              <Link href={`/spv/${id}/overview`}>
+                <Button variant="outline" size="icon">
+                  <Eye className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
+            {info.row.original.status === "Draft" && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setSelectedDraft(info.row.original)}
+              >
+                <Send className="h-5 w-5" />
               </Button>
-            </Link>
+            )}
           </div>
         );
       },
     },
   ];
 
-  return <TableComponent columns={columns} data={data || []} model="spv" />;
+  const visibleColumns = hideDraftFields
+    ? columns.filter(
+        (col: any) =>
+          !["totalInvestors", "aum", "OnchainAddress", 'status'].includes(
+            (col as any).accessorKey
+          )
+      )
+    : columns;
+
+  return (
+    <>
+      <TableComponent
+        columns={visibleColumns}
+        data={data || []}
+        model="spv"
+      />
+
+      <Dialog
+        open={!!selectedDraft}
+        onOpenChange={() => setSelectedDraft(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send SPV to Super Admin</DialogTitle>
+            <DialogDescription>
+              This will notify the super admin to review this SPV
+              {selectedDraft?.name ? ` (${selectedDraft.name})` : ""} before it
+              goes live.
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-sm text-gray-600">
+            Note: Once sent, Admin will be notifed and will be able to review the SPV before it goes live and if any changes required admin send u request for changes you need to make changes and submit again .
+          </p>
+          <Textarea placeholder="Enter the message" />
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setSelectedDraft(null)}
+            >
+              Close
+            </Button>
+            <Button onClick={() => handleSendStatus(selectedDraft?._id)} disabled={isSendingStatus}>
+              {isSendingStatus ? <Spinner /> : "Send"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
 
 export default SPVTable;

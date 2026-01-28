@@ -22,7 +22,7 @@ const SpvPage = () => {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const router = useRouter();
 
-  const { getAllSpv, getAllSpvStatus, error: getAllSpvError, responseData: getAllSpvResponseData } = useGetAllSpv();
+  const { getAllSpv,  responseData: getAllSpvResponseData } = useGetAllSpv();
   
   useEffect(() => {
     getAllSpv({
@@ -76,11 +76,7 @@ const SpvPage = () => {
   }, [activeTab, selectedFilters, searchTerm]);
 
   const totalPages = Math.ceil(filteredData.length / limit);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * limit,
-    currentPage * limit
-  );
-
+ 
   // -------------------------
   // Tabs
   // -------------------------
@@ -98,12 +94,12 @@ const SpvPage = () => {
     {
       id: "draft",
       title: "Drafts",
-      component: <SPVTable data={spvData}  />,
+      component: <SPVTable data={spvData} hideDraftFields />,
     },
     {
-      id: "inactive",
-      title: "Inactive",
-      component: <SPVTable data={spvData}  />,
+      id: "pending",
+      title: "Pending",
+      component: <SPVTable data={spvData} hideDraftFields />,
     },
   ];
 
