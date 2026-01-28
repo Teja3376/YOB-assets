@@ -280,7 +280,7 @@ const SpvFormPage = () => {
                             >
                                 {isSaving ? (
                                     <>
-                                        <LoadingSpinner/>
+                                        {/* <LoadingSpinner/> */}
                                         {id ? "Updating..." : "Creating..."}
                                     </>
                                 ) : (
@@ -294,7 +294,7 @@ const SpvFormPage = () => {
                             <Button
                                 type="button"
                                 variant="outline"
-                                disabled={isLastStep || !id || isDirty || isSaving}
+                                disabled={isLastStep || !id  || isSaving}
                                 onClick={handleNext}
                             >
                                 Next
