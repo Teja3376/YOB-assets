@@ -49,6 +49,7 @@ export const COUNTRY_OPTIONS = [
   // { label: "UK", value: "GB" },
   { label: "Qatar", value: "QA" },
   { label: "United States", value: "US" },
+  {label: "Italy", value: "IT"}
 ];
 export const CURRENCY_OPTIONS = [
   { label: "INR", value: "INR" },
@@ -56,6 +57,8 @@ export const CURRENCY_OPTIONS = [
   { label: "QAR", value: "QAR" },
   { label: "GBP", value: "GBP" },
   { label: "USD", value: "USD" },
+  { label: "EUR", value: "EUR" }
+  ,
 ];
 
 export const EXCLUDED_FIELDS = [
