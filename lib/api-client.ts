@@ -3,7 +3,6 @@ import axios from "axios";
 // Create an Axios instance
 export const api = axios.create({
   baseURL: "http://localhost:5050/api",
-  // baseURL: "https://test.ownmali.com/api/auth-issuer",
   headers: {
     "Content-Type": "application/json",
   },
@@ -49,7 +48,7 @@ api.interceptors.response.use(
           }
 
           const { data } = await axios.post(
-            "http://localhost:5050/api/auth-issuer/refresh-token",
+            "http://localhost:5050/api/auth-issuer/refresh",
             { refreshToken }
           );
 
@@ -109,7 +108,7 @@ export const authAPI = {
   },
 
   // Verify OTP
-  verifyOTP: async (data: { otp: string, email: string   }) => {
+  verifyOTP: async (data: { otp: string, email: string }) => {
     const response = await api.post("/auth-issuer/verify-otp", { otp: data.otp, email: data.email });
     return response.data;
   },

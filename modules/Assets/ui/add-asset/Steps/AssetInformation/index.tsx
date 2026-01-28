@@ -1,0 +1,106 @@
+
+
+import { useRouter, useParams } from 'next/navigation';
+import { lazy, Suspense, useCallback, useMemo, JSX } from 'react';
+import CustomTabs from '@/components/ui/custom-tab';
+import { ASSET_STEPS_TABS } from '@/modules/Assets/utils/global';
+import { Spinner } from '@/components/ui/spinner';
+import dynamic from 'next/dynamic';
+import Loading from '@/components/ui/Loading';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+// Lazy-loaded components
+const AssetType = dynamic(() => import('./AssetType'));
+const InvestmentDetails = dynamic(() => import('./InvestmentDetails')); 
+const EscrowLegal = dynamic(() => import('./EscrowLegal'));
+const TenantInformation = dynamic(() => import('./TenantInformation'));
+
+interface Props {
+  tab: string;
+  step: string;
+  asset: any;
+}
+
+
+const AssetInformation = ({ tab, step, asset }: Props) => {
+  const { assetId = null } = useParams<{ assetId?: string }>();
+  const navigate = useRouter();
+
+  // Inside AssetInformation
+const getComponentByTabId = (tabId: string): JSX.Element => {
+  switch (tabId) {
+    case 'asset-type':
+      return (
+        <Suspense fallback={<LoadingSpinner />}>
+          <AssetType asset={asset} />
+        </Suspense>
+      );
+    case 'investment-details':
+      return (
+        <Suspense fallback={<LoadingSpinner />}>
+          <InvestmentDetails asset={asset} />
+        </Suspense>
+      );
+    case 'rent-information':
+      return (
+        <Suspense fallback={<LoadingSpinner />}>
+          <TenantInformation asset={asset} />
+        </Suspense>
+      );
+    case 'escrow-legal':
+      return (
+        <Suspense fallback={<LoadingSpinner />}>
+          <EscrowLegal asset={asset} />
+        </Suspense>
+      );
+    default:
+      return <div />;
+  }
+};
+
+  // Memoized tab change handler
+  const handleTabChange = useCallback(
+    (tabId: string) => {
+      const basePath = assetId ? `/assets/edit-asset/${assetId}` : '/assets/add-asset';
+      navigate.push(`${basePath}?step=${step}&tab=${tabId}`);
+    },
+    [assetId, navigate, step]
+  );
+
+  // Memoized tabs computation
+  const tabs = useMemo(() => {
+    const stepTabs =
+      ASSET_STEPS_TABS.find((ele:any) => ele.id === step)?.tabs || [];
+    return stepTabs.map((tabItem:any) => ({
+      id: tabItem.id,
+      title: tabItem.title,
+      component: getComponentByTabId(tabItem.id) || <div />,
+    }));
+  }, [step, asset]);
+
+  const disabledTabs = useMemo(() => {
+    if (assetId) {
+      return [];
+    } else {
+      return tabs.slice(1, tabs.length).map((tab:any) => tab.id);
+    }
+  }, [tabs]);
+
+  return (
+    <Suspense fallback={<div>Loading Asset Information...</div>}>
+      <div className='asset-information shadow-none'>
+        <h1 className='text-2xl font-bold mb-4'>Asset Information</h1>
+        <CustomTabs
+          defaultTab={tab}
+          tabs={tabs}
+          handleTabChange={handleTabChange}
+         disabledTabs={disabledTabs}
+        />
+      </div>
+    </Suspense>
+  );
+}
+
+AssetInformation.displayName = 'AssetInformation';
+
+export default AssetInformation;

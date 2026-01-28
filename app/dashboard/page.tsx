@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import IssuerLayout from "@/components/layout/issuer-layout";
 import { useFetchMyApplication } from "@/connection/useFetchMyApplication";
-import { useFetchIssuer } from "@/connection/useFetchIssuer";
 import {
   Card,
   CardContent,
@@ -90,88 +88,7 @@ const getStepperSteps = (status: string): StepperStep[] => {
 
 export default function IssuerDashboard() {
   const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
-  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError } = useFetchIssuer();
   const { data, isLoading, error, refetch } = useFetchMyApplication();
-
-  useEffect(() => {
-    // Check for access token and refresh token
-    const checkAuth = () => {
-      if (typeof window === "undefined") return;
-
-      const accessToken = sessionStorage.getItem("accessToken");
-      const refreshToken = sessionStorage.getItem("refreshToken");
-
-      // If either token is missing, redirect to login
-      if (!accessToken || !refreshToken) {
-        router.push("/login");
-        return;
-      }
-
-      // Tokens exist, allow access
-      setIsChecking(false);
-    };
-
-    checkAuth();
-  }, [router]);
-
-  useEffect(() => {
-    // Check issuer application status first
-    if (!isChecking && !isIssuerLoading && !issuerError && issuerData) {
-      // Get issuer application status from the /me endpoint
-      const issuerApplicationStatus = 
-        issuerData.data?.issuerStatus ;
-
-        console.log(issuerApplicationStatus, "issuerApplicationStatus");
-
-      // If issuer application status is not "approved", redirect to apply page
-      if (issuerApplicationStatus !== "approved") {
-        router.push("/apply");
-        return;
-      }
-
-    }
-  }, [issuerData, isIssuerLoading, issuerError, isChecking, router]);
-
-  useEffect(() => {
-    if (!isChecking && !isLoading && !error && data) {
-      // ✅ 1. KYC check
-      // The user data can be nested: data.data.user.user.kycStatus or flat: data.data.user.kycStatus
-      const userData = data.data?.user;
-      // Type guard: check if userData has a 'user' property (nested structure)
-      const user = (userData && typeof userData === 'object' && 'user' in userData) 
-        ? (userData as { user: any }).user 
-        : userData;
-      const kycStatus = user?.kycStatus;
-      
-      console.log("KYC Status check:", {
-        kycStatus,
-        user,
-        userData: data.data?.user,
-        fullData: data.data
-      });
-  
-      // If KYC status is not "approved", redirect to KYB page
-      if (kycStatus && kycStatus !== "approved") {
-        router.push("/kyb");
-        return;
-      }
-    }
-  }, [data, isLoading, error, isChecking, router]);
-  
-  // Show loading state while checking authentication or loading issuer data
-  if (isChecking || isIssuerLoading) {
-    return (
-      <IssuerLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF6B00] mx-auto mb-4"></div>
-            <p className="text-gray-600">Verifying authentication...</p>
-          </div>
-        </div>
-      </IssuerLayout>
-    );
-  }
 
   return (
     <IssuerLayout>
@@ -205,7 +122,7 @@ export default function IssuerDashboard() {
                     ? (userData as { user: any }).user
                     : userData;
                   const kycStatus = user?.kycStatus;
-                  
+
                   return (
                     <>
                       <div className="flex items-center gap-3">
@@ -257,7 +174,7 @@ export default function IssuerDashboard() {
 
         {/* Applications Section */}
         <div>
-      
+
 
           {/* Loading State */}
           {isLoading && (

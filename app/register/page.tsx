@@ -63,7 +63,7 @@ export default function RegisterPage() {
       // Call signup API
       const response = await authAPI.signup({
         email: values.email,
-        firstName : values.firstName,
+        firstName: values.firstName,
         lastName: values.lastName,
         phoneNumber: String(values.phone),
         countryCode: values.countryCode,
@@ -95,48 +95,48 @@ export default function RegisterPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* First Name */}
             <div className="grid grid-cols-2 gap-2">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700">
-                    What is your first name?
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="First name"
-                      className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FF6B00] focus:ring-[#FF6B00] h-12"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">
+                      What is your first name?
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="First name"
+                        className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FF6B00] focus:ring-[#FF6B00] h-12"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
 
-            {/* Last Name */}
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700">
-                    Your last name?
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Last name"
-                      className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FF6B00] focus:ring-[#FF6B00] h-12"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
+              {/* Last Name */}
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">
+                      Your last name?
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Last name"
+                        className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FF6B00] focus:ring-[#FF6B00] h-12"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Email */}
@@ -180,11 +180,11 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormControl>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger
-  className="w-32 min-h-12 h-12 py-0 flex items-center bg-white border-gray-300"
->
-  <SelectValue placeholder="Code" />
-</SelectTrigger>
+                          <SelectTrigger
+                            className="w-32 min-h-12 h-12 py-0 flex items-center bg-white border-gray-300"
+                          >
+                            <SelectValue placeholder="Code" />
+                          </SelectTrigger>
 
                           <SelectContent>
                             {countries.map((country) => (
