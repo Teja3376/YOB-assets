@@ -1,7 +1,8 @@
 import api from "@/lib/api-client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function useSendApproval() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["send-approval"],
     mutationFn: async ({
@@ -17,5 +18,8 @@ export default function useSendApproval() {
       );
       return response.data.data;
     },
+    onSuccess:()=>{
+      queryClient.invalidateQueries({ queryKey: ["assetList"] })
+    }
   });
 }

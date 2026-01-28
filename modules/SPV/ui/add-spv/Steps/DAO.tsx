@@ -64,7 +64,7 @@ const DAOCreation = () => {
                     {["Ethereum", "Polygon", "XRPL"].map((chain) => (
                         <Button
                             key={chain}
-                            variant={blockChain === chain ? "secondary" : "outline"}
+                            variant={blockChain === chain ? "default" : "outline"}
                             className="w-full h-10 justify-center relative"
                             type="button"
                             // disabled={spv?.daoConfiguration?.blockchain ? true : false}
@@ -87,7 +87,7 @@ const DAOCreation = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <Button
                         variant={
-                            governanceModel === "Token-Weighted" ? "secondary" : "outline"
+                            governanceModel === "Token-Weighted" ? "default" : "outline"
                         }
                         className="w-full h-12 justify-start px-4 relative"
                         type="button"
