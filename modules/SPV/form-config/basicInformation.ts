@@ -22,6 +22,7 @@ export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConf
     QA: "QAR",
     US: "USD",
     GB: "GBP",
+    IT: "EUR",
   };
 
   // Auto-update currency when jurisdiction changes
