@@ -6,7 +6,7 @@ export const handleCopy = async (text: string = "") => {
     toast.success("Copied to clipboard");
   } catch (error) {
     toast.error("Failed to copy");
-    console.error("Clipboard copy failed:", error);
+    console.error("Clipboard copy faaaailed:", error);
   }
 };
 
