@@ -29,7 +29,7 @@ export const SPV_TYPES = [
     type: string;  // 'llc' | 'private-limited' | 'dao-llc' | 'corporation' | 'public-entity' | 'partnership'
     formationDate: string;
     businessPurpose: string;
-    completedSteps: string[];
+    
     memoAndTerms?: {
       investmentMemorandum: string;
       termsAndConditions: string;
@@ -105,6 +105,7 @@ export const SPV_TYPES = [
     _id?: string;
     OnchainAddress?: string;
     blockchainCompanyId?: string | null;
+    completedSteps?: any;
     status?: string;
     createdAt?: string;
     updatedAt?: string;

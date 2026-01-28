@@ -50,7 +50,7 @@ const Index: React.FC<IndexProps> = ({
             </FormLabel>
 
             <Select
-              value={field.value || ""}
+              value={field.value ?? ""}
               disabled={disabled}
               onValueChange={(value) => {
                 field.onChange(value);

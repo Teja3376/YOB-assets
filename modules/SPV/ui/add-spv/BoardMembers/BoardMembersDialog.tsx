@@ -14,6 +14,7 @@ import { boardMembersFormConfig } from "@/modules/SPV/form-config/boardMembers";
 import { useFormContext } from "react-hook-form";
 import { useABApi } from "@/hooks/spv/useABApi";
 import { useParams } from "next/navigation";
+import { clear } from "console";
 
 interface BoardMembersDialogProps {
   index: number | null;
@@ -33,11 +34,7 @@ const BoardMembersDialog = ({
   remove,
 }: BoardMembersDialogProps) => {
   const { createAB, updateAB } = useABApi();
-  const {
-    getValues: formGetValues,
-    clearErrors,
-    trigger,
-  } = useFormContext();
+  const { getValues: formGetValues, clearErrors, trigger } = useFormContext();
 
   const isOpen = index !== null;
   const isEdit = index !== -1;
@@ -49,7 +46,7 @@ const BoardMembersDialog = ({
   //     if (currentItem && !currentItem._id && !isEdit) {
   //       remove(index);
   //     } else if (isEdit) {
-  //       // Restore previous values for edit mode
+  //       // Restore previous values for edit mode+63
   //       const previousValues = fields[index];
   //       if (previousValues) {
   //         update(index, previousValues);
@@ -60,13 +57,17 @@ const BoardMembersDialog = ({
   //   clearErrors();
   //   setOpenBoardMembersDialog(false);
   // };
-  const onOpenChange = () => {
-    const previousValues = index !== null ? fields[index] : {};
-    if (index !== null) {
-      update(index, previousValues);
+
+  const onOpenChange = (open: boolean) => {
+    if (!open) {
+      const previousValues = index !== null ? fields[index] : {};
+      if (index !== null) {
+        update(index, previousValues);
+      }
+
+      clearErrors(`boardMembers.${index}`);
+      setIndex(null);
     }
-    setIndex(null);
-    clearErrors();
   };
 
   const onSubmit = async () => {
@@ -78,7 +79,7 @@ const BoardMembersDialog = ({
           if (isEdit) {
             // Update existing board member
             update(index ?? -1, { ...values });
-            await updateAB(values._id, {
+            await updateAB(index ?? -1, {
               fullName: values.fullName,
               email: values.email,
               countryCode: values.countryCode,
@@ -87,6 +88,7 @@ const BoardMembersDialog = ({
               idProof: values.idProof,
               role: values.role,
             });
+            clearErrors();
           } else {
             // Create new board member
             await createAB({
@@ -138,12 +140,16 @@ const BoardMembersDialog = ({
           {FormGenerator(
             boardMembersFormConfig({
               index: index ?? -1,
-            })
+            }),
           )}
         </div>
 
         <DialogFooter className="flex justify-end mt-6">
-          <Button type="button" variant="outline" onClick={onOpenChange}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button type="button" onClick={onSubmit}>

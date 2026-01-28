@@ -1,14 +1,12 @@
-
-
-import React from 'react';
+import React from "react";
 import {
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TextareaControllerProps {
   name: string;
@@ -44,21 +42,23 @@ const TextareaController: React.FC<TextareaControllerProps> = ({
           <FormItem>
             <FormLabel htmlFor={name}>
               {label}
-              {isRequired && <span className='text-red-500'>*</span>}
+              {isRequired && <span className="text-red-500">*</span>}
             </FormLabel>
             <FormControl>
               <div>
                 <Textarea
                   disabled={disabled}
                   id={name}
-                  value={value || ''}
+                  value={value || ""}
                   onChange={(e) => {
                     controllerOnChange(e);
                     onChange && onChange(e);
                   }}
+                
+                  className="resize-none overflow-auto max-h-50 scrollbar-hide"
                 />
                 {bottomText && (
-                  <span className='text-sm text-gray-500'>{bottomText}</span>
+                  <span className="text-sm text-gray-500">{bottomText}</span>
                 )}
               </div>
             </FormControl>

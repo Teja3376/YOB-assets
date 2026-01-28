@@ -103,7 +103,7 @@ const DAOCreation = () => {
 
                     <Button
                         variant={
-                            governanceModel === "Equal-Voting" ? "secondary" : "outline"
+                            governanceModel === "Equal-Voting" ? "default" : "outline"
                         }
                         className="w-full h-12 justify-start px-4 relative"
                         type="button"
@@ -119,7 +119,7 @@ const DAOCreation = () => {
 
                     <Button
                         variant={
-                            governanceModel === "Reputation-Based" ? "secondary" : "outline"
+                            governanceModel === "Reputation-Based" ? "default" : "outline"
                         }
                         className="w-full h-12 justify-start px-4 relative"
                         type="button"

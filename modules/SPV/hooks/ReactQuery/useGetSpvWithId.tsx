@@ -2,7 +2,7 @@ import { api } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
 const useGetSpvWithId = (id: string) => {
-  const query = useQuery({
+  return useQuery({
     queryKey: ["spv", id],
     queryFn: async () => {
       const res = await api.get(`/spv/${id}`);
@@ -11,13 +11,7 @@ const useGetSpvWithId = (id: string) => {
     enabled: !!id,
   });
 
-  return {
-    status: query.status,
-    loading: query.isLoading,
-    error: query.error,
-    responseData: query.data,
-    refetch: query.refetch,
-  };
+
 };
 
 export default useGetSpvWithId;

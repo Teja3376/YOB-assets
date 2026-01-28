@@ -25,10 +25,13 @@ import EscrowDetails from "./Steps/EscrowDetails";
 import LegalDocuments from "./Steps/LegalDocuments";
 import BoardMembers from "./Steps/BoardMembers";
 import DAOCreation from "./Steps/DAO";
-import useCreateSpv from "../../hooks/useCreateSpv";
-import useUpdateSpv from "../../hooks/useUpdateSpv";
-import useGetSpvWithId from "../../hooks/useGetSpvWithId";
+// import useCreateSpv from "../../hooks/useCreateSpv";
+// import useUpdateSpv from "../../hooks/useUpdateSpv";
+// import useGetSpvWithId from "../../hooks/useGetSpvWithId";
 import normalizedSpv from "../../utils/normalizedspv";
+import useCreateSpv from "../../hooks/ReactQuery/useCreateSpvT";
+import useUpdateSpv from "../../hooks/ReactQuery/useUpdateSpv";
+import useGetSpvWithId from "../../hooks/ReactQuery/useGetSpvWithId";
 
 const DEFAULT_STEP = "basic-information";
 
@@ -51,13 +54,23 @@ const SpvFormPage = () => {
   const searchParams = useSearchParams();
   const { spvId: id } = useParams();
 
-  const { createSpv, loading: createLoading } = useCreateSpv();
-  const { updateSpv, status: updateStatus } = useUpdateSpv();
-  const {
-    getSpvWithId,
-    status: getSpvWithIdStatus,
-    responseData: getSpvWithIdResponseData,
-  } = useGetSpvWithId();
+  // const { createSpv, loading: createLoading } = useCreateSpv();
+  // const { updateSpv, status: updateStatus } = useUpdateSpv();
+
+  const { mutate: createSpv, isPending: createLoading } = useCreateSpv();
+
+  const { mutate: updateSpv, status: updateStatus } = useUpdateSpv(
+    id as string,
+  );
+
+  const { data: getSpvWithIdResponseData, isFetching: getSpvWithIdStatus } =
+    useGetSpvWithId(id as string);
+
+  // const {
+  //   getSpvWithId,
+  //   status: getSpvWithIdStatus,
+  //   responseData: getSpvWithIdResponseData,
+  // } = useGetSpvWithId();
 
   const normalizedSpvData = useMemo(
     () => normalizedSpv(getSpvWithIdResponseData),
@@ -68,33 +81,53 @@ const SpvFormPage = () => {
     (searchParams.get("step") as (typeof STEP_IDS)[number]) || DEFAULT_STEP;
   const basePath = id ? `/spv/edit-spv/${id}` : "/spv/add-spv";
 
-  useEffect(() => {
-    if (id) {
-      getSpvWithId(id as string).catch((err: any) => {
-        toast.error(err.response?.data?.message || "Failed to fetch SPV");
-      });
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id) {
+  //     getSpvWithId(id as string).catch((err: any) => {
+  //       toast.error(err.response?.data?.message || "Failed to fetch SPV");
+  //     });
+  //   }
+  // }, [id]);
 
   const methods = useForm<SpvFormData>({
     defaultValues: { completedSteps: [] },
     mode: "onBlur",
   });
 
+  // useEffect(() => {
+  //   if (normalizedSpvData && Object.keys(normalizedSpvData).length > 0 && id) {
+  //     methods.reset(
+  //       {
+  //         ...normalizedSpvData,
+  //         completedSteps:
+  //           normalizedSpvData.completedSteps ??
+  //           methods.getValues("completedSteps") ??
+  //           [],
+  //       },
+  //       { keepDefaultValues: false },
+  //     );
+  //   }
+  // }, [normalizedSpvData, id, methods]);
+
   useEffect(() => {
-    if (normalizedSpvData && Object.keys(normalizedSpvData).length > 0 && id) {
-      methods.reset(
-        {
-          ...normalizedSpvData,
-          completedSteps:
-            normalizedSpvData.completedSteps ??
-            methods.getValues("completedSteps") ??
-            [],
-        },
-        { keepDefaultValues: false },
-      );
-    }
-  }, [normalizedSpvData, id, methods]);
+    if (!id) return;
+    if (!normalizedSpvData) return;
+    if (getSpvWithIdStatus) return;
+
+    methods.reset(
+      {
+        ...normalizedSpvData,
+        completedSteps:
+          normalizedSpvData.completedSteps ??
+          methods.getValues("completedSteps") ??
+          [],
+      },
+      {
+        keepDirty: false,
+        keepTouched: false,
+      },
+    );
+  }, [id, normalizedSpvData, getSpvWithIdStatus]);
 
   const { watch } = methods;
   const { isDirty } = methods.formState;
@@ -157,8 +190,7 @@ const SpvFormPage = () => {
   const currentIndex = steps.findIndex((s) => s.id === step);
   const isFirstStep = currentIndex <= 0;
   const isLastStep = currentIndex >= steps.length - 1;
-  const isSaving = createLoading || updateStatus === "loading";
-
+  const isSaving = createLoading || updateStatus === "pending";
   const changeStep = (stepId: string) => {
     router.push(`${basePath}?step=${stepId}`);
   };
@@ -174,7 +206,6 @@ const SpvFormPage = () => {
 
     if (step === "board-members") {
       const data = methods.getValues();
-      console.log("data", data.boardMembers);
       if (data.boardMembers?.length < 1) {
         toast.error("Please add at least one board member.");
         return;
@@ -187,35 +218,45 @@ const SpvFormPage = () => {
     const nextCompleted = completedSteps.includes(step)
       ? completedSteps
       : [...completedSteps, step];
-    const payload = { ...data, completedSteps: nextCompleted } as any;
 
-    try {
-      await updateSpv(id as string, payload);
-      methods.setValue("completedSteps", nextCompleted, { shouldDirty: false });
-      router.push(`${basePath}?step=${steps[currentIndex + 1].id}`);
-    } catch (err: any) {
-      console.error(err.response?.data?.message ?? "SPV save failed");
-    }
-  };
+    const payload = { ...data, completedSteps: nextCompleted };
 
-  const onSubmit: SubmitHandler<SpvFormData> = async (data) => {
-    const payload = { ...data } as any;
-    try {
-      if (id) {
-        const nextCompleted = completedSteps.includes(step)
-          ? completedSteps
-          : [...completedSteps, step];
-        payload.completedSteps = nextCompleted;
-        await updateSpv(id as string, payload);
+    updateSpv(payload, {
+      onSuccess: () => {
         methods.setValue("completedSteps", nextCompleted, {
           shouldDirty: false,
         });
-      } else {
-        payload.completedSteps = [step];
-        await createSpv(payload);
-      }
-    } catch (err: any) {
-      console.error(err.response?.data?.message ?? "SPV save failed");
+        router.push(`${basePath}?step=${steps[currentIndex + 1].id}`);
+      },
+    });
+  };
+
+  const onSubmit: SubmitHandler<SpvFormData> = (data) => {
+    const payload = { ...data };
+
+    if (id) {
+      const nextCompleted = completedSteps.includes(step)
+        ? completedSteps
+        : [...completedSteps, step];
+
+      payload.completedSteps = nextCompleted;
+
+      updateSpv(payload, {
+        onSuccess: () => {
+          methods.setValue("completedSteps", nextCompleted, {
+            shouldDirty: false,
+          });
+        },
+      });
+    } else {
+      payload.completedSteps = [step];
+
+      createSpv(payload, {
+        onSuccess: (responseData: any) => {
+          toast.success("SPV created successfully");
+          router.push(`/spv/edit-spv/${responseData.data.id}?step=${step}`);
+        },
+      });
     }
   };
 
@@ -238,14 +279,12 @@ const SpvFormPage = () => {
     }
   }, [step, normalizedSpvData]);
 
-  if ((getSpvWithIdStatus === "loading" && id)||isSaving) {
+  if ((getSpvWithIdStatus && id) || isSaving) {
     return <LoadingSpinner />;
   }
 
   return (
     <div className="container mx-auto px-6 py-8 space-y-4">
-     
-
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
           {id ? "Update" : "Create"} SPV

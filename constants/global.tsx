@@ -71,6 +71,7 @@ export const EMPTY_TABLE_DATA = [
     { label: "Qatar", value: "QA" },
     { label: "UK", value: "GB" },
     { label: "United States", value: "US" },
+    { label: "Italy", value: "IT" },
   ];
   export const CURRENCY_OPTIONS = [
     { label: "INR", value: "INR" },
@@ -78,4 +79,5 @@ export const EMPTY_TABLE_DATA = [
     { label: "QAR", value: "QAR" },
     { label: "GBP", value: "GBP" },
     { label: "USD", value: "USD" },
+    { label: "EUR", value: "EUR" },
   ];
