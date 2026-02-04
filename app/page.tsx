@@ -12,7 +12,7 @@ import Footer from "@/components/layout/footer"
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen overflow-y-auto">
       <Header />
       <HeroSection />
       {/* <PerformanceSection /> */}
