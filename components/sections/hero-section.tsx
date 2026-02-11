@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 export default function HeroSection() {
   const router = useRouter()
   return (
-    <section className="hero-section">
+    <section className="hero-section flex items-center justify-center min-h-screen">
       <div className="hero-container">
         <div className="hero-content">
           <h1 className="hero-title">
