@@ -5,7 +5,11 @@ import { useEffect, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 
-export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConfig[] => {
+export const basicInformationFormConfig = ({
+  spv,
+}: {
+  spv: any;
+}): FormFieldConfig[] => {
   const { control, setValue } = useFormContext<any>();
   const params = useParams<{ id?: string; spvId?: string }>();
   const id = params?.spvId ?? params?.id;
@@ -13,8 +17,7 @@ export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConf
   const currency = useWatch({ control, name: "currency" });
 
   const autoSetCurrencyRef = useRef<string | null>(null);
-  console.log("spv in form config", spv);
-
+  // console.log("spv in form config", spv);
 
   const countryCurrencyMap: Record<string, string> = {
     IN: "INR",
@@ -24,8 +27,6 @@ export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConf
     GB: "GBP",
     IT: "EUR",
   };
-
-  // Auto-update currency when jurisdiction changes
   useEffect(() => {
     const mapped = jurisdiction ? countryCurrencyMap[jurisdiction] : undefined;
 
@@ -42,22 +43,26 @@ export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConf
     }
   }, [jurisdiction, currency, setValue]);
 
-  // Force update values when spv data changes
   useEffect(() => {
-    if (spv && Object.keys(spv).length > 0) {
-      // Set all form values from SPV data
-      Object.keys(spv).forEach((key) => {
-        if (spv[key] !== undefined && spv[key] !== null) {
-          setValue(key as any, spv[key], {
-            shouldValidate: false,
-            shouldDirty: false,
+    if (spv) {
+      const timer = setTimeout(() => {
+        if (spv.type) {
+          setValue("type", spv.type, {
+            shouldValidate: true,
+            shouldDirty: true,
           });
         }
-      });
+        if (spv.jurisdiction) {
+          setValue("jurisdiction", spv.jurisdiction, {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
   }, [spv, setValue]);
-
-
   return [
     {
       label: "SPV/LLC Name",
@@ -108,6 +113,7 @@ export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConf
       options: CURRENCY_OPTIONS,
       rules: { required: "Currency is required" },
       disabled: true,
+      defaultValue: spv?.currency,
     },
 
     {
