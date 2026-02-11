@@ -5,7 +5,11 @@ import { useEffect, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 
-export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConfig[] => {
+export const basicInformationFormConfig = ({
+  spv,
+}: {
+  spv: any;
+}): FormFieldConfig[] => {
   const { control, setValue } = useFormContext<any>();
   const params = useParams<{ id?: string; spvId?: string }>();
   const id = params?.spvId ?? params?.id;
@@ -14,7 +18,6 @@ export const basicInformationFormConfig = ({ spv }: { spv: any }): FormFieldConf
 
   const autoSetCurrencyRef = useRef<string | null>(null);
   // console.log("spv in form config", spv);
-
 
   const countryCurrencyMap: Record<string, string> = {
     IN: "INR",
