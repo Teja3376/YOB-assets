@@ -48,8 +48,8 @@ api.interceptors.response.use(
             return handleLogout();
           }
 
-          const { data } = await axios.post(
-            "http://localhost:5050/api/auth-issuer/refresh",
+          const { data } = await api.post(
+            "/auth-issuer/refresh",
             { refreshToken }
           );
 
