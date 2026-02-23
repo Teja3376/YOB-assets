@@ -22,6 +22,7 @@ import { useKyb } from "../hooks/useKyb";
 import { useFetchIssuer } from "@/connection/useFetchIssuer";
 import KybSuccessCard from "../components/KybSuccessCard";
 import { Info } from "lucide-react";
+import { toast } from "sonner";
 
 const kybSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -48,10 +49,9 @@ export default function KYBPage() {
       onSuccess: (data) => {
         window.location.href = data.data.kybLink;
         
-        console.log("KYB success:", data);
       },
       onError: (error) => {
-        console.log("KYB error:", error);
+        toast.error(error?.message);
       },
     });
   };
