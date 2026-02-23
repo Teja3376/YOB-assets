@@ -15,8 +15,16 @@ export default function IssuerLayout({
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
-  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError } = useFetchIssuer();
-  const { data: appData, isLoading: isAppLoading, error: appError } = useFetchMyApplication();
+  const {
+    data: issuerData,
+    isLoading: isIssuerLoading,
+    error: issuerError,
+  } = useFetchIssuer();
+  const {
+    data: appData,
+    isLoading: isAppLoading,
+    error: appError,
+  } = useFetchMyApplication();
 
   // 1. Token check – redirect to login if missing
   useEffect(() => {
@@ -26,7 +34,7 @@ export default function IssuerLayout({
       const accessToken = sessionStorage.getItem("accessToken");
       const refreshToken = sessionStorage.getItem("refreshToken");
 
-      if (!accessToken && !refreshToken || !refreshToken) {
+      if ((!accessToken && !refreshToken) || !refreshToken) {
         router.push("/login");
         return;
       }

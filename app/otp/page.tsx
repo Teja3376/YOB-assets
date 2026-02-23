@@ -1,95 +1,105 @@
-"use client"
+"use client";
 
-import { useState, useEffect, Suspense } from "react"
-import {  useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import OTPInput from "@/components/features/auth/otp-input"
-import GetStartedLayout from "@/components/layout/get-started"
-import { authAPI } from "@/lib/api-client"
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import OTPInput from "@/components/features/auth/otp-input";
+import GetStartedLayout from "@/components/layout/get-started";
+import { authAPI } from "@/lib/api-client";
 
 function OTPPageContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const email = searchParams.get("email") || ""
-  const [otp, setOtp] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [resendTimer, setResendTimer] = useState(60)
-  const [error, setError] = useState<string>("")
-  const [resendLoading, setResendLoading] = useState(false)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
+  const [otp, setOtp] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(60);
+  const [error, setError] = useState<string>("");
+  const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
     if (resendTimer > 0) {
       const timer = setTimeout(() => {
-        setResendTimer(resendTimer - 1)
-      }, 1000)
-      return () => clearTimeout(timer)
+        setResendTimer(resendTimer - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
     }
-  }, [resendTimer])
+  }, [resendTimer]);
 
   const handleOTPComplete = (completedOtp: string) => {
-    setOtp(completedOtp)
-  }
+    setOtp(completedOtp);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (otp.length !== 6) return
+    e.preventDefault();
+    if (otp.length !== 6) return;
 
-    setIsLoading(true)
-    setError("")
+    setIsLoading(true);
+    setError("");
 
     try {
       // Call verify OTP API
-      
-      const response = await authAPI.verifyOTP({ otp: otp, email: email })
+
+      const response = await authAPI.verifyOTP({ otp: otp, email: email });
 
       // Update tokens if new ones are provided
       if (response.data?.accessToken && response.data?.refreshToken) {
-        sessionStorage.setItem("accessToken", response.data.accessToken)
-        sessionStorage.setItem("refreshToken", response.data.refreshToken)
+        sessionStorage.setItem("accessToken", response.data.accessToken);
+        sessionStorage.setItem("refreshToken", response.data.refreshToken);
       }
 
-         // Clear the isNewUser flag if it exists
-          router.push("/kyb")
-       
+      // Check status and redirect accordingly
+      const userData = response.data?.user;
+      const kycStatus = userData?.kycStatus;
+      const issuerStatus = response.data?.issuerStatus;
+
+      if (kycStatus && kycStatus !== "approved") {
+        router.push("/kyb");
+      } else if (issuerStatus !== "approved") {
+        router.push("/apply");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "OTP verification failed. Please try again."
-      )
-      setIsLoading(false)
+        err.response?.data?.message ||
+          "OTP verification failed. Please try again.",
+      );
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleResend = async () => {
-    if (resendTimer > 0 || resendLoading) return
+    if (resendTimer > 0 || resendLoading) return;
 
-    setResendLoading(true)
-    setError("")
+    setResendLoading(true);
+    setError("");
 
     try {
       // Call resend OTP API
-      await authAPI.resendOTP()
-      setResendTimer(60)
+      await authAPI.resendOTP();
+      setResendTimer(60);
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Failed to resend OTP. Please try again."
-      )
+        err.response?.data?.message ||
+          "Failed to resend OTP. Please try again.",
+      );
     } finally {
-      setResendLoading(false)
+      setResendLoading(false);
     }
-  }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
-  const accessToken = sessionStorage.getItem("accessToken")
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+  const accessToken = sessionStorage.getItem("accessToken");
 
-  const isCheck = accessToken ? false : true
-  
-  
+  const isCheck = accessToken ? false : true;
+
   return (
     <GetStartedLayout>
       <div className="w-full">
@@ -106,7 +116,8 @@ function OTPPageContent() {
           </p>
           <p className="text-sm">
             Please enter the 6-digit code we sent to verify your email address.
-            Don't forget to check your spam or junk folder if you don't see the email.
+            Don't forget to check your spam or junk folder if you don't see the
+            email.
           </p>
         </div>
 
@@ -135,8 +146,8 @@ function OTPPageContent() {
               {resendLoading
                 ? "Sending..."
                 : resendTimer > 0
-                ? `Resend code in ${formatTime(resendTimer)}`
-                : "Resend code"}
+                  ? `Resend code in ${formatTime(resendTimer)}`
+                  : "Resend code"}
               {resendTimer === 0 && !resendLoading && (
                 <ArrowRight className="ml-2" size={16} />
               )}
@@ -167,7 +178,7 @@ function OTPPageContent() {
         </div>
       </div>
     </GetStartedLayout>
-  )
+  );
 }
 
 export default function OTPPage() {
@@ -181,5 +192,5 @@ export default function OTPPage() {
     >
       <OTPPageContent />
     </Suspense>
-  )
+  );
 }

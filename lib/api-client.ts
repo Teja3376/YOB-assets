@@ -2,8 +2,8 @@ import axios from "axios";
 
 // Create an Axios instance
 export const api = axios.create({
-  // baseURL: "http://localhost:5050/api",
-  baseURL: "https://nexa-issuer-backend.vercel.app/api",
+  baseURL: "http://localhost:5050/api",
+  // baseURL: "https://nexa-issuer-backend.vercel.app/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -43,6 +43,7 @@ api.interceptors.response.use(
       try {
         if (typeof window !== "undefined") {
           const refreshToken = sessionStorage.getItem("refreshToken") || localStorage.getItem("refreshToken");
+          // const sessionId = sessionStorage.getItem("sessionId") || localStorage.getItem("sessionId");
           if (!refreshToken) {
             console.error("No refresh token found. Redirecting to login.");
             return handleLogout();
@@ -50,7 +51,7 @@ api.interceptors.response.use(
 
           const { data } = await api.post(
             "/auth-issuer/refresh",
-            { refreshToken }
+            {refreshToken }
           );
 
           // Store in the same location it was retrieved from

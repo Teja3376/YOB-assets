@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -22,10 +22,10 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form"
-import GetStartedLayout from "@/components/layout/get-started"
-import { authAPI } from "@/lib/api-client"
-import { useState } from "react"
+} from "@/components/ui/form";
+import GetStartedLayout from "@/components/layout/get-started";
+import { authAPI } from "@/lib/api-client";
+import { useState } from "react";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -33,7 +33,7 @@ const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   countryCode: z.string().min(1, "Country code is required"),
   phone: z.string().min(1, "Phone number is required"),
-})
+});
 
 const countries = [
   { code: "+971", name: "UAE" },
@@ -41,11 +41,11 @@ const countries = [
   { code: "+44", name: "UK" },
   { code: "+91", name: "India" },
   { code: "+966", name: "Saudi Arabia" },
-]
+];
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const [error, setError] = useState<string>("")
+  const router = useRouter();
+  const [error, setError] = useState<string>("");
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -55,10 +55,10 @@ export default function RegisterPage() {
       countryCode: "+91",
       phone: "",
     },
-  })
+  });
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
-    setError("")
+    setError("");
     try {
       // Call signup API
       const response = await authAPI.signup({
@@ -67,20 +67,22 @@ export default function RegisterPage() {
         lastName: values.lastName,
         phoneNumber: String(values.phone),
         countryCode: values.countryCode,
-      })
+      });
 
       // Store isNewUser flag in sessionStorage for OTP page
-      const isNewUser = response.data?.isNewUser || false
-      sessionStorage.setItem("isNewUser", String(isNewUser))
+      const isNewUser = response.data?.isNewUser || false;
+      sessionStorage.setItem("isNewUser", String(isNewUser));
 
       // Redirect to OTP page with email
-      router.push(`/otp?email=${encodeURIComponent(values.email)}&flow=register`)
+      router.push(
+        `/otp?email=${encodeURIComponent(values.email)}&flow=register`,
+      );
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Registration failed. Please try again."
-      )
+        err.response?.data?.message || "Registration failed. Please try again.",
+      );
     }
-  }
+  };
 
   return (
     <GetStartedLayout>
@@ -179,16 +181,20 @@ export default function RegisterPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger
-                            className="w-32 min-h-12 h-12 py-0 flex items-center bg-white border-gray-300"
-                          >
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-32 min-h-12 h-12 py-0 flex items-center bg-white border-gray-300">
                             <SelectValue placeholder="Code" />
                           </SelectTrigger>
 
                           <SelectContent>
                             {countries.map((country) => (
-                              <SelectItem key={country.code} value={country.code}>
+                              <SelectItem
+                                key={country.code}
+                                value={country.code}
+                              >
                                 {country.code} ({country.name})
                               </SelectItem>
                             ))}
@@ -218,7 +224,6 @@ export default function RegisterPage() {
                   )}
                 />
               </div>
-
             </div>
 
             {/* Error Message */}
@@ -252,5 +257,5 @@ export default function RegisterPage() {
         </div>
       </div>
     </GetStartedLayout>
-  )
+  );
 }
