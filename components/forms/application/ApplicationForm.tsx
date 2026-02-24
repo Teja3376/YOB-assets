@@ -136,6 +136,7 @@ export default function ApplicationForm() {
       ...form.getValues(),
       legalEntityName: user.companyName ?? "",
       countryOfIncorporation: user.companyCountry ?? "",
+      email: user.email ?? "",
     });
   }, [issuerData, form]);
 
@@ -167,7 +168,7 @@ export default function ApplicationForm() {
       form.reset({
         legalEntityName: user?.companyName ?? "",
         countryOfIncorporation: user?.companyCountry ?? "",
-        email: "",
+        email: user?.email ?? "",
         phoneCountryCode: "",
         phoneNumber: "",
         assetCategory: "",
@@ -297,8 +298,9 @@ export default function ApplicationForm() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="example@email.com"
+                      placeholder="Enter your email address"
                       {...field}
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
