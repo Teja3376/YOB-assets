@@ -1,19 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ChevronDown, Menu, X } from "lucide-react"
-import Image from "next/image"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ChevronDown, Menu, X, LogOut } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 interface HeaderProps {
-  hideNavigation?: boolean
+  hideNavigation?: boolean;
 }
 
 export default function Header({ hideNavigation = false }: HeaderProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken");
+    setAccessToken(token);
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("sessionId");
+    setAccessToken(null);
+    router.push("/");
+  };
 
   return (
-    <nav id="navbar" className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
+    <nav
+      id="navbar"
+      className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -33,10 +53,16 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
           {/* Desktop Menu */}
           {!hideNavigation && (
             <nav className="hidden md:flex items-center space-x-10">
-              <Link href="/" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
+              <Link
+                href="/"
+                className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors"
+              >
                 Home
               </Link>
-              <Link href="/about" className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors">
+              <Link
+                href="/about"
+                className="nav-link text-gray-700 hover:text-[#FF6B00] font-medium transition-colors"
+              >
                 About
               </Link>
               <div className="relative group">
@@ -44,7 +70,10 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                   Assets <ChevronDown className="ml-1 text-xs" size={12} />
                 </button>
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                  <Link href="/real-estate" className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors">
+                  <Link
+                    href="/real-estate"
+                    className="block px-4 py-3 hover:bg-orange-50 hover:text-[#FF6B00] transition-colors"
+                  >
                     Real Estate
                   </Link>
                   <Link
@@ -90,8 +119,23 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
             </nav>
           )}
 
+          {/* Logout Button (if logged in) */}
+          {accessToken && (
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-transparent border border-gray-300 hover:border-red-500 text-gray-700 hover:text-red-500 font-medium rounded-full transition-colors"
+                id="logout-btn"
+              >
+                <LogOut size={16} />
+                Logout
+              </Button>
+            </div>
+          )}
+
           {/* CTA Buttons */}
-          {!hideNavigation && (
+          {!accessToken && !hideNavigation && (
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/login"
@@ -122,20 +166,31 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
         </div>
       </div>
 
-
       {/* Mobile Menu */}
       {!hideNavigation && isOpen && (
-        <div id="mobile-menu" className="md:hidden bg-white border-t border-gray-100">
+        <div
+          id="mobile-menu"
+          className="md:hidden bg-white border-t border-gray-100"
+        >
           <nav className="px-4 py-4 space-y-3">
-            <Link href="/" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
+            <Link
+              href="/"
+              className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium"
+            >
               Home
             </Link>
-            <Link href="/about" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
+            <Link
+              href="/about"
+              className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium"
+            >
               About
             </Link>
             <div className="border-t border-gray-200 pt-2">
               <p className="text-sm font-semibold text-gray-500 mb-2">Assets</p>
-              <Link href="/real-estate" className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium">
+              <Link
+                href="/real-estate"
+                className="block py-2 pl-4 text-gray-700 hover:text-[#FF6B00] font-medium"
+              >
                 Real Estate
               </Link>
               <Link
@@ -174,10 +229,28 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                 Vehicles & Equipment
               </Link>
             </div>
-            <Link href="/contact" className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium">
+            <Link
+              href="/contact"
+              className="block py-2 text-gray-700 hover:text-[#FF6B00] font-medium"
+            >
               Contact Us
             </Link>
-            {!hideNavigation && (
+            {accessToken && (
+              <div className="px-4">
+                <Button
+                  onClick={() => {
+                    handleLogout();
+                    setIsOpen(false);
+                  }}
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 text-red-600 font-medium rounded-full transition text-center"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </Button>
+              </div>
+            )}
+            {!accessToken && !hideNavigation && (
               <div className="flex flex-col gap-2 mt-2 mx-4">
                 <Link
                   href="/login"
@@ -199,5 +272,5 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
         </div>
       )}
     </nav>
-  )
+  );
 }

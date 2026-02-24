@@ -15,8 +15,16 @@ export default function IssuerLayout({
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
-  const { data: issuerData, isLoading: isIssuerLoading, error: issuerError } = useFetchIssuer();
-  const { data: appData, isLoading: isAppLoading, error: appError } = useFetchMyApplication();
+  const {
+    data: issuerData,
+    isLoading: isIssuerLoading,
+    error: issuerError,
+  } = useFetchIssuer();
+  const {
+    data: appData,
+    isLoading: isAppLoading,
+    error: appError,
+  } = useFetchMyApplication();
 
   // 1. Token check – redirect to login if missing
   useEffect(() => {
@@ -26,7 +34,7 @@ export default function IssuerLayout({
       const accessToken = sessionStorage.getItem("accessToken");
       const refreshToken = sessionStorage.getItem("refreshToken");
 
-      if (!accessToken && !refreshToken || !refreshToken) {
+      if ((!accessToken && !refreshToken) || !refreshToken) {
         router.push("/login");
         return;
       }
@@ -48,21 +56,6 @@ export default function IssuerLayout({
     }
   }, [issuerData, isIssuerLoading, issuerError, isChecking, router]);
 
-  // 3. KYC status check – redirect to /kyb if not approved
-  useEffect(() => {
-    if (isChecking || isAppLoading || appError || !appData) return;
-
-    const userData = appData.data?.user;
-    const user =
-      userData && typeof userData === "object" && "user" in userData
-        ? (userData as { user: { kycStatus?: string } }).user
-        : userData;
-    const kycStatus = user?.kycStatus;
-
-    if (kycStatus && kycStatus !== "approved") {
-      router.push("/kyb");
-    }
-  }, [appData, isAppLoading, appError, isChecking, router]);
 
   const isAuthPending = isChecking || isIssuerLoading;
 

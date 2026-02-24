@@ -10,8 +10,16 @@ import SPVStatusDialog from "@/modules/SPV/ui/spv-list/spvstatusdialog";
 import { mockSpvData } from "@/modules/SPV/mock-data/mock-data-spv";
 import { useRouter } from "next/navigation";
 import useGetAllSpv from "../../hooks/useGetAllSpv";
+import { z } from "zod";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25];
+
+const searchSchema = z
+  .string()
+  .trim()
+  .refine((val: string) => !/\p{Emoji}/gu.test(val), {
+    message: "No emoji allowed",
+  });
 
 const SpvPage = () => {
   const [spv, setSpv] = useState<any>(null);
@@ -19,11 +27,23 @@ const SpvPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  const handleSearchChange = (value: string) => {
+    const result = searchSchema.safeParse(value);
+
+    if (result.success) {
+      setSearchTerm(value);
+      setSearchError(null);
+    } else {
+      setSearchError(result.error.errors[0].message);
+    }
+  };
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const router = useRouter();
 
-  const { getAllSpv,  responseData: getAllSpvResponseData } = useGetAllSpv();
-  
+  const { getAllSpv, responseData: getAllSpvResponseData } = useGetAllSpv();
+
   useEffect(() => {
     getAllSpv({
       page: currentPage,
@@ -44,7 +64,7 @@ const SpvPage = () => {
     setSelectedFilters((prev) =>
       prev.includes(normalized)
         ? prev.filter((v) => v !== normalized)
-        : [...prev, normalized]
+        : [...prev, normalized],
     );
   };
 
@@ -64,32 +84,30 @@ const SpvPage = () => {
     return mockSpvData
       .filter((item: any) => item.status === activeTab)
       .filter((item: any) =>
-        selectedFilters.length > 0
-          ? selectedFilters.includes(item.type)
-          : true
+        selectedFilters.length > 0 ? selectedFilters.includes(item.type) : true,
       )
       .filter((item: any) =>
         searchTerm
           ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
-          : true
+          : true,
       );
   }, [activeTab, selectedFilters, searchTerm]);
 
   const totalPages = Math.ceil(filteredData.length / limit);
- 
+
   // -------------------------
   // Tabs
   // -------------------------
   // Extract data array from response (handle both nested and flat structures)
-  const spvData = Array.isArray(getAllSpvResponseData) 
-    ? getAllSpvResponseData 
+  const spvData = Array.isArray(getAllSpvResponseData)
+    ? getAllSpvResponseData
     : getAllSpvResponseData?.data || [];
 
   const tabs = [
     {
       id: "active",
       title: "Active",
-      component: <SPVTable data={spvData}  />,
+      component: <SPVTable data={spvData} />,
     },
     {
       id: "draft",
@@ -116,7 +134,7 @@ const SpvPage = () => {
       {/* Filters */}
       <Filters
         searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        setSearchTerm={handleSearchChange}
         selectedFilters={selectedFilters}
         handleFilterToggle={handleFilterToggle}
         removeFilter={removeFilter}
