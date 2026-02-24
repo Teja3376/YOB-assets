@@ -57,20 +57,20 @@ export default function IssuerLayout({
   }, [issuerData, isIssuerLoading, issuerError, isChecking, router]);
 
   // 3. KYC status check – redirect to /kyb if not approved
-  useEffect(() => {
-    if (isChecking || isAppLoading || appError || !appData) return;
+  // useEffect(() => {
+  //   if (isChecking || isAppLoading || appError || !appData) return;
 
-    const userData = appData.data?.user;
-    const user =
-      userData && typeof userData === "object" && "user" in userData
-        ? (userData as { user: { kycStatus?: string } }).user
-        : userData;
-    const kycStatus = user?.kycStatus;
+  //   const userData = appData.data?.user;
+  //   const user =
+  //     userData && typeof userData === "object" && "user" in userData
+  //       ? (userData as { user: { kycStatus?: string } }).user
+  //       : userData;
+  //   const kycStatus = user?.kycStatus;
 
-    if (kycStatus && kycStatus !== "approved") {
-      router.push("/kyb");
-    }
-  }, [appData, isAppLoading, appError, isChecking, router]);
+  //   if (kycStatus && kycStatus !== "approved") {
+  //     router.push("/kyb");
+  //   }
+  // }, [appData, isAppLoading, appError, isChecking, router]);
 
   const isAuthPending = isChecking || isIssuerLoading;
 

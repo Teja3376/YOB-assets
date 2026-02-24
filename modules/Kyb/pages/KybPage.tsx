@@ -56,7 +56,9 @@ export default function KYBPage() {
     });
   };
 
-  if (isIssuerLoading) {
+  const isKybVerified = issuerData?.data?.user?.iskyb;
+
+  if (isIssuerLoading && isKybVerified === null) {
     return (
       <GetStartedLayout>
         <div className="flex items-center justify-center p-12">
@@ -66,7 +68,7 @@ export default function KYBPage() {
     );
   }
 
-  const isKybVerified = issuerData?.data?.user?.iskyb;
+
 
   return (
     <GetStartedLayout>

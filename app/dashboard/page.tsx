@@ -122,6 +122,7 @@ export default function IssuerDashboard() {
                     ? (userData as { user: any }).user
                     : userData;
                   const kycStatus = user?.kycStatus;
+                  const iskyb = user?.iskyb;
 
                   return (
                     <>
@@ -155,12 +156,12 @@ export default function IssuerDashboard() {
                           <Badge
                             variant="outline"
                             className={
-                              kycStatus === "approved"
+                              iskyb === true
                                 ? "bg-green-100 text-green-800 border-green-200"
                                 : "bg-yellow-100 text-yellow-800 border-yellow-200"
                             }
                           >
-                            {kycStatus || "N/A"}
+                            {iskyb === true ? "Approved" : "Pending"}
                           </Badge>
                         </div>
                       </div>

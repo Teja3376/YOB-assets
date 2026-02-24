@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import useIssuerRequestApi from "@/connection/useIssuerRequestApi";
 import { useFetchIssuer } from "@/connection/useFetchIssuer";
@@ -81,6 +82,19 @@ export default function ApplicationForm() {
     loading: apiLoading,
     error: apiError,
   } = useIssuerRequestApi();
+
+  const router = useRouter();
+
+  const issuerStatus = localIssuerStatus || issuerData?.data?.issuerStatus;
+
+  useEffect(() => {
+    if (issuerStatus === "approved") {
+      const hasSeenApproved = localStorage.getItem("issuer_approved_seen");
+      if (hasSeenApproved) {
+        router.push("/dashboard");
+      }
+    }
+  }, [issuerStatus, router]);
 
   // Load Lottie animations
   useEffect(() => {
@@ -180,8 +194,6 @@ export default function ApplicationForm() {
       </div>
     );
   }
-
-  const issuerStatus = localIssuerStatus || issuerData?.data?.issuerStatus;
 
   if (issuerStatus === "pending") {
     return (

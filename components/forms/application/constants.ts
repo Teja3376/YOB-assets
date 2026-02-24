@@ -149,6 +149,7 @@ export const countryCodes = [
   { code: "+1", country: "US/CA", flag: "🇺🇸" },
   { code: "+44", country: "UK", flag: "🇬🇧" },
   { code: "+212", country: "MA", flag: "🇲🇦" },
+  { code: "+91", country: "IND", flag: "🇮🇳" },
 ];
 
 export const phoneRegex = /^[0-9]{7,15}$/;

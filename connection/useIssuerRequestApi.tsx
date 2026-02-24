@@ -5,7 +5,7 @@ import { api } from "@/lib/api-client";
 // Create axios instance for issuer applications API
 
 export interface IssuerApplicationData {
-  legalName: string;
+  legalEntityName: string;
   countryOfIncorporation: string;
   email: string;
   assetCategory: string;

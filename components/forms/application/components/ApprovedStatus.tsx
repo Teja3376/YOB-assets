@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Lottie from "lottie-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,18 @@ export default function ApprovedStatus({
   applicationId,
 }: ApprovedStatusProps) {
   const router = useRouter();
+
+  useEffect(() => {
+    // Mark as seen so next time they are redirected automatically
+    localStorage.setItem("issuer_approved_seen", "true");
+
+    // Automatically navigate after 3 seconds
+    const timer = setTimeout(() => {
+      router.push("/dashboard");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
