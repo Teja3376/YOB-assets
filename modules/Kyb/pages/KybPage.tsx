@@ -47,8 +47,8 @@ export default function KYBPage() {
     console.log("KYB values:", values);
     createKyb(values, {
       onSuccess: (data) => {
+        toast.success("KYB verification started successfully");
         window.location.href = data.data.kybLink;
-        
       },
       onError: (error) => {
         toast.error(error?.message);
@@ -129,6 +129,7 @@ export default function KYBPage() {
                   <Button
                     type="submit"
                     className="w-full h-12 bg-gradient-to-r from-[#FF6B00] to-[#FF8A33] text-white font-medium shadow-lg hover:shadow-orange-500/20 transition-all"
+                    disabled={isIssuerLoading}
                   >
                     Start Verification
                   </Button>
