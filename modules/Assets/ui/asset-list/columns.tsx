@@ -1,8 +1,8 @@
 // Extracted columns definition for the AssetList table
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Copy, Edit, Eye, Maximize, Send } from "lucide-react";
-import { handleCopy, maskId } from "@/helpers/global";
+import { ArrowUpRight, Copy, Edit, Eye, Maximize, Send } from "lucide-react";
+import { handleCopy, handleViewOnBlockchain, maskId } from "@/helpers/global";
 import { formatCompactNumber } from "@/lib/format.utils";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
@@ -43,9 +43,6 @@ const getColumns = (
       header: "Asset Name",
       accessorKey: "logo",
       cell: (info: any) => {
-        const fallbackLogo =
-          "https://andreaslloyd.dk/wp-content/themes/koji/assets/images/default-fallback-image.png";
-        const logo = info.getValue() || fallbackLogo;
         const fullName = String(info.row.original?.name ?? "SPV Name");
 
         return (
@@ -74,41 +71,37 @@ const getColumns = (
     },
     {
       header: "Blockchain Address",
-      accessorKey: "tokenInformation.blockchainProjectAddress",
+      accessorKey: "blockchainProjectAddress",
       cell: (info: any) => {
         const row = info.row.original;
-        console.log("row ai here:", row);
         // Access the nested blockchain address from tokenInformation
         const assetAddress =
-          row.tokenInformation?.blockchainProjectAddress ||
-          row.assetAddress ||
-          "";
-        console.log("assetAddress:", assetAddress);
+          row.blockchainProjectAddress || row.assetAddress || "";
         if (!assetAddress) {
           return <span className="text-gray-500">Not deployed</span>;
         }
-
-        // Convert Ethereum address format to XDC format for explorer
-        const xdcAddress = assetAddress.replace(/^0x/, "xdc");
-        const explorerUrl = `https://testnet.xdcscan.com/address/${xdcAddress}`;
+        const formattedAddress = assetAddress
+          ? `${assetAddress.slice(0, 6)}...${assetAddress.slice(-4)}`
+          : "-";
 
         return (
-          <div className="flex gap-2">
-            <Copy
-              onClick={() => handleCopy(assetAddress)}
-              size={4}
-              className="text-gray-500 cursor-pointer min-h-4 min-w-4"
-            />
-            <a
-              href={explorerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm truncate text-blue-500 hover:text-blue-700 underline"
-              title={assetAddress}
-            >
-              {assetAddress.substring(0, 10)}...
-              {assetAddress.substring(assetAddress.length - 8)}
-            </a>
+          <div
+            onClick={() => handleViewOnBlockchain(assetAddress || "-", "asset")}
+            className="group flex items-center gap-2"
+          >
+            <span className="group-hover:underline cursor-pointer font-medium text-gray-900">
+              {formattedAddress}
+            </span>
+
+            {assetAddress && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 cursor-pointer"
+              >
+                <ArrowUpRight size={14} />
+              </Button>
+            )}
           </div>
         );
       },

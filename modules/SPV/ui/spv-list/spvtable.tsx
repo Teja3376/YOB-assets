@@ -3,11 +3,14 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
-import { handleCopy, maskId } from "@/helpers/global";
+import { handleCopy, handleViewOnBlockchain, maskId } from "@/helpers/global";
 import { ColumnDef } from "@tanstack/react-table";
-import { Copy, Edit, Eye, Send } from "lucide-react";
+import { ArrowUpRight, Copy, Edit, Eye, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatCurrencyFlexible, formatCompactNumber } from "@/lib/format.utils";
+import {
+  formatCurrencyFlexible,
+  formatCompactNumber,
+} from "@/lib/format.utils";
 import { SPV_TYPES } from "@/modules/SPV/utils/global";
 import TableComponent from "@/common/TableComponent";
 import {
@@ -79,9 +82,7 @@ const SPVTable: React.FC<SPVTableProps> = ({
       cell: (info: any) => {
         const type = info.getValue();
         return (
-          <>
-            {SPV_TYPES.find((opt: any) => opt.value === type)?.label ?? "-"}
-          </>
+          <>{SPV_TYPES.find((opt: any) => opt.value === type)?.label ?? "-"}</>
         );
       },
     },
@@ -89,8 +90,7 @@ const SPVTable: React.FC<SPVTableProps> = ({
       header: "Total Investors",
       accessorKey: "totalInvestors",
       size: 100,
-      cell: (info: any) =>
-        formatCompactNumber(info.getValue() || 0),
+      cell: (info: any) => formatCompactNumber(info.getValue() || 0),
     },
 
     {
@@ -120,23 +120,28 @@ const SPVTable: React.FC<SPVTableProps> = ({
         if (!address)
           return <span className="text-gray-400">Not deployed</span>;
 
-        const explorerUrl = `https://testnet.xdcscan.com/address/${address}`;
+        const formattedAddress = address
+          ? `${address.slice(0, 6)}...${address.slice(-4)}`
+          : "-";
 
         return (
-          <div className="flex gap-2 items-center">
-            <Copy
-              onClick={() => handleCopy(address)}
-              size={14}
-              className="text-gray-500 cursor-pointer"
-            />
-            <a
-              href={explorerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm truncate text-blue-500 underline"
-            >
-              {address.slice(0, 6)}...{address.slice(-4)}
-            </a>
+          <div
+            onClick={() => handleViewOnBlockchain(address || "-", "asset")}
+            className="group flex items-center gap-2"
+          >
+            <span className="group-hover:underline cursor-pointer font-medium text-gray-900">
+              {formattedAddress}
+            </span>
+
+            {address && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 cursor-pointer"
+              >
+                <ArrowUpRight size={14} />
+              </Button>
+            )}
           </div>
         );
       },
@@ -148,12 +153,18 @@ const SPVTable: React.FC<SPVTableProps> = ({
       size: 80,
       cell: (info: any) => {
         const isActive = info.getValue() === "Approval";
-        console.log(data);    
+        console.log(data);
         return (
           <Switch
             checked={isActive}
-            onCheckedChange={() => data?.map((item: any) => item._id === info.row.original._id ? { ...item, status: isActive ? "Approval" : "inactive" } : item)}
-            disabled={isActive }
+            onCheckedChange={() =>
+              data?.map((item: any) =>
+                item._id === info.row.original._id
+                  ? { ...item, status: isActive ? "Approval" : "inactive" }
+                  : item,
+              )
+            }
+            disabled={isActive}
           />
         );
       },
@@ -195,19 +206,15 @@ const SPVTable: React.FC<SPVTableProps> = ({
   const visibleColumns = hideDraftFields
     ? columns.filter(
         (col: any) =>
-          !["totalInvestors", "aum", "OnchainAddress", 'status'].includes(
-            (col as any).accessorKey
-          )
+          !["totalInvestors", "aum", "OnchainAddress", "status"].includes(
+            (col as any).accessorKey,
+          ),
       )
     : columns;
 
   return (
     <>
-      <TableComponent
-        columns={visibleColumns}
-        data={data || []}
-        model="spv"
-      />
+      <TableComponent columns={visibleColumns} data={data || []} model="spv" />
 
       <Dialog
         open={!!selectedDraft}
@@ -223,17 +230,19 @@ const SPVTable: React.FC<SPVTableProps> = ({
             </DialogDescription>
           </DialogHeader>
           <p className="text-sm text-gray-600">
-            Note: Once sent, Admin will be notifed and will be able to review the SPV before it goes live and if any changes required admin send u request for changes you need to make changes and submit again .
+            Note: Once sent, Admin will be notifed and will be able to review
+            the SPV before it goes live and if any changes required admin send u
+            request for changes you need to make changes and submit again .
           </p>
           <Textarea placeholder="Enter the message" />
           <DialogFooter>
-            <Button
-              variant="secondary"
-              onClick={() => setSelectedDraft(null)}
-            >
+            <Button variant="secondary" onClick={() => setSelectedDraft(null)}>
               Close
             </Button>
-            <Button onClick={() => handleSendStatus(selectedDraft?._id)} disabled={isSendingStatus}>
+            <Button
+              onClick={() => handleSendStatus(selectedDraft?._id)}
+              disabled={isSendingStatus}
+            >
               {isSendingStatus ? <Spinner /> : "Send"}
             </Button>
           </DialogFooter>
