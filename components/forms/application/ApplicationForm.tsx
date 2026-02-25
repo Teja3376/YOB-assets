@@ -31,6 +31,7 @@ import {
   assetCategories,
   countryCodeToName,
   countryCodes,
+  getDialCodeFromIso3,
   phoneRegex,
 } from "./constants";
 import PendingStatus from "./components/PendingStatus";
@@ -51,7 +52,7 @@ export const formSchema = z.object({
     .min(7, "Phone number must be at least 7 digits")
     .max(15, "Phone number must not exceed 15 digits")
     .regex(phoneRegex, "Phone number must contain only digits"),
-  assetCategory: z.string().min(1, "Asset category is required"),
+  // assetCategory: z.string().min(1, "Asset category is required"),
   shortAssetDescription: z
     .string()
     .min(10, "Short asset description must be at least 10 characters"),
@@ -123,7 +124,7 @@ export default function ApplicationForm() {
       email: "",
       phoneCountryCode: "",
       phoneNumber: "",
-      assetCategory: "",
+      // assetCategory: "",
       shortAssetDescription: "",
     },
   });
@@ -131,12 +132,14 @@ export default function ApplicationForm() {
   useEffect(() => {
     const user = issuerData?.data?.user;
     if (!user) return;
-
+    const dialCode = getDialCodeFromIso3(issuerData?.data?.user?.companyCountry ?? "");
     form.reset({
       ...form.getValues(),
       legalEntityName: user.companyName ?? "",
       countryOfIncorporation: user.companyCountry ?? "",
       email: user.email ?? "",
+      phoneCountryCode: dialCode,
+      phoneNumber: user.phoneNumber ?? "",
     });
   }, [issuerData, form]);
 
@@ -148,7 +151,7 @@ export default function ApplicationForm() {
         legalEntityName: data.legalEntityName,
         countryOfIncorporation: data.countryOfIncorporation,
         email: data.email,
-        assetCategory: data.assetCategory,
+        // assetCategory: data.assetCategory,
         shortAssetDescription: data.shortAssetDescription,
         phoneCountryCode: data.phoneCountryCode,
         phoneNumber: data.phoneNumber,
@@ -169,9 +172,9 @@ export default function ApplicationForm() {
         legalEntityName: user?.companyName ?? "",
         countryOfIncorporation: user?.companyCountry ?? "",
         email: user?.email ?? "",
-        phoneCountryCode: "",
-        phoneNumber: "",
-        assetCategory: "",
+        phoneCountryCode: getDialCodeFromIso3(user?.companyCountry ?? ""),
+        phoneNumber: user?.phoneNumber ?? "",
+        // assetCategory: "",
         shortAssetDescription: "",
       });
     }
@@ -260,7 +263,7 @@ export default function ApplicationForm() {
                 <FormItem>
                   <FormLabel>Country of Incorporation *</FormLabel>
                   <Select
-                    key={field.value} // 🔥 THIS LINE FIXES IT
+                    key={field.value}
                     value={field.value}
                     onValueChange={field.onChange}
                     disabled
@@ -286,9 +289,8 @@ export default function ApplicationForm() {
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
+
             <FormField
               control={form.control}
               name="email"
@@ -300,14 +302,14 @@ export default function ApplicationForm() {
                       type="email"
                       placeholder="Enter your email address"
                       {...field}
-                      disabled
+                      disabled={true}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="assetCategory"
               render={({ field }) => (
@@ -330,61 +332,63 @@ export default function ApplicationForm() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-3">
-            <FormField
-              control={form.control}
-              name="phoneCountryCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country Code *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Code" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-[300px]">
-                      {countryCodes.map((item, index) => (
-                        <SelectItem
-                          key={`${item.code}-${item.country}-${index}`}
-                          value={item.code}
-                        >
-                          <span className="flex items-center gap-2">
-                            <span>{item.flag}</span>
-                            <span>{item.code}</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            /> */}
 
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mobile Number *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder="1234567890"
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, "");
-                        field.onChange(value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex gap-2">
+              <FormField
+                control={form.control}
+                name="phoneCountryCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Code *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} key={field.value} >
+                      <FormControl>
+                        <SelectTrigger className="w-24">
+                          <SelectValue placeholder="Code" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="max-h-[300px]">
+                        {countryCodes.map((item, index) => (
+                          <SelectItem
+                            key={`${item.code}-${item.country}-${index}`}
+                            value={item.code}
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>{item.flag}</span>
+                              <span>{item.code}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mobile Number *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="tel"
+                        placeholder="Enter your mobile number"
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
+                        className="w-56"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
           <FormField

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import Header from "@/components/layout/header";
@@ -19,6 +19,7 @@ export default function GetStartedLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+
   const pathname = usePathname();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -28,14 +29,14 @@ export default function GetStartedLayout({
     if (stepIndex !== -1) {
       setCurrentStep(stepIndex);
       setCompletedSteps(Array.from({ length: stepIndex }, (_, i) => i));
-    }
-  }, [pathname]);
-
   const handleStepClick = (index: number) => {
     if (completedSteps.includes(index) || index === currentStep) {
       router.push(steps[index].route);
     }
   };
+
+    }
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -57,9 +58,8 @@ export default function GetStartedLayout({
                     <div key={step.id} className="flex items-center flex-1">
                       <div className="flex flex-col items-center">
                         <motion.div
-                          onClick={() => handleStepClick(index)}
                           animate={{ scale: isActive ? 1.1 : 1 }}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm cursor-pointer
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
                             ${
                               isCompleted
                                 ? "bg-green-500 text-white"

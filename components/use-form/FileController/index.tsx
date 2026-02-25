@@ -133,10 +133,10 @@ function FileUploadController({
           className={cn("text-sm font-medium", error && "text-destructive")}
         >
           {label}
-          {rules?.required && <span className="ml-1 text-destructive">*</span>}
+          {rules?.required && <span className="ml-1 text-destructive ">*</span>}
         </label>
 
-        <span className="text-xs text-muted-foreground">{description}</span>
+        <span className="text-xs text-muted-foreground text-right">{description}</span>
       </div>
 
       <Controller

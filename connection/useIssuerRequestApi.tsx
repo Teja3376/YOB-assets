@@ -8,7 +8,7 @@ export interface IssuerApplicationData {
   legalEntityName: string;
   countryOfIncorporation: string;
   email: string;
-  assetCategory: string;
+  // assetCategory: string;
   shortAssetDescription: string;
   phoneCountryCode: string;
   phoneNumber: string;
@@ -24,7 +24,7 @@ export interface IssuerApplicationResponse {
     email: string;
     legalEntityName: string;
     countryOfIncorporation: string;
-    assetCategory: string;
+    // assetCategory: string;
     shortAssetDescription: string;
     status: string;
     submittedAt: string;
