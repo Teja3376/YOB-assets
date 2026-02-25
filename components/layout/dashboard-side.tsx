@@ -18,7 +18,7 @@ const menu = [
   { name: "SPV List(WIP)", href: "/spv", icon: Building2, },
   { name: "Assets(WIP)", href: "/assets", icon: Package, },
   { name: "Orders(WIP)", href: "/issuer/orders", icon: ShoppingCart, disabled: true },
-  { name: "Investors(WIP)", href: "/issuer/investors", icon: Users, disabled: true },
+  { name: "Investors(WIP)", href: "/investors", icon: Users},
 ];
 
 export default function DashboardSidebar() {

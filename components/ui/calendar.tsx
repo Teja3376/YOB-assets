@@ -139,10 +139,7 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
-              <ChevronLeftIcon
-                className={cn("size-4", className)}
-                {...props}
-              />
+              <ChevronLeftIcon className={cn("size-4", className)} {...props} />
             );
           }
 
@@ -156,10 +153,7 @@ function Calendar({
           }
 
           return (
-            <ChevronDownIcon
-              className={cn("size-4", className)}
-              {...props}
-            />
+            <ChevronDownIcon className={cn("size-4", className)} {...props} />
           );
         },
         DayButton: CalendarDayButton,
@@ -170,6 +164,66 @@ function Calendar({
                 {children}
               </div>
             </td>
+          );
+        },
+        Dropdown: ({ value, onChange, children, options, ...props }: any) => {
+          const dropdownOptions =
+            options ||
+            (
+              React.Children.toArray(children) as React.ReactElement<
+                React.ComponentProps<"option">
+              >[]
+            ).map((child) => ({
+              value: child.props.value,
+              label: child.props.children,
+            }));
+
+          const selected = dropdownOptions.find(
+            (opt: any) => opt.value === value,
+          );
+          const [isOpen, setIsOpen] = React.useState(false);
+
+          return (
+            <div className="relative inline-block w-full min-w-[80px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full h-8 justify-between px-2 text-xs font-semibold hover:bg-accent border border-yob-primary/20 bg-transparent shadow-none"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                <span>{selected?.label || selected?.value || "Select"}</span>
+                <ChevronDownIcon className="ml-1 h-3 w-3 opacity-50" />
+              </Button>
+              {isOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsOpen(false)}
+                  />
+                  <div className="absolute top-full left-0 z-50 mt-1 min-w-full bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto p-1">
+                    {dropdownOptions.map((option: any, id: number) => (
+                      <div
+                        key={`${option.value}-${id}`}
+                        className={cn(
+                          "px-2 py-1.5 text-xs rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                          option.value === value &&
+                            "bg-accent text-accent-foreground font-medium",
+                        )}
+                        onClick={() => {
+                          const changeEvent = {
+                            target: { value: option.value },
+                          } as React.ChangeEvent<HTMLSelectElement>;
+                          onChange?.(changeEvent);
+                          setIsOpen(false);
+                        }}
+                      >
+                        {option.label}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           );
         },
         ...components,
@@ -208,7 +262,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70',
+        "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70",
         defaultClassNames.day,
         className,
       )}
