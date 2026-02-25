@@ -26,6 +26,7 @@ import {
 import GetStartedLayout from "@/components/layout/get-started";
 import { authAPI } from "@/lib/api-client";
 import { useState } from "react";
+import { countryCodes } from "@/components/forms/application/constants";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -35,13 +36,6 @@ const registerSchema = z.object({
   phone: z.string().min(1, "Phone number is required"),
 });
 
-const countries = [
-  { code: "+971", name: "UAE" },
-  { code: "+1", name: "USA" },
-  { code: "+44", name: "UK" },
-  { code: "+91", name: "India" },
-  { code: "+966", name: "Saudi Arabia" },
-];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -190,12 +184,12 @@ export default function RegisterPage() {
                           </SelectTrigger>
 
                           <SelectContent>
-                            {countries.map((country) => (
+                            {countryCodes.map((country) => (
                               <SelectItem
                                 key={country.code}
                                 value={country.code}
                               >
-                                {country.code} ({country.name})
+                                {country.code} ({country.country})
                               </SelectItem>
                             ))}
                           </SelectContent>

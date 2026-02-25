@@ -11,6 +11,8 @@ export interface IssuerUser {
   createdAt: string;
   updatedAt: string;
   id: string;
+  phoneCountryCode?: string;
+  phoneNumber?: string;
   iskyb?: boolean;
   companyName?: string;
   companyCountry?: string;
