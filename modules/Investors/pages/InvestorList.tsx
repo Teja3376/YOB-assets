@@ -10,7 +10,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Users, DollarSign, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DatePicker from "../components/DatePicker";
+import DatePicker from "../ui/DatePicker";
 
 const InvestorList = () => {
   const router = useRouter();

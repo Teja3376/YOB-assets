@@ -44,7 +44,7 @@ const investorColumn = () => {
         const totalTokens = info.getValue();
         return (
           <div className="flex items-center gap-2 px-2">
-            <Coins size={14} />
+            <Coins size={14} className="text-primary"/>
             <span className="text-sm uppercase">{totalTokens}</span>
           </div>
         );

@@ -1,91 +1,184 @@
-import axios from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { toast } from "sonner";
 
-// Create an Axios instance
-export const api = axios.create({
-  baseURL: "http://localhost:5050/api",
-  // baseURL: "https://nexa-issuer-backend.vercel.app/api",
+const API_BASE_URL = "http://localhost:5050/api";
+// const API_BASE_URL = "https://nexa-issuer-backend.vercel.app/api";
+
+/**
+ * Main API instance
+ */
+export const api: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request Interceptor: Attach Token to Requests
+/**
+ * Separate instance WITHOUT interceptors for refresh
+ */
+const refreshApi: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+function getAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+
+  return (
+    sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken")
+  );
+}
+
+function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+
+  return (
+    sessionStorage.getItem("refreshToken") ||
+    localStorage.getItem("refreshToken")
+  );
+}
+
+function setAccessToken(token: string) {
+  if (typeof window === "undefined") return;
+
+  const storage = sessionStorage.getItem("refreshToken")
+    ? sessionStorage
+    : localStorage;
+
+  storage.setItem("accessToken", token);
+}
+function setRefreshToken(token: string) {
+  if (typeof window === "undefined") return;
+
+  sessionStorage.setItem("refreshToken", token);
+}
+function clearTokens() {
+  if (typeof window === "undefined") return;
+
+  sessionStorage.clear();
+  localStorage.clear();
+}
+
+function handleLogout() {
+  clearTokens();
+
+  toast.error("Session expired. Please login again.");
+
+  if (typeof window !== "undefined") {
+    window.location.href = "/login";
+  }
+}
+
 api.interceptors.request.use(
-  (config) => {
-    // Check if we're in browser environment
-    if (typeof window !== "undefined") {
-      const token = sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+  (config: InternalAxiosRequestConfig) => {
+    const token = getAccessToken();
+
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
-// Response Interceptor: Handle Token Expiry & Errors
 api.interceptors.response.use(
-  (response) => response, // Return response as is if successful
-  async (error) => {
-    const originalRequest = error.config;
+  (response: AxiosResponse) => response,
+
+  async (error: AxiosError) => {
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     if (!error.response) {
-      console.error("Network error: No response received.");
-      return Promise.reject({ message: "Network Error" });
+      toast.error("Network error");
+      return Promise.reject(error);
     }
 
-    const { status } = error.response;
+    const status = error.response.status;
 
-    if (status === 401 || status === 403) {
-      console.warn("Unauthorized request: Attempting to refresh token.");
+    if ((status === 401 || status === 403) && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        handleLogout();
+        console.warn("No refresh token available");
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token: string) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
 
       try {
-        if (typeof window !== "undefined") {
-          const refreshToken = sessionStorage.getItem("refreshToken") || localStorage.getItem("refreshToken");
-          // const sessionId = sessionStorage.getItem("sessionId") || localStorage.getItem("sessionId");
-          if (!refreshToken) {
-            console.error("No refresh token found. Redirecting to login.");
-            return handleLogout();
-          }
+        const response = await refreshApi.post("/auth-issuer/refresh", {
+          refreshToken,
+        });
 
-          const { data } = await api.post(
-            "/auth-issuer/refresh",
-            {refreshToken }
-          );
+        console.log("Refresh response:", response);
 
-          // Store in the same location it was retrieved from
-          const storage = sessionStorage.getItem("refreshToken") ? sessionStorage : localStorage;
-          storage.setItem("accessToken", data.data.accessToken);
+        const newAccessToken = response.data.data.accessToken;
+        const newRefreshToken = response.data.data.refreshToken;
+        console.log("New tokens:", { newAccessToken, newRefreshToken });
 
-          // Retry the original request with new token
-          originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
-          return api(originalRequest);
+        setAccessToken(newAccessToken);
+        setRefreshToken(newRefreshToken);
+
+        onRefreshed(newAccessToken);
+
+        toast.success("Session refreshed");
+
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
+
+        return api(originalRequest);
       } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-        return handleLogout();
+        handleLogout();
+        console.log("Refresh error:", refreshError);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
-const handleLogout = () => {
-  if (typeof window !== "undefined") {
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.removeItem("refreshToken");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    window.location.href = "/login";
-  }
-  return Promise.reject({ message: "Session expired. Redirecting to login." });
-};
-
-// Auth API functions
 export const authAPI = {
-  // Signup
   signup: async (data: {
     email: string;
     firstName: string;
@@ -93,31 +186,24 @@ export const authAPI = {
     phoneNumber: string;
     countryCode?: string;
   }) => {
-    const response = await api.post("/auth-issuer/signup", data);
-    return response.data;
+    const res = await api.post("/auth-issuer/signup", data);
+    return res.data;
   },
 
-  // Login
-  login: async (data: { email: string; }) => {
-    const response = await api.post("/auth-issuer/login", data);
-    return response.data;
+  login: async (data: { email: string }) => {
+    const res = await api.post("/auth-issuer/login", data);
+    return res.data;
   },
 
-  // Resend OTP
   resendOTP: async () => {
-    const response = await api.post("/auth-issuer/resend-otp");
-    return response.data;
+    const res = await api.post("/auth-issuer/resend-otp");
+    return res.data;
   },
 
-  // Verify OTP
-  verifyOTP: async (data: { otp: string, email: string }) => {
-    const response = await api.post("/auth-issuer/verify-otp", { otp: data.otp, email: data.email });
-    return response.data;
+  verifyOTP: async (data: { otp: string; email: string }) => {
+    const res = await api.post("/auth-issuer/verify-otp", data);
+    return res.data;
   },
-
-
-  // Update KYC status
-
 };
 
 export default api;

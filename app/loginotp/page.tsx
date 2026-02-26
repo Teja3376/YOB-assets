@@ -43,6 +43,7 @@ function OTPPageContent() {
       // Call verify OTP API
 
       const response = await authAPI.verifyOTP({ otp: otp, email: email });
+      console.log("OTP verification successful:", response);
 
       // Update tokens if new ones are provided
       if (response.data?.accessToken && response.data?.refreshToken) {
