@@ -12,19 +12,48 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+const DATE_FORMAT = "yyyy-MM-dd";
+
 interface DatePickerProps {
   label: string;
   date?: Date;
   onSelect: (date: Date | undefined) => void;
   className?: string;
+  /** Min selectable date (e.g. for "To Date" use fromDate so start ≤ end) */
+  minDate?: Date;
+  /** Max selectable date (e.g. for "From Date" use toDate so start ≤ end; use today to block future dates) */
+  maxDate?: Date;
+  /** When true, picker is disabled and cannot be opened */
+  disabled?: boolean;
 }
+
+const todayEnd = () => {
+  const d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d;
+};
+
+/** Returns true for dates after today (calendar day). Makes future dates non-selectable. */
+const isFutureDate = (date: Date): boolean => {
+  const d = new Date(date);
+  const t = new Date();
+  d.setHours(0, 0, 0, 0);
+  t.setHours(0, 0, 0, 0);
+  return d.getTime() > t.getTime();
+};
 
 const DatePicker: React.FC<DatePickerProps> = ({
   label,
   date,
   onSelect,
   className,
+  minDate,
+  maxDate,
+  disabled = false,
 }) => {
+  const effectiveMaxDate =
+    maxDate && maxDate <= todayEnd() ? maxDate : todayEnd();
+
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <p className="text-sm font-medium text-gray-600">{label}</p>
@@ -32,13 +61,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
+            disabled={disabled}
             className={cn(
               "w-[200px] justify-start text-left font-normal border-gray-300",
               !date && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
-            {date ? format(date, "yyyy/MM/dd") : <span>Pick a date</span>}
+            {date ? format(date, DATE_FORMAT) : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -51,6 +81,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
             defaultMonth={date || new Date()}
             startMonth={new Date(1900, 0)}
             endMonth={new Date(2100, 11)}
+            fromDate={minDate}
+            toDate={effectiveMaxDate}
+            disabled={isFutureDate}
           />
         </PopoverContent>
       </Popover>

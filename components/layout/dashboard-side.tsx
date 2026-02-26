@@ -17,8 +17,8 @@ const menu = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "SPV List", href: "/spv", icon: Building2, },
   { name: "Assets", href: "/assets", icon: Package, },
-  { name: "Orders(WIP)", href: "/orders", icon: ShoppingCart, },
-  { name: "Investors(WIP)", href: "/investors", icon: Users},
+  { name: "Orders(WIP)", href: "/orders", icon: ShoppingCart, disabled: true },
+  { name: "Investors", href: "/investors", icon: Users, },
 ];
 
 export default function DashboardSidebar() {
