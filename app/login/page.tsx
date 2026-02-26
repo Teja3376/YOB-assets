@@ -42,6 +42,8 @@ export default function LoginPage() {
         email: values.email,
       });
 
+      console.log("Login successful:", response);
+
       // Store tokens in sessionStorage
       if (
         response.data?.accessToken &&
