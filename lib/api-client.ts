@@ -158,7 +158,7 @@ api.interceptors.response.use(
 
         onRefreshed(newAccessToken);
 
-        toast.success("Session refreshed");
+        // toast.success("Session refreshed");
 
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

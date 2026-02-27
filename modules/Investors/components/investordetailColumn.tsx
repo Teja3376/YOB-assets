@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { handleCopy } from "@/helpers/global";
-import { formatDate } from "@/lib/format.utils";
+import { formatCurrencyWithLocale, formatDate } from "@/lib/format.utils";
 import StatusBadge from "@/modules/Orders/ui/StatusBadge";
 import { Coins, Copy, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,12 +11,13 @@ const investordetailColumn = () => {
         {
             header: "Investor Id",
             accessorKey: "_id",
+            size: 80,
             cell: (info: any) => {
                 const id = info.getValue();
                 return (
                     <div className="flex flex-col py-1">
                         <div className="flex items-center gap-2 px-2">
-                            <span className="uppercase font-semibold">{`INV-${id.slice(-3)}`}</span> 
+                            <span className="uppercase font-semibold">{`ORD-${id.slice(-3)}`}</span> 
                             <Copy className="w-4 h-4 text-gray-500 cursor-pointer" onClick={() => handleCopy(id)} />
                         </div>
                     </div>
@@ -26,6 +27,7 @@ const investordetailColumn = () => {
         {
             header: "Spv",
             accessorKey: "spvName",
+            size: 180,
             cell: (info: any) => {
                 const spvName = info.getValue();
                 return (
@@ -40,6 +42,7 @@ const investordetailColumn = () => {
         {
             header: "Asset",
             accessorKey: "assetName",
+            size: 180,
             cell: (info: any) => {
                 const assetName = info.getValue();
                 return (
@@ -54,12 +57,13 @@ const investordetailColumn = () => {
         {
             header: "Invested Amount",
             accessorKey: "investorAmount",
+            size: 100,
             cell: (info: any) => {
                 const investorAmount = info.getValue();
                 return (
                     <div className="flex flex-col py-1">
                         <div className="flex items-center gap-2 px-2">
-                            <span className="">{investorAmount?.toFixed(2)}</span>
+                            <span className="">{formatCurrencyWithLocale(investorAmount, "USD")}</span>
                         </div>
                     </div>
 
@@ -69,6 +73,7 @@ const investordetailColumn = () => {
         {
             header: "Tokens",
             accessorKey: "numberOfTokens",
+            size: 50,
             cell: (info: any) => {
                 const numberOfTokens = info.getValue();
                 return (
@@ -84,6 +89,7 @@ const investordetailColumn = () => {
         {
             header: "Invested Date",
             accessorKey: "createdAt",
+            size: 80,
             cell: (info: any) => {
                 const createdAt = info.getValue();
                 return (
@@ -98,6 +104,7 @@ const investordetailColumn = () => {
         {
             header: "Order Status",
             accessorKey: "status",
+            size: 100,
             cell: (info: any) => {
                 const status = info.getValue();
                 return (
