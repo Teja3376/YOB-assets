@@ -8,8 +8,6 @@ import Pagination from "@/common/Pagination";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Users, DollarSign, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import DatePicker from "../../../components/DatePicker";
 import useInvestorCount from "../hooks/useInvestorCount";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { formatCurrencyWithLocale } from "@/lib/format.utils";
@@ -21,18 +19,6 @@ const InvestorList = () => {
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
   const [search, setSearch] = useState("");
-  const [fromDate, setFromDate] = useState<Date | undefined>();
-  const [toDate, setToDate] = useState<Date | undefined>();
-
-  const handleFromDateSelect = (date: Date | undefined) => {
-    setFromDate(date);
-    if (date && toDate && date > toDate) setToDate(date);
-  };
-  const handleToDateSelect = (date: Date | undefined) => {
-    setToDate(date);
-    if (date && fromDate && date < fromDate) setFromDate(date);
-  };
-
 
   const debouncedSearch = useDebounce(search, 500);
   const { data, isLoading } = useInvesterList(page, limit, debouncedSearch);
