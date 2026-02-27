@@ -35,11 +35,24 @@ export const orderCols = (router: any) => {
       },
     },
     {
+      header: "SPV",
+      accessorKey: "spv",
+      cell: (info: any) => {
+        const spv = info.getValue();
+        return <div>{spv?.name}</div>;
+      },
+    },
+    {
       header: "Tokens Purchased",
       accessorKey: "numberOfTokens",
       cell: (info: any) => {
         const tokens = info.getValue();
-        return <div className="flex items-center gap-2"><Coins className="text-yellow-500" size={15}/>{tokens}</div>;
+        return (
+          <div className="flex items-center gap-2">
+            <Coins className="text-yellow-500" size={15} />
+            {tokens}
+          </div>
+        );
       },
     },
     {
@@ -47,7 +60,8 @@ export const orderCols = (router: any) => {
       accessorKey: "investorAmount",
       cell: (info: any) => {
         const orderValue = info.getValue();
-        const assetCurrency = info.row.original.asset.curreny;
+        const assetCurrency = info.row.original.asset.currency;
+
         return <div>{formatCurrencyWithLocale(orderValue, assetCurrency)}</div>;
       },
     },
@@ -60,6 +74,15 @@ export const orderCols = (router: any) => {
         return (
           <div>{formatCurrencyWithLocale(investorPaid, investorCurrency)}</div>
         );
+      },
+    },
+    {
+      header: "FX Rate",
+      accessorKey: "fxRate",
+      cell: (info: any) => {
+        const fxRate = info.getValue();
+
+        return <div>{fxRate?.toFixed(5) || "-"}</div>;
       },
     },
     {
@@ -86,9 +109,10 @@ export const orderCols = (router: any) => {
       header: "Actions",
       accessorKey: "actions",
       cell: (info: any) => {
+        const orderId = info.row.original._id;
         return (
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" onClick={() => router.push(`/orders/${orderId}`)}>
               <Eye className="h-5 w-5" />
             </Button>
           </div>

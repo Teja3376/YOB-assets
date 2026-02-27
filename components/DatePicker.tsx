@@ -11,20 +11,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
 
-const DATE_FORMAT = "yyyy-MM-dd";
+const DATE_FORMAT = "dd-MM-yyyy";
 
 interface DatePickerProps {
-  label: string;
+  label?: string;
   date?: Date;
   onSelect: (date: Date | undefined) => void;
   className?: string;
-  /** Min selectable date (e.g. for "To Date" use fromDate so start ≤ end) */
   minDate?: Date;
-  /** Max selectable date (e.g. for "From Date" use toDate so start ≤ end; use today to block future dates) */
   maxDate?: Date;
-  /** When true, picker is disabled and cannot be opened */
+  placeHolder?: string;
   disabled?: boolean;
+  popoverClassName?: string;
+  range?: DateRange;
+  onRangeSelect?: (range: DateRange | undefined) => void;
 }
 
 const todayEnd = () => {
@@ -49,6 +51,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
   className,
   minDate,
   maxDate,
+  placeHolder,
+  popoverClassName,
   disabled = false,
 }) => {
   const effectiveMaxDate =
@@ -56,7 +60,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <p className="text-sm font-medium text-gray-600">{label}</p>
+      {label && <p className="text-sm font-medium text-gray-600">{label}</p>}
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -65,10 +69,15 @@ const DatePicker: React.FC<DatePickerProps> = ({
             className={cn(
               "w-[200px] justify-start text-left font-normal border-gray-300",
               !date && "text-muted-foreground",
+              popoverClassName,
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
-            {date ? format(date, DATE_FORMAT) : <span>Pick a date</span>}
+            {date ? (
+              format(date, DATE_FORMAT)
+            ) : (
+              <span>{placeHolder || "Pick a date"}</span>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
