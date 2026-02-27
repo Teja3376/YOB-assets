@@ -21,25 +21,31 @@ import OrdersTable from "../ui/OrdersTable";
 import { orderCols } from "../schema/orderCols";
 import useGetOrderList from "../hooks/useGetOrderList";
 import Pagination from "@/common/Pagination";
-import { set } from "lodash";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
-import clsx from "clsx";
 import { useGetOrdersStats } from "../hooks/useGetOrdersStats";
+import DateRangePicker from "@/components/DateRangePicker";
+import { DateRange } from "react-day-picker";
+import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 const OrderListPage = () => {
+  const router=useRouter()
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const searchQuery = useDebounce(searchTerm, 500);
   const [status, setStatus] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const fromDate = dateRange?.from;
+  const toDate = dateRange?.to;
   const {
     data: orders,
     isPending: isOrdersLoading,
     isError,
-  } = useGetOrderList(page, pageSize, searchQuery, status);
+  } = useGetOrderList(page, pageSize, searchQuery, status, fromDate, toDate);
 
   const { data: orderStats, isPending: isOrderStatsLoading } =
     useGetOrdersStats();
@@ -54,22 +60,15 @@ const OrderListPage = () => {
   };
   const ORDER_STATUSES = [
     { label: "All", value: "" },
-    { label: "Initiated", value: "initiated" },
-    { label: "Payment Pending", value: "payment_pending" },
-    { label: "Payment Success", value: "payment_success" },
-    { label: "Payment Failed", value: "payment_failed" },
-    { label: "Token Transfer Pending", value: "token_transfer_pending" },
-    { label: "Token Transferred", value: "token_transferred" },
-    { label: "Token Transfer Failed", value: "token_transfer_failed" },
-    { label: "Signature Pending", value: "signature_pending" },
-    { label: "Order Failed", value: "order_failed" },
+    { label: "Pending", value: "pending" },
     { label: "Completed", value: "completed" },
+    { label: "Failed", value: "failed" },
   ];
   return (
-    <div className="p-2 space-y-2">
+    <main className="p-2 space-y-4">
       <h1 className="text-2xl font-semibold">Orders</h1>
 
-      <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
+      <div className="grid gap-3 grid-cols-4">
         <DashboardCard
           title="Total Orders"
           value={orderStats?.totalOrders || 0}
@@ -78,78 +77,16 @@ const OrderListPage = () => {
           containerClassName="rounded-lg"
         />
         <DashboardCard
-          title="Initiated Orders"
-          value={orderStats?.statusCounts?.initiated || "0"}
-          leftIcon={<CircleDot size={25} className="text-slate-500" />}
+          title="Pending Orders"
+          value={orderStats?.inProgress || "0"}
+          leftIcon={<Clock size={25} className="text-yellow-500" />}
           titleIconClassName="bg-slate-100 rounded-full p-2"
           containerClassName="rounded-lg"
         />
-        {orderStats?.statusCounts?.payment_pending > 0 && (
-          <DashboardCard
-            title="Payment Pending Orders"
-            value={orderStats?.statusCounts?.payment_pending || 0}
-            leftIcon={<Clock size={25} className="text-yellow-600" />}
-            titleIconClassName="bg-yellow-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
-        {orderStats?.statusCounts?.payment_success > 0 && (
-          <DashboardCard
-            title="Payment Success Orders"
-            value={orderStats?.statusCounts?.payment_success || 0}
-            leftIcon={<BadgeCheck size={25} className="text-green-600" />}
-            titleIconClassName="bg-green-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
-        {orderStats?.statusCounts?.payment_failed > 0 && (
-          <DashboardCard
-            title="Payment Failed Orders"
-            value={orderStats?.statusCounts?.payment_failed || 0}
-            leftIcon={<XCircle size={25} className="text-red-600" />}
-            titleIconClassName="bg-red-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
-        {orderStats?.statusCounts?.token_transfer_pending > 0 && (
-          <DashboardCard
-            title="Token Transfer Pending Orders"
-            value={orderStats?.statusCounts?.token_transfer_pending || 0}
-            leftIcon={<LoaderCircle size={25} className="text-yellow-600" />}
-            titleIconClassName="bg-yellow-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
-        {orderStats?.statusCounts?.token_transferred > 0 && (
-          <DashboardCard
-            title="Token Transferred Orders"
-            value={orderStats?.statusCounts?.token_transferred || 0}
-            leftIcon={<ArrowRightLeft size={25} className="text-green-600" />}
-            titleIconClassName="bg-green-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
-        {orderStats?.statusCounts?.token_transfer_failed > 0 && (
-          <DashboardCard
-            title="Token Transfer Failed Orders"
-            value={orderStats?.statusCounts?.token_transfer_failed || 0}
-            leftIcon={<AlertTriangle size={25} className="text-red-600" />}
-            titleIconClassName="bg-red-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
-        {orderStats?.statusCounts?.signature_pending > 0 && (
-          <DashboardCard
-            title="Signature Pending Orders"
-            value={orderStats?.statusCounts?.signature_pending || 0}
-            leftIcon={<PenLine size={25} className="text-orange-600" />}
-            titleIconClassName="bg-orange-50 rounded-full p-2"
-            containerClassName="rounded-lg"
-          />
-        )}
+
         <DashboardCard
           title="Completed Orders"
-          value={orderStats?.statusCounts?.completed || 0}
+          value={orderStats?.completed || 0}
           leftIcon={<CheckCheck size={25} className="text-emerald-600" />}
           titleIconClassName="bg-emerald-50 rounded-full p-2"
           containerClassName="rounded-lg"
@@ -157,7 +94,7 @@ const OrderListPage = () => {
 
         <DashboardCard
           title="Failed Orders"
-          value={orderStats?.statusCounts?.order_failed || 0}
+          value={orderStats?.failed || 0}
           leftIcon={<XCircle size={25} className="text-red-700" />}
           titleIconClassName="bg-red-50 rounded-full p-2"
           containerClassName="rounded-lg"
@@ -175,10 +112,9 @@ const OrderListPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-2">
           {ORDER_STATUSES.map((item) => {
             const isActive = status === item.value;
-
             return (
               <Button
                 key={item.value}
@@ -197,13 +133,16 @@ const OrderListPage = () => {
               </Button>
             );
           })}
+
+          <DateRangePicker range={dateRange} onSelect={setDateRange} />
           <Button
             onClick={() => {
               setStatus("");
               setSearchTerm("");
+              setDateRange(undefined);
             }}
             variant="outline"
-            className="border-0 shadow-none hover:underline "
+            className="border-0 shadow-none hover:underline rounded-full "
           >
             Clear all
           </Button>
@@ -211,7 +150,7 @@ const OrderListPage = () => {
       </div>
       <div>
         {!isOrdersLoading && orders && (
-          <OrdersTable cols={orderCols(undefined)} data={orders?.data || []} />
+          <OrdersTable cols={orderCols(router)} data={orders?.data || []} />
         )}
         {isOrdersLoading && (
           <div>
@@ -227,7 +166,7 @@ const OrderListPage = () => {
           onPageSizeChange={onPageSizeChange}
         />
       )}
-    </div>
+    </main>
   );
 };
 

@@ -10,7 +10,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Users, DollarSign, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DatePicker from "../ui/DatePicker";
+import DatePicker from "../../../components/DatePicker";
 import useInvestorCount from "../hooks/useInvestorCount";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
