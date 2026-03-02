@@ -22,6 +22,7 @@ const InvestorList = () => {
 
   const debouncedSearch = useDebounce(search, 500);
   const { data, isLoading } = useInvesterList(page, limit, debouncedSearch);
+  
   const { data: investorCount, isLoading: isInvestorCountLoading } = useInvestorCount();
   console.log(investorCount);
   const investors = data?.data || [];
@@ -71,8 +72,9 @@ const InvestorList = () => {
 
 
       {/* Table */}
+      {isLoading ? <LoadingSpinner /> : (
       <TableComponent columns={investorColumn()} data={investors} model="investor" />
-
+      )}
       {/* Pagination */}
       {pagination && (
         <Pagination
