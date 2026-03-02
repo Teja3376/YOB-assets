@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import DatePicker from "../../../components/DatePicker";
 import useInvestorCount from "../hooks/useInvestorCount";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { formatCurrencyWithLocale } from "@/lib/format.utils";
 
 const InvestorList = () => {
   const router = useRouter();
@@ -33,10 +34,14 @@ const InvestorList = () => {
     if (date && fromDate && date < fromDate) setFromDate(date);
   };
 
-
   const debouncedSearch = useDebounce(search, 500);
-  const { data, isLoading } = useInvesterList(page, limit, debouncedSearch);
-  const { data: investorCount, isLoading: isInvestorCountLoading } = useInvestorCount();
+  const { data, isFetching: isInvestorsLoading } = useInvesterList(
+    page,
+    limit,
+    debouncedSearch,
+  );
+  const { data: investorCount, isFetching: isInvestorCountLoading } =
+    useInvestorCount();
   console.log(investorCount);
   const investors = data?.data || [];
   const pagination = data?.pagination;
@@ -66,7 +71,10 @@ const InvestorList = () => {
         />
         <InvestorCard
           title="Total Invested"
-          value={investorCount?.totalInvested.toFixed(2)}
+          value={formatCurrencyWithLocale(
+            investorCount?.totalInvestedUSD?.toFixed(2) || 0,
+            investorCount?.baseCurrency || "USD",
+          )}
           icon={<DollarSign className="w-6 h-6 text-green-500" />}
           color={"green"}
         />
@@ -83,18 +91,25 @@ const InvestorList = () => {
         />
       </div>
 
-
       {/* Table */}
-      <TableComponent columns={investorColumn()} data={investors} model="investor" />
+      {isInvestorsLoading && !investors ? (
+        <LoadingSpinner />
+      ) : (
+        <TableComponent
+          columns={investorColumn()}
+          data={investors}
+          model="investor"
+        />
+      )}
 
       {/* Pagination */}
       {pagination && (
         <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          hasPreviousPage={pagination.page > 1}
-          hasNextPage={pagination.page < pagination.totalPages}
-          limit={pagination.limit}
+          currentPage={pagination?.page}
+          totalPages={pagination?.totalPages}
+          hasPreviousPage={pagination?.page > 1}
+          hasNextPage={pagination?.page < pagination.totalPages}
+          limit={pagination?.limit}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
         />

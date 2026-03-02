@@ -107,7 +107,7 @@ const SpvPage = () => {
     {
       id: "active",
       title: "Active",
-      component: <SPVTable data={spvData} />,
+      component: <SPVTable data={spvData} status="active" />,
     },
     {
       id: "draft",
