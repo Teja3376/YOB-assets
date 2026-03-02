@@ -122,10 +122,10 @@ const SpvPage = () => {
   ];
 
   return (
-    <div className="p-4 border border-gray-200 rounded-lg m-2 space-y-4 ">
+    <div className="p-2 space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-2xl font-semibold">
           Special Purpose Vehicles (SPV) List
         </h1>
         <Button onClick={() => router.push("/spv/add-spv")}>Add SPV</Button>

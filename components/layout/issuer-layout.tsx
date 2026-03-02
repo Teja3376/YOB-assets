@@ -35,7 +35,8 @@ export default function IssuerLayout({
       const refreshToken = sessionStorage.getItem("refreshToken");
 
       if ((!accessToken && !refreshToken) || !refreshToken) {
-        router.push("/login");
+        // router.push("/login");
+        console.log("No tokens found, redirecting to login...");
         return;
       }
 

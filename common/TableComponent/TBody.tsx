@@ -16,7 +16,9 @@ const TBody: React.FC<TBodyProps> = ({ data, model }) => {
           <td colSpan={100}>
             <Empty
               title={emptyData?.title || "No Data Available"}
-              description={emptyData?.description || "No data found for this table."}
+              description={
+                emptyData?.description || "No data found for this table."
+              }
               icon={emptyData?.icon}
               actionButton={emptyData?.actionButton}
             />

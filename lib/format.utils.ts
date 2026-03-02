@@ -1,3 +1,5 @@
+import { getLocales } from "locale-currency";
+
 export const getCurrencySymbol = (currency: string): string => {
     const symbols: Record<string, string> = {
         INR: "₹",
@@ -113,3 +115,52 @@ export function formatCompactNumber(value: number | string): string {
 
     return num.toFixed(2).replace(/\.?0+$/, "");
 }
+
+function normalizeLocale(locale: string): string {
+  if (locale.includes("-")) return locale;
+  return `en-${locale}`;
+}
+
+export function formatCurrencyWithLocale(
+  value: string | number | null | undefined,
+  currency: string = "USD",
+  compact: boolean = false,
+  minimumFractionDigits: number = 0,
+  maximumFractionDigits: number = 2,
+): string {
+  const amount = typeof value === "string" ? Number.parseFloat(value) : value;
+
+  if (amount === null || amount === undefined || Number.isNaN(amount)) {
+    return formatCurrencyWithLocale(
+      0,
+      currency,
+      compact,
+      minimumFractionDigits,
+      maximumFractionDigits,
+    );
+  }
+
+  let locale = getLocales(currency)[0] || "en-US";
+  locale = normalizeLocale(locale);
+
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    notation: compact ? "compact" : "standard",
+    compactDisplay: "short",
+    minimumFractionDigits,
+    maximumFractionDigits,
+  }).format(amount);
+}
+
+export const formatDate = (date: string | Date): string => {
+    if (!date) return "";
+  
+    const d = new Date(date);
+  
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+  
+    return `${day}/${month}/${year}`;
+  };
