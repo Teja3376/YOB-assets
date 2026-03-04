@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select';
 import { ORDER_TRACKING_STATUS } from '../../types/global';
 import DateRangePicker from '@/components/DateRangePicker';
 import { DateRange } from 'react-day-picker';
@@ -39,27 +32,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       />
 
       <DateRangePicker range={dateRange} onSelect={setDateRange}  />
-      {/* <Select
-        onValueChange={(value) => {
-          setFilter(value);
-        }}
-        defaultValue={filter}
-      >
-        <SelectTrigger className='max-w-xl'>
-          <SelectValue placeholder='Filter by status' />
-        </SelectTrigger>
-        <SelectContent>
-          {ORDER_TRACKING_STATUS.map((status) => (
-            <SelectItem
-              key={status.value}
-              value={status.value}
-              className='flex items-center gap-2 text-ellipsis'
-            >
-              {status.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select> */}
     </div>
   );
 };

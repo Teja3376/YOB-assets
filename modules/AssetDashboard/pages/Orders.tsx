@@ -1,171 +1,87 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import queryString from "query-string";
-// import { useAssetOrder } from "@/hooks/asset/useAssetOrder";
-// import { useDebounce } from "@/hooks/useDebounce";
-// import Pagination from "@/layout/Pagination";
 import TableComponent from "@/common/TableComponent";
-import SearchFilter from "../components/Orders/SearchFilter";
-import { CheckCheck, CheckCircle, Clock, Eye, ShoppingCart, XCircle } from "lucide-react";
-import { ORDER_TRACKING_STATUS, PAYMENT_TYPE } from "../types/global";
-import OrderStatusCard from "../components/Orders/OrderStatusCard";
-import { formatCompactNumber } from "@/helpers/global";
+import {
+  CheckCheck,
+  Clock,
+  Search,
+  ShoppingCart,
+  XCircle,
+} from "lucide-react";
 
-import usdt from "../../../public/USDTlogo.png";
-import usdc from "../../../public/USDClogo.png";
-import { formatCurrencyFlexible } from "@/lib/format.utils";
-import { Assetdata } from "../types/assetdata";
-import Image from "next/image";
 import Pagination from "@/common/Pagination";
 import DashboardCard from "@/components/DashboardCard";
 import { useGetOrdersCount } from "../hooks/useGetOrdersCount";
+import { columns } from "../schema/ordersCols";
+import { Input } from "@/components/ui/input";
+import { DateRange } from "react-day-picker";
+import { useGetOrders } from "../hooks/useGetOrders";
+import { useDebounce } from "@/hooks/useDebounce";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import DateRangePicker from "@/components/DateRangePicker";
 
-const Orders = ({ assetorders }: { assetorders: any }) => {
+const Orders = () => {
   const searchParams = useSearchParams();
   const queryParams = Object.fromEntries(searchParams.entries());
-  const { id } = useParams();
   const page = Number(queryParams.page) || 1;
   const limit = Number(queryParams.limit) || 10;
   const router = useRouter();
-  //   const { orders, getOrders, pagination } = useAssetOrder();
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("");
-  //   const debouncedSearch = useDebounce(search, 500);
-const params=useParams()
-const assetId=params.assetid
+  const searchQuery = useDebounce(search, 500);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const fromDate = dateRange?.from;
+  const toDate = dateRange?.to;
+  const params = useParams();
+  const assetId = params.assetid as string;
 
-  const {data:ordersCount}=useGetOrdersCount(assetId)
+  const { data: assetorders, isPending: isOrdersLoading } = useGetOrders(
+    assetId as string,
+    page, limit, searchQuery,fromDate, toDate
+  );
 
-  function loadImage(currency?: string) {
-    const key = currency?.trim().toLowerCase() || "";
+  const { data: ordersCount } = useGetOrdersCount(assetId);
 
-    const chainLogos: Record<string, any> = {
-      usdt: usdt,
-      usdc: usdc,
-    };
-
-    return chainLogos[key] || usdt; // fallback
-  }
-
-  const columns = [
-    {
-      header: "Order Id",
-      accessorKey: "_id",
-      maxWidth: 100,
-    },
-    {
-      header: "Investor",
-      accessorKey: "investor",
-      cell: ({
-        getValue,
-      }: {
-        getValue: () => {
-          fullName: string;
-          email: string;
-        };
-      }) => {
-        const investor = getValue();
-        return (
-          <div className="flex flex-col ">
-            <span className="truncate">{investor?.fullName}</span>
-            <span className="text-gray-500 text-sm truncate">
-              {investor?.email}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
-      header: "Tokens",
-      accessorKey: "tokens",
-      cell: ({ row }: { row: any }) => {
-        const tokens = row.original.orderValue?.tokens;
-        return <div>{tokens}</div>;
-      },
-    },
-    {
-      header: "Order Value",
-      accessorKey: "OrderValue",
-      cell: ({ row }: { row: any }) => {
-        const tokenValue = row.original.orderValue?.tokenValue || 0;
-        const currency = row.original.orderValue?.userCurrency;
-
-        return (
-          <span className="font-semibold">
-            {formatCurrencyFlexible(tokenValue, currency)}
-          </span>
-        );
-      },
-    },
-
-    {
-      header: "Order Status",
-      accessorKey: "status",
-      cell: ({ getValue }: { getValue: () => string }) => {
-        const status = getValue();
-        const statusLabel = ORDER_TRACKING_STATUS.find(
-          (statusObj) => statusObj.value === status,
-        )?.label;
-        return statusLabel || status;
-      },
-    },
-    {
-      header: "Created At",
-      accessorKey: "createdAt",
-      cell: ({ getValue }: { getValue: () => string }) => {
-        const date = new Date(getValue());
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        });
-      },
-    },
-    {
-      header: "View",
-      accessorKey: "action",
-      cell: ({ row }: { row: { original: { _id: string } } }) => (
-        <div className="flex items-center gap-2">
-          <Eye
-            onClick={() => {
-              router.push(`/orders/order-details/${row.original._id}`);
-            }}
-            className="h-5 w-5 cursor-pointer"
-          />
-        </div>
-      ),
-    },
-  ];
-
+  const pagination = assetorders?.pagination || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 1,
+  };
   const onPageSizeChange = (pageSize: number) => {
-    router.push(
-      `/dashborad-asset/${id}?search=${search}&page=1&limit=${pageSize}`,
-    );
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("limit", String(pageSize));
+    params.set("page", "1");
+
+    router.push(`/dashborad-asset/${assetId}?${params.toString()}`);
   };
 
   const onPageChange = (page: number) => {
-    router.push(`/dashborad-asset/${id}?page=${page}&limit=${limit}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+
+    router.push(`/dashborad-asset/${assetId}?${params.toString()}`);
   };
 
   return (
     <div className="space-y-4">
       <div className="grid gap-3 grid-cols-4">
-         <DashboardCard
+        <DashboardCard
           title="Total Orders"
           value={ordersCount?.totalorders || 0}
           leftIcon={<ShoppingCart size={25} className="text-blue-500" />}
           titleIconClassName="bg-blue-50 rounded-full p-2"
           containerClassName="rounded-lg"
         />
-         <DashboardCard
+        <DashboardCard
           title="Completed Orders"
           value={ordersCount?.completed || 0}
           leftIcon={<CheckCheck size={25} className="text-emerald-600" />}
           titleIconClassName="bg-emerald-50 rounded-full p-2"
           containerClassName="rounded-lg"
         />
-       <DashboardCard
+        <DashboardCard
           title="Pending Orders"
           value={ordersCount?.inProgress || "0"}
           leftIcon={<Clock size={25} className="text-yellow-500" />}
@@ -181,27 +97,39 @@ const assetId=params.assetid
           containerClassName="rounded-lg"
         />
       </div>
-      {/*  */}
-      <div className="flex justify-between items-center my-5">
-        {/* <h1 className="text-xl font-semibold">Orders</h1> */}
-        <SearchFilter
-          search={search}
-          setSearch={setSearch}
-          filter={filter}
-          setFilter={setFilter}
+      <div className="flex items-center  mb-2 relative py-4">
+        <Search
+          size={15}
+          className="absolute left-5 top-1/2 -translate-y-1/2 text-primary"
         />
+        <Input
+          className="w-full pl-10 h-10  focus-visible:outline-0 focus-visible:border-primary py-4 focus-visible:ring-0 mr-5"
+          placeholder="Search orders..."
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <DateRangePicker range={dateRange} onSelect={setDateRange} />
       </div>
-
-      <TableComponent
-        columns={columns}
-        data={assetorders?.data || []}
-        model="order"
-      />
-      {/* <Pagination
-        {...pagination}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      /> */}
+      <div>
+        {!isOrdersLoading && assetorders && (
+          <TableComponent
+            columns={columns(router)}
+            data={assetorders?.data || []}
+            model="order"
+          />
+        )}
+        {isOrdersLoading && (
+          <div>
+            <LoadingSpinner />
+          </div>
+        )}
+      </div>
+      {assetorders?.pagination && (
+        <Pagination
+          {...pagination}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      )}
     </div>
   );
 };
