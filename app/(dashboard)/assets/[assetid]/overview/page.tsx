@@ -1,12 +1,7 @@
-import Index from '@/modules/AssetDashboard/pages'
-import React from 'react'
+import AssetOverviewPage from "@/modules/Assets/pages/overview";
 
-function page() {
-  return (
-    <div>
-      <Index />
-    </div>
-  )
+function AssetOverview() {
+  return <AssetOverviewPage />;
 }
 
-export default page
+export default AssetOverview;
