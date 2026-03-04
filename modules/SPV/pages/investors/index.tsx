@@ -1,3 +1,4 @@
+"use client"
 import { Input } from "@/components/ui/input";
 import { formatCurrencyWithLocale } from "@/lib/format.utils";
 import InvestorCard from "@/modules/Investors/components/InvestorCard";
