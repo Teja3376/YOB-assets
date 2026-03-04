@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select';
 import { ORDER_TRACKING_STATUS } from '../../types/global';
+import DateRangePicker from '@/components/DateRangePicker';
+import { DateRange } from 'react-day-picker';
 
 
 interface SearchFilterProps {
@@ -17,14 +19,16 @@ interface SearchFilterProps {
   setFilter: (value: string) => void;
 }
 
+
 const SearchFilter: React.FC<SearchFilterProps> = ({
   search,
   setSearch,
   filter,
   setFilter,
 }) => {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   return (
-    <div className='flex gap-4 items-center'>
+    <div className='flex gap-4 items-center w-full'>
       <Input
         onChange={(e) => {
           setSearch(e.target.value);
@@ -33,7 +37,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         type='search'
         placeholder='Search'
       />
-      <Select
+
+      <DateRangePicker range={dateRange} onSelect={setDateRange}  />
+      {/* <Select
         onValueChange={(value) => {
           setFilter(value);
         }}
@@ -53,7 +59,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </SelectItem>
           ))}
         </SelectContent>
-      </Select>
+      </Select> */}
     </div>
   );
 };

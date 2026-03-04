@@ -2,14 +2,14 @@ import { formatCurrencyFlexible } from "@/lib/format.utils";
 import { Building, DollarSign, PercentCircle, MapPin } from "lucide-react";
 
 export function PropertyDetails({ assetOverview }: { assetOverview: any }) {
-  const name = assetOverview?.name ?? "Unnamed";
-  const netMonthlyRent = assetOverview?.rentalInformation?.netMonthlyRent ?? 0;
+  const name = assetOverview?.assetName ?? "Unnamed";
+  const netMonthlyRent = assetOverview?.rental?.grossMonthly ?? 0;
   const vacancyRate = assetOverview?.rentalInformation?.vacancyRate ?? 0;
   const totalNumberOfSfts = assetOverview?.totalNumberOfSfts ?? 0;
-  // const city = assetOverview?.city ?? "Unknown City";
-  const state = assetOverview?.state ?? "Unknown State";
-  const country = assetOverview?.country ?? "Unknown Country";
-  const landmark = assetOverview?.landmark ?? "Unknown landmark";
+
+  const state = assetOverview?.location?.state ?? "Unknown State"; 
+  const country = assetOverview?.location?.country ?? "Unknown Country";
+  const landmark = assetOverview?.location?.city ?? "Unknown landmark";
   const category = assetOverview?.category ?? "Unknown category";
   const latitude = assetOverview?.latitude ?? 0;
   const longitude = assetOverview?.longitude ?? 0;

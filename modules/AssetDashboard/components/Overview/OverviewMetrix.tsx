@@ -16,10 +16,17 @@ interface InvestmentStats {
 }
 
 interface AssetOverview {
-  investmentStats: InvestmentStats;
-  totalPropertyValueAfterFees: number;
-  annualRentalYield: number;
-  currency?: string; // Added the missing property
+  investmentStats?: {
+    totalRaised?: number;
+    investors?: number;
+  };
+  property?: {
+    valuation?: number;
+  };
+  performance?: {
+    netRentalYield?: number;
+  };
+  currency?: string;
 }
 
 interface Metric {
@@ -34,7 +41,7 @@ interface Metric {
   progressPercentage?: number;
   progressColor?: string;
   percentage?: string; // Added the missing property
-  currency?: string; // Added the missing property
+  currency?: string; // Added the missing property  
 }
 
 export function OverviewMetrics({
@@ -42,18 +49,22 @@ export function OverviewMetrics({
 }: {
   assetOverview: AssetOverview;
 }) {
-  const {
-    investmentStats = { totalRaised: 0, numberOfInvestors: 0 },
-    totalPropertyValueAfterFees = 0,
-    annualRentalYield = 0,
-  } = assetOverview || {};
+  const totalRaisedd = assetOverview?.investmentStats?.totalRaised ?? 0;
 
-  const { totalRaised, numberOfInvestors } = investmentStats;
+  const numberOfInvestorss = assetOverview?.investmentStats?.investors ?? 0;
+
+  const totalPropertyValueAfterFees = assetOverview?.property?.valuation ?? 0;
+
+  const annualRentalYield = assetOverview?.performance?.netRentalYield ?? 0;
+
+  const currency = assetOverview?.currency ?? "USD";
+
+  // const { totalRaised, numberOfInvestors } = investmentStats;
 
   const raiseProgress = totalPropertyValueAfterFees
-    ? (totalRaised / totalPropertyValueAfterFees) * 100
+    ? (totalRaisedd / totalPropertyValueAfterFees) * 100
     : 0;
-  const currency = assetOverview?.currency ?? "USD";
+  const currencyy = assetOverview?.currency ?? "USD";
 
   const metrics: Metric[] = [
     {
@@ -64,8 +75,8 @@ export function OverviewMetrics({
       ),
       title: "Total Raised",
       subtitle: "Progress towards target",
-      value: "djbfbn",
-    target: `of ${formatCurrencyFlexible(totalPropertyValueAfterFees, currency)} target`,
+      value: totalRaisedd,
+      target: `of ${formatCurrencyFlexible(totalPropertyValueAfterFees, currency)} target`,
       percentage: `${raiseProgress.toFixed(2)}%`,
       trend: "up",
       progressColor: "bg-green-500",
@@ -75,14 +86,14 @@ export function OverviewMetrics({
       icon: <Users className="h-5 w-5 text-blue-500" />,
       title: "Number of Investors",
       subtitle: "Total active investors",
-      value: numberOfInvestors,
+      value: numberOfInvestorss,
       trend: "up",
     },
     {
-      icon: <Building className="h-5 w-5 text-purple-500" />, 
+      icon: <Building className="h-5 w-5 text-purple-500" />,
       title: "Property Value",
       subtitle: "Current market valuation",
-      value: "dbhbd",
+      value: formatCurrencyFlexible(totalPropertyValueAfterFees, currencyy),
       trend: "up",
       trendColor: "text-green-500",
     },

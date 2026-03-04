@@ -8,22 +8,29 @@ import Loading from "@/components/ui/Loading";
 import Overview from "./overview";
 import Investors from "./Investor";
 import Orders from "./Orders";
+import { useGetOverview } from "../hooks/useGetOverview";
+import { useGetInvestors } from "../hooks/useGetInvestors";
+import { useGetOrders } from "../hooks/useGetOrders";
 
 
 const Index = () => {
   const router = useRouter();
-  const { id = null } = useParams();
-//   const { assetOverview, getAssetOverview, isPending } = useAssetApi();
   const queryParams = queryString.parse(location.search);
 
-//   useEffect(() => {
-//     const fetchAsset = async () => {
-//       if (id) {
-//         await getAssetOverview(id);
-//       }
-//     };
-//     fetchAsset();
-//   }, [id]);
+  const params=useParams()
+
+  console.log("params",params)
+  const assetId=params.assetid;
+  console.log("assetId",assetId)
+  const {data, isFetching}=useGetOverview(assetId as string);
+  console.log("Overview",data)
+
+  const {data:invetsors }=useGetInvestors(assetId as string)
+
+  console.log("Invetorslist", invetsors)
+
+   const {data:orders }=useGetOrders(assetId as string)
+
 
   const tab: string = Array.isArray(queryParams["tab"])
     ? queryParams["tab"][0] || "overview"
@@ -33,17 +40,17 @@ const Index = () => {
     {
       id: "overview",
       title: "Overview",
-      component: <Overview assetOverview={"hfghdf"} />,
+      component: <Overview assetOverview={data?.data} />,
     },
     {
       id: "investers",
       title: "Investors",
-      component: <Investors assetOverview={"hbdshsg"} />,
+      component: <Investors assetOverview={invetsors} />,
     },
     {
       id: "orders",
       title: "Orders",
-      component: <Orders assetOverview={"gfhsfgfsc"} />,
+      component: <Orders assetorders={orders} />,
     },
     // {
     //   id: "documents",
