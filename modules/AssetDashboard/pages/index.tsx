@@ -29,7 +29,7 @@ const Index = () => {
 
   console.log("Invetorslist", invetsors)
 
-   const {data:orders }=useGetOrders(assetId as string)
+  //  const {data:orders }=useGetOrders(assetId as string)
 
 
   const tab: string = Array.isArray(queryParams["tab"])
@@ -50,26 +50,15 @@ const Index = () => {
     {
       id: "orders",
       title: "Orders",
-      component: <Orders assetorders={orders} />,
+      component: <Orders />,
     },
-    // {
-    //   id: "documents",
-    //   title: "Documents",
-    //   component: <Documents assetOverview={assetOverview} />,
-    // },
+    
   ];
 
   const handleTabChange = (tabId: string) => {
     router.push(`?tab=${tabId}`);
   };
 
-//   if (isPending) {
-//     return (
-//       <div className="flex items-center justify-center h-screen">
-//         <Loading />
-//       </div>
-//     );
-//   }
 
   return (
     <div>

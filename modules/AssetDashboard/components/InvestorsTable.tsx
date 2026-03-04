@@ -1,5 +1,6 @@
 import Pagination from "@/common/Pagination";
-import TableComponent from "@/components/TableComponent";
+import TableComponent from "@/common/TableComponent";
+
 
 
 const InvestorTable = ({
