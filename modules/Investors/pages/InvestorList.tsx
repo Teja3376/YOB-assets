@@ -21,13 +21,9 @@ const InvestorList = () => {
   const [search, setSearch] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
-  const { data, isFetching: isInvestorsLoading } = useInvesterList(
-    page,
-    limit,
-    debouncedSearch,
-  );
-  const { data: investorCount, isFetching: isInvestorCountLoading } =
-    useInvestorCount();
+  const { data, isFetching:isLoading } = useInvesterList(page, limit, debouncedSearch);
+  
+  const { data: investorCount, isFetching: isInvestorCountLoading } = useInvestorCount();
   console.log(investorCount);
   const investors = data?.data || [];
   const pagination = data?.pagination;
@@ -75,16 +71,9 @@ const InvestorList = () => {
       </div> */}
 
       {/* Table */}
-      {isInvestorsLoading && !investors ? (
-        <LoadingSpinner />
-      ) : (
-        <TableComponent
-          columns={investorColumn()}
-          data={investors}
-          model="investor"
-        />
+      {isLoading ? <LoadingSpinner /> : (
+      <TableComponent columns={investorColumn()} data={investors} model="investor" />
       )}
-
       {/* Pagination */}
       {pagination && (
         <Pagination
