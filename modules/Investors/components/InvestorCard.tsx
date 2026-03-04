@@ -25,7 +25,7 @@ const InvestorCard = ({
 }: InvestorCardProps) => {
   return (
     <div
-      className={`border border-gray-300 rounded-md p-6 flex items-center gap-3 bg-gradient-to-r ${colors[color]}`}
+      className={`border border-gray-300 rounded-md p-6 flex items-center gap-3 bg-gradient-to-r ${colors[color]} w-full`}
     >
       <div className="bg-white p-2 rounded-full border">
         {icon}
