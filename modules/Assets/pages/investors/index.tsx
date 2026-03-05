@@ -105,6 +105,7 @@ const InvestorsPage = () => {
         currentPage={investors?.pagination?.page || page}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
+        totalPages={investors?.pagination?.pages}
       />
     </div>
   );
