@@ -99,7 +99,26 @@ export const cleanUpdateData = (data: any): any => {
 
   return data;
 };
+export function formatCompactNumber(value: number | string): string {
+  const num = typeof value === "string" ? parseFloat(value) : value;
 
+  if (isNaN(num)) return "-";
+
+  const abs = Math.abs(num);
+
+  const format = (n: number, suffix: string) => {
+    const rounded = Math.round(n * 100) / 100;
+    const formatted = rounded.toFixed(2).replace(/\.?0+$/, ""); // trim .00 or .0
+    return `${formatted} ${suffix}`;
+  };
+
+  if (abs >= 1_000_000_000_000) return format(num / 1_000_000_000_000, "T");
+  if (abs >= 1_000_000_000) return format(num / 1_000_000_000, "B");
+  if (abs >= 1_000_000) return format(num / 1_000_000, "M");
+  if (abs >= 1_000) return format(num / 1_000, "K");
+
+  return num.toFixed(2).replace(/\.?0+$/, "");
+}
 export async function handleViewOnBlockchain(
   address: string,
   type: "token" | "spv" | "asset",

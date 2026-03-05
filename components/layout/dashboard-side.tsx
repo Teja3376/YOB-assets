@@ -15,10 +15,10 @@ import { useRouter } from "next/navigation";
 
 const menu = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "SPV List(WIP)", href: "/spv", icon: Building2, },
-  { name: "Assets(WIP)", href: "/assets", icon: Package, },
-  { name: "Orders(WIP)", href: "/issuer/orders", icon: ShoppingCart, disabled: true },
-  { name: "Investors(WIP)", href: "/issuer/investors", icon: Users, disabled: true },
+  { name: "SPV List", href: "/spv", icon: Building2, },
+  { name: "Assets", href: "/assets", icon: Package, },
+  { name: "Orders", href: "/orders", icon: ShoppingCart },
+  { name: "Investors", href: "/investors", icon: Users },
 ];
 
 export default function DashboardSidebar() {
@@ -47,22 +47,21 @@ export default function DashboardSidebar() {
         {menu.map((item) => {
           const active = pathname.startsWith(item.href);
           const Icon = item.icon;
-          const disabled = item.disabled ?? isDisabled;
 
           return (
             <Link
               key={item.name}
-              href={disabled ? "#" : item.href}
-              onClick={(e) => handleLinkClick(e, disabled)}
+              href={isDisabled ? "#" : item.href}
+              onClick={(e) => handleLinkClick(e, isDisabled)}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition
                 ${
-                  disabled
+                  isDisabled
                     ? "opacity-50 cursor-not-allowed pointer-events-none"
                     : active
                     ? "bg-gray-100 text-black"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
-              aria-disabled={disabled}
+              aria-disabled={isDisabled}
             >
               <Icon size={18} />
               {item.name}

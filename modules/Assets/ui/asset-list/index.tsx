@@ -163,9 +163,9 @@ const Index: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 space-y-2">
+    <div className="p-2 space-y-2">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Assets List </h1>
+        <h1 className="text-2xl font-semibold text-black">Assets List </h1>
         <div className="flex items-center gap-2">
           <Input
             type="search"

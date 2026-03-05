@@ -27,11 +27,13 @@ import { Spinner } from "@/components/ui/spinner";
 
 interface SPVTableProps {
   data?: any[];
+  status?: string;
   hideDraftFields?: boolean;
 }
 
 const SPVTable: React.FC<SPVTableProps> = ({
   data,
+  status,
   hideDraftFields = false,
 }) => {
   const [selectedDraft, setSelectedDraft] = useState<any | null>(null);
@@ -176,11 +178,13 @@ const SPVTable: React.FC<SPVTableProps> = ({
         const id = info.row.original._id;
         return (
           <div className="flex gap-2">
-            <Link href={`/spv/edit-spv/${id}`}>
-              <Button variant="outline" size="icon">
-                <Edit className="h-5 w-5" />
-              </Button>
-            </Link>
+            {info.row.original.status !== "Active" && (
+              <Link href={`/spv/edit-spv/${id}`}>
+                <Button variant="outline" size="icon">
+                  <Edit className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
             {info.row.original.status !== "Draft" && (
               <Link href={`/spv/${id}/overview`}>
                 <Button variant="outline" size="icon">
