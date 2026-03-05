@@ -1,46 +1,44 @@
 "use client";
-import { useState } from "react";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
-import TableComponent from "@/common/TableComponent";
-import {
-  CheckCheck,
-  Clock,
-  Search,
-  ShoppingCart,
-  XCircle,
-} from "lucide-react";
 
 import Pagination from "@/common/Pagination";
+import TableComponent from "@/common/TableComponent";
 import DashboardCard from "@/components/DashboardCard";
-import { useGetOrdersCount } from "../hooks/useGetOrdersCount";
-import { columns } from "../schema/ordersCols";
-import { Input } from "@/components/ui/input";
-import { DateRange } from "react-day-picker";
-import { useGetOrders } from "../hooks/useGetOrders";
-import { useDebounce } from "@/hooks/useDebounce";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import DateRangePicker from "@/components/DateRangePicker";
+import { Input } from "@/components/ui/input";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useGetOrders } from "@/modules/Assets/hooks/assetDashBoard/useGetOrders";
+import { useGetOrdersCount } from "@/modules/Assets/hooks/assetDashBoard/useGetOrdersCount";
+import { CheckCheck, Clock, Search, ShoppingCart, XCircle } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
+import { columns } from "../../schema/ordersCols";
 
-const Orders = () => {
-  const searchParams = useSearchParams();
-  const queryParams = Object.fromEntries(searchParams.entries());
-  const page = Number(queryParams.page) || 1;
-  const limit = Number(queryParams.limit) || 10;
+const OrdersPage = () => {
   const router = useRouter();
+  const params = useParams();
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const searchQuery = useDebounce(search, 500);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const fromDate = dateRange?.from;
   const toDate = dateRange?.to;
-  const params = useParams();
   const assetId = params.assetid as string;
 
-  const { data: assetorders, isPending: isOrdersLoading } = useGetOrders(
+  const { data: assetorders, isFetching: isOrdersLoading } = useGetOrders(
     assetId as string,
-    page, limit, searchQuery,fromDate, toDate
+    page,
+    limit,
+    searchQuery,
+    fromDate,
+    toDate,
   );
 
-  const { data: ordersCount } = useGetOrdersCount(assetId);
+  const { data: ordersCount, isFetching: isOrdersCountLoading } =
+    useGetOrdersCount(assetId);
 
   const pagination = assetorders?.pagination || {
     page: 1,
@@ -49,23 +47,19 @@ const Orders = () => {
     pages: 1,
   };
   const onPageSizeChange = (pageSize: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("limit", String(pageSize));
-    params.set("page", "1");
-
-    router.push(`/dashborad-asset/${assetId}?${params.toString()}`);
+    setLimit(pageSize);
   };
 
   const onPageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", String(page));
-    params.set("limit", String(limit));
-
-    router.push(`/dashborad-asset/${assetId}?${params.toString()}`);
+    setPage(page);
   };
 
+  if (isOrdersCountLoading && isOrdersLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mt-5">
       <div className="grid gap-3 grid-cols-4">
         <DashboardCard
           title="Total Orders"
@@ -126,6 +120,7 @@ const Orders = () => {
       {assetorders?.pagination && (
         <Pagination
           {...pagination}
+           currentPage={pagination?.page || page}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
         />
@@ -134,4 +129,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default OrdersPage;

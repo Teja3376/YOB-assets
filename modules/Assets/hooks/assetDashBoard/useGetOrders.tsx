@@ -1,18 +1,30 @@
 import api from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetOrders = (assetId: string,page: number = 1,
-  pageSize: number = 10,
+export const useGetOrders = (
+  assetId: string,
+  page: number = 1,
+  limit: number = 10,
   searchQuery: string = "",
   fromDate?: Date,
-  toDate?: Date,) => {
+  toDate?: Date,
+) => {
   return useQuery({
-    queryKey: ["Orders",assetId,page,pageSize,searchQuery,fromDate,toDate],
+    queryKey: [
+      "Orders",
+      assetId,
+      page,
+      limit,
+      searchQuery,
+      fromDate,
+      toDate,
+    ],
     queryFn: async () => {
       const response = await api.get("/assetDashboard/orders", {
         params: {
           assetId,
           page,
+          limit,
           search: searchQuery,
           status,
           startDate: fromDate ? fromDate.toISOString() : undefined,
@@ -25,5 +37,6 @@ export const useGetOrders = (assetId: string,page: number = 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 2,
+    enabled: !!assetId,
   });
 };

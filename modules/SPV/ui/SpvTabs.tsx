@@ -29,7 +29,7 @@ const SpvTabs = () => {
   console.log(pathname);
   return (
     <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">Asset Name</h1>
+      <h1 className="text-2xl font-semibold">Spv Name</h1>
       <p className="text-sm text-muted-foreground">Created on </p>
 
       <div className="flex gap-2 items-center my-2">

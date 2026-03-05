@@ -1,9 +1,9 @@
 import { formatCurrencyFlexible } from "@/lib/format.utils";
-import { ORDER_TRACKING_STATUS } from "../types/global";
+import StatusBadge from "@/modules/Orders/ui/StatusBadge";
 import { Eye } from "lucide-react";
 
- export const columns = (router: any)=>{
-    return [
+export const columns = (router: any) => {
+  return [
     {
       header: "Order Id",
       accessorKey: "_id",
@@ -59,10 +59,8 @@ import { Eye } from "lucide-react";
       accessorKey: "status",
       cell: ({ getValue }: { getValue: () => string }) => {
         const status = getValue();
-        const statusLabel = ORDER_TRACKING_STATUS.find(
-          (statusObj) => statusObj.value === status,
-        )?.label;
-        return statusLabel || status;
+
+        return <StatusBadge status={status} />;
       },
     },
     {
@@ -81,16 +79,14 @@ import { Eye } from "lucide-react";
       header: "View",
       accessorKey: "action",
       cell: ({ row }: { row: { original: { _id: string } } }) => (
-        
-        <div className="flex items-center gap-2">
-          <Eye
-            onClick={() => {
-              router.push(`/orders/order-details/${row.original._id}`);
-            }}
-            className="h-5 w-5 cursor-pointer"
-          />
-        </div>
+        <Eye
+          onClick={() => {
+            router.push(`/orders/${row.original._id}`);
+          }}
+          className="cursor-pointer"
+          size={15}
+        />
       ),
     },
   ];
-}
+};
