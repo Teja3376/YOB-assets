@@ -27,8 +27,8 @@ export const useGetOrders = (
           limit,
           search: searchQuery,
           status,
-          startDate: fromDate ? fromDate.toISOString() : undefined,
-          endDate: toDate ? toDate.toISOString() : undefined,
+          fromDate: fromDate ? fromDate.toISOString() : undefined,
+          toDate: toDate ? toDate.toISOString() : undefined,
         },
       });
       console.log("OrdersDetails", response);

@@ -46,6 +46,7 @@ const OrdersPage = () => {
     total: 0,
     pages: 1,
   };
+  console.log("ordersCount", pagination);
   const onPageSizeChange = (pageSize: number) => {
     setLimit(pageSize);
   };
@@ -99,6 +100,7 @@ const OrdersPage = () => {
         <Input
           className="w-full pl-10 h-10  focus-visible:outline-0 focus-visible:border-primary py-4 focus-visible:ring-0 mr-5"
           placeholder="Search orders..."
+          value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <DateRangePicker range={dateRange} onSelect={setDateRange} />
@@ -123,6 +125,7 @@ const OrdersPage = () => {
            currentPage={pagination?.page || page}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
+          totalPages={pagination?.pages}
         />
       )}
     </div>
