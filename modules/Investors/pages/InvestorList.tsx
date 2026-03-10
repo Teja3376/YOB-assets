@@ -21,9 +21,9 @@ const InvestorList = () => {
   const [search, setSearch] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
-  const { data, isLoading } = useInvesterList(page, limit, debouncedSearch);
+  const { data, isFetching:isLoading } = useInvesterList(page, limit, debouncedSearch);
   
-  const { data: investorCount, isLoading: isInvestorCountLoading } = useInvestorCount();
+  const { data: investorCount, isFetching: isInvestorCountLoading } = useInvestorCount();
   console.log(investorCount);
   const investors = data?.data || [];
   const pagination = data?.pagination;
@@ -53,7 +53,7 @@ const InvestorList = () => {
         />
         <InvestorCard
           title="Total Invested"
-          value={formatCurrencyWithLocale(investorCount?.totalInvested, "USD")}
+          value={formatCurrencyWithLocale(investorCount?.totalInvestedUsd, "USD")}
           icon={<DollarSign className="w-6 h-6 text-green-500" />}
           color={"green"}
         />
@@ -70,7 +70,6 @@ const InvestorList = () => {
         />
       </div> */}
 
-
       {/* Table */}
       {isLoading ? <LoadingSpinner /> : (
       <TableComponent columns={investorColumn()} data={investors} model="investor" />
@@ -78,11 +77,11 @@ const InvestorList = () => {
       {/* Pagination */}
       {pagination && (
         <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          hasPreviousPage={pagination.page > 1}
-          hasNextPage={pagination.page < pagination.totalPages}
-          limit={pagination.limit}
+          currentPage={pagination?.page}
+          totalPages={pagination?.totalPages}
+          hasPreviousPage={pagination?.page > 1}
+          hasNextPage={pagination?.page < pagination.totalPages}
+          limit={pagination?.limit}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
         />

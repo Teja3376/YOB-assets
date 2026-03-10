@@ -231,7 +231,7 @@ const getColumns = (
               <Edit className="h-5 w-5 text-gray-600" />
             </Button>
             {info.row.original.status !== "draft" && (
-              <Link href={`/asset/${info.row.original._id}/overview`}>
+              <Link href={`/assets/${info.row.original._id}/overview`}>
                 <Button variant="outline" size="icon">
                   <Eye className="h-5 w-5" />
                 </Button>

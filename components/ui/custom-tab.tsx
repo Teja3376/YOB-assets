@@ -1,4 +1,4 @@
-import React, { useState, useTransition, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useTransition, useMemo, useRef } from 'react';
 import clsx from 'clsx';
 
 interface Tab {
