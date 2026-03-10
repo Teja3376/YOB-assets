@@ -40,7 +40,7 @@ const Index: React.FC = () => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const queryParams = queryString.parse(searchParams.toString());
-  const assetStatus = (queryParams?.status as string) || "active";
+  const assetStatus = (queryParams?.status as string) || "approved";
   const currentPage = Number(queryParams?.page) || 1;
   const limit = Number(queryParams?.limit) || 10;
   const [newStatus, setNewStatus] = useState<
@@ -124,13 +124,6 @@ const Index: React.FC = () => {
   };
 
   const tabs = [
-    {
-      id: "active",
-      title: "Active",
-      component: (
-        <AssetTable columns={columns} assetList={assetList?.data || []} />
-      ),
-    },
     {
       id: "approved",
       title: "Approved",
