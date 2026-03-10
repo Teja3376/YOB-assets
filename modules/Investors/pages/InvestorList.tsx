@@ -53,7 +53,7 @@ const InvestorList = () => {
         />
         <InvestorCard
           title="Total Invested"
-          value={formatCurrencyWithLocale(investorCount?.totalInvestedUsd, "USD")}
+          value={formatCurrencyWithLocale(investorCount?.totalInvestedUSD, "USD")}
           icon={<DollarSign className="w-6 h-6 text-green-500" />}
           color={"green"}
         />
