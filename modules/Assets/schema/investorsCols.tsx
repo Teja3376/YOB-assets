@@ -1,8 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { handleCopy, maskId } from "@/helpers/global";
-import { formatCompactNumber } from "@/lib/format.utils";
+import { formatCompactNumber, formatCurrencyWithLocale } from "@/lib/format.utils";
 import {  Copy } from "lucide-react";
-export const Investorcolumns = (router: any) => {
+export const Investorcolumns = (router: any, currency: string) => {
+
   return [
     {
       header: "Investor Id",
@@ -41,7 +42,7 @@ export const Investorcolumns = (router: any) => {
       accessorKey: "investment",
       cell: (info: any) => {
         const value = formatCompactNumber(info.getValue() || 0);
-        return <span>{value}</span>;
+        return <span>{formatCurrencyWithLocale(value, currency)}</span>;
       },
     },
     {
