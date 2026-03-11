@@ -119,6 +119,11 @@ const SpvPage = () => {
       title: "Pending",
       component: <SPVTable data={spvData} hideDraftFields />,
     },
+    {
+      id: "Rejected",
+      title: "Rejected",
+      component: <SPVTable data={spvData} hideDraftFields />,
+    }
   ];
 
   return (

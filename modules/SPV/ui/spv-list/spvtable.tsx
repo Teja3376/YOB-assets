@@ -24,6 +24,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import useSendStatus from "@/modules/SPV/hooks/useSendStatus";
 import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "next/navigation";
 
 interface SPVTableProps {
   data?: any[];
@@ -37,7 +38,7 @@ const SPVTable: React.FC<SPVTableProps> = ({
   hideDraftFields = false,
 }) => {
   const [selectedDraft, setSelectedDraft] = useState<any | null>(null);
-
+  const router = useRouter();
   const { mutate: sendStatus, isPending: isSendingStatus } = useSendStatus();
   const handleSendStatus = (spvId: string) => {
     sendStatus({ spvId, status: "Pending" });
@@ -166,7 +167,7 @@ const SPVTable: React.FC<SPVTableProps> = ({
                   : item,
               )
             }
-            disabled={isActive}
+            disabled={true}
           />
         );
       },
@@ -186,11 +187,10 @@ const SPVTable: React.FC<SPVTableProps> = ({
               </Link>
             )}
             {info.row.original.status !== "Draft" && (
-              <Link href={`/asset/${id}/overview`}>
-                <Button variant="outline" size="icon">
-                  <Eye className="h-5 w-5" />
-                </Button>
-              </Link>
+
+              <Button variant="outline" size="icon" disabled onClick={() => {router.push(`/asset/${id}/overview`)}}>
+                <Eye className="h-5 w-5" />
+              </Button>
             )}
             {info.row.original.status === "Draft" && (
               <Button
@@ -209,11 +209,11 @@ const SPVTable: React.FC<SPVTableProps> = ({
 
   const visibleColumns = hideDraftFields
     ? columns.filter(
-        (col: any) =>
-          !["totalInvestors", "aum", "OnchainAddress", "status"].includes(
-            (col as any).accessorKey,
-          ),
-      )
+      (col: any) =>
+        !["totalInvestors", "aum", "OnchainAddress", "status"].includes(
+          (col as any).accessorKey,
+        ),
+    )
     : columns;
 
   return (
