@@ -153,6 +153,18 @@ const Index: React.FC = () => {
         />
       ),
     },
+    {
+      id: "rejected",
+      title: "Rejected",
+      component: (
+        <AssetTable
+          columns={columns}
+          assetList={assetList?.data || []}
+          hideDraftFields
+        />
+      ),
+    },
+    
   ];
 
   return (
