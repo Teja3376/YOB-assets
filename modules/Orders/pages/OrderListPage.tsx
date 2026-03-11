@@ -71,7 +71,7 @@ const OrderListPage = () => {
       <div className="grid gap-3 grid-cols-4">
         <DashboardCard
           title="Total Orders"
-          value={orderStats?.totalOrders || 0}
+          value={orderStats?.totalOrders || "0"}
           leftIcon={<ShoppingCart size={25} className="text-blue-500" />}
           titleIconClassName="bg-blue-50 rounded-full p-2"
           containerClassName="rounded-lg"

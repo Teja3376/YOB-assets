@@ -66,9 +66,10 @@ const AssetOverviewPage = () => {
             occupancy={assetOverview?.data?.rental?.vacancy}
             grossMonthlyRentalIncome={assetOverview?.data?.rental?.grossMonthly}
             netMonthlyRentalIncome={assetOverview?.data?.rental?.netMonthly}
+            currency={assetOverview?.data?.currency}
           />{" "}
         </div>
-        <div className="col-span-2">
+        <div className="col-span-full">
           <AssetHostedBy
             name={assetOverview?.data?.assetHostedBy?.name}
             description={assetOverview?.data?.assetHostedBy?.about}
@@ -79,9 +80,9 @@ const AssetOverviewPage = () => {
             phone={assetOverview?.data?.assetHostedBy?.phone}
           />
         </div>
-        <div className="col-span-3">
+        {/* <div className="col-span-3">
           <Dao dao={assetOverview?.data?.spv?.dao} />
-        </div>
+        </div> */}
       </div>
     </div>
   );

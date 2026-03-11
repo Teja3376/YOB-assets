@@ -56,14 +56,19 @@ const investordetailColumn = () => {
         },
         {
             header: "Invested Amount",
-            accessorKey: "investorAmount",
+            accessorKey: "investedAmount",
             size: 100,
             cell: (info: any) => {
-                const investorAmount = info.getValue();
+                const currency = info.row.original.assetCurrency;
+                const investorAmount = info.row.original.investorAmount;
+                const usdAmount = info.row.original.usdAmount;
                 return (
                     <div className="flex flex-col py-1">
                         <div className="flex items-center gap-2 px-2">
-                            <span className="">{formatCurrencyWithLocale(investorAmount, "USD")}</span>
+                            <span className="">{formatCurrencyWithLocale(investorAmount, currency)}</span>
+                            ~
+                            <span className="">{formatCurrencyWithLocale(usdAmount, "USD")}</span>
+                            
                         </div>
                     </div>
 

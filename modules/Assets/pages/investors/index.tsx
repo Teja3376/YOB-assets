@@ -95,7 +95,7 @@ const InvestorsPage = () => {
         <LoadingSpinner />
       ) : (
         <TableComponent
-          columns={Investorcolumns(router)}
+          columns={Investorcolumns(router, currency)}
           data={investors?.investors || []}
           model="investor"
         />

@@ -64,7 +64,7 @@ const OrdersPage = () => {
       <div className="grid gap-3 grid-cols-4">
         <DashboardCard
           title="Total Orders"
-          value={ordersCount?.totalorders || 0}
+          value={ordersCount?.totalorders || "0"}
           leftIcon={<ShoppingCart size={25} className="text-blue-500" />}
           titleIconClassName="bg-blue-50 rounded-full p-2"
           containerClassName="rounded-lg"
@@ -78,7 +78,7 @@ const OrdersPage = () => {
         />
         <DashboardCard
           title="Pending Orders"
-          value={ordersCount?.inProgress || "0"}
+          value={ordersCount?.pending || "0"}
           leftIcon={<Clock size={25} className="text-yellow-500" />}
           titleIconClassName="bg-slate-100 rounded-full p-2"
           containerClassName="rounded-lg"

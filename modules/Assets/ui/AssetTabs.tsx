@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useGetAssetBasic from "../hooks/assetDashBoard/useGetAssetBasic";
 import { format } from "date-fns";
+import Loading from "@/components/ui/Loading";
 
 const tabs = [
   {
@@ -26,7 +27,7 @@ const AssetTabs = () => {
   const { data: assetName, isFetching } = useGetAssetBasic(assetid as string);
 
   if (isFetching) {
-    return <div>Loading...</div>;
+    return <Loading  />;
   }
   return (
     <div className="space-y-2">
