@@ -6,7 +6,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import SignatureDialog from "./SignatureDialog";
 import DeleteDialog from "./DeleteDialog";
-// import { useDocumentTemplates } from "@/hooks/documents/useDocusealApi";
+import { useDocumentTemplates } from "@/hooks/documents/useDocusealApi";
 import { toast } from "sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
@@ -48,28 +48,31 @@ const SignatureInvestors = memo(({ tab, step }: Props) => {
     clearErrors,
     trigger,
   } = useFormContext();
-  const { fields, append, update, remove } = useFieldArray({
+  const { fields, append, update, remove, replace } = useFieldArray({
     control,
     name: "signatureDocuments",
     keyName: "signatureDocuments_id",
   });
 
-  // const {
-  //   templates,
-  //   isLoading,
-  //   error,
-  //   deleteTemplateById,
-  //   createTemplate,
-  //   updateTemplateById,
-  // } = useDocumentTemplates(id);
-  const [templates, setTemplates] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [deleteTemplateById, setDeleteTemplateById] = useState<any>(null);
-  const [createTemplate, setCreateTemplate] = useState<any>(null);
-  const [updateTemplateById, setUpdateTemplateById] = useState<any>(null);
+  const {
+    fetchTemplates,
+    createTemplate,
+    updateTemplateById,
+    deleteTemplateById,
+    isLoading,
+    templates,
+  } = useDocumentTemplates(assetId as string | undefined);
 
-  // Get templates when component mounts
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+
+  // Sync API templates into the form's field array
+  useEffect(() => {
+    if (templates.length > 0) {
+      replace(templates);
+    }
+  }, [templates, replace]);
 
   const onSubmit = async () => {
     try {
@@ -89,11 +92,8 @@ const SignatureInvestors = memo(({ tab, step }: Props) => {
 
       setIndex(null);
     } catch (err) {
-      toast.error(`Failed to add template : ${(err as Error).message}`);
-      console.error("Failed to add template:", err);
-      toast.error("Failed to add template Check the template id and try again ")
+      toast.error(`Failed to add template: ${(err as Error).message}`);
       setIndex(null);
-
     }
   };
   const handleOnDelete = async () => {
@@ -110,9 +110,9 @@ const SignatureInvestors = memo(({ tab, step }: Props) => {
     index: number,
     payload: { templateName: string; providerTemplateId: string }
   ) => {
-    const values = fields[index];
-    await updateTemplateById(values.signatureDocuments_id, payload);
-    update(index, { ...values, ...payload }); // update form values
+    const values = fields[index] as any;
+    await updateTemplateById(values._id, payload);
+    update(index, { ...values, ...payload });
   };
 
   return (

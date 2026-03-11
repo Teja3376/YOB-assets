@@ -17,18 +17,25 @@ const SignatureInvestor: React.FC<SignatureInvestorProps> = ({
   actionHandlers,
   update,
 }) => {
+
   const columns = [
     {
       header: "Template Id",
       accessorKey: "providerTemplateId",
-      cell: (info: { getValue: () => any }) => info.getValue() || "N/A",
+      cell: (info: { getValue: () => any }) => {
+        const value = info.getValue();
+        return value || "N/A";
+      },
       enableResize: true,
       size: 100,
     },
     {
       header: "Template Name",
       accessorKey: "templateName",
-      cell: (info: { getValue: () => any }) => info.getValue() || "N/A",
+      cell: (info: { getValue: () => any }) => {
+        const value = info.getValue();
+        return value || "N/A";
+      },
       enableResize: true,
       size: 100,
     },
