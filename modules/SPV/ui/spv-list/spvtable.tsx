@@ -186,7 +186,7 @@ const SPVTable: React.FC<SPVTableProps> = ({
               </Link>
             )}
             {info.row.original.status !== "Draft" && (
-              <Link href={`/spv/${id}/overview`}>
+              <Link href={`/asset/${id}/overview`}>
                 <Button variant="outline" size="icon">
                   <Eye className="h-5 w-5" />
                 </Button>
