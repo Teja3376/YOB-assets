@@ -37,16 +37,31 @@ export interface AssetResponse {
   message: string;
 }
 
-const fetchAdminAssets = async (status: string, page: number, limit: number): Promise<AssetResponse> => {
+const fetchAdminAssets = async (
+  status: string,
+  page: number,
+  limit: number,
+  search: string,
+): Promise<AssetResponse> => {
   const res = await api.get(
-    `/real-estate/asset-list?status=${status}&page=${page}&limit=${limit}`
+    `/real-estate/asset-list?status=${status}&page=${page}&limit=${limit}&search=${search}`,
   );
   return res.data;
 };
 
-export const useAssetList = ({ status, page, limit }: { status: string; page: number; limit: number }) => {
+export const useAssetList = ({
+  status,
+  page,
+  limit,
+  search,
+}: {
+  status: string;
+  page: number;
+  limit: number;
+  search: string;
+}) => {
   return useQuery({
-    queryKey: ["assetList", status, page, limit],
-    queryFn: () => fetchAdminAssets(status, page, limit),
+    queryKey: ["assetList", status, page, limit, search],
+    queryFn: () => fetchAdminAssets(status, page, limit, search),
   });
 };

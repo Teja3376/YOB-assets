@@ -41,7 +41,7 @@ export const Investorcolumns = (router: any, currency: string) => {
       header: "Investment",
       accessorKey: "investment",
       cell: (info: any) => {
-        const value = formatCompactNumber(info.getValue() || 0);
+        const value = info.getValue() || 0;
         return <span>{formatCurrencyWithLocale(value, currency)}</span>;
       },
     },
