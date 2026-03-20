@@ -78,8 +78,12 @@ const UpdateAssetStatusDialog: React.FC<UpdateAssetStatusDialogProps> = ({
                 Activation Failed
               </DialogTitle>
               <DialogDescription className="text-red-500">
-                Something broke. Try again.
-                <span className="font-normal">{error}</span>.
+                 We couldn't activate this asset. Please try again.
+                {error && (
+                  <span className="block font-normal mt-2">
+                    Details: {error}
+                  </span>
+                )}
               </DialogDescription>
             </DialogHeader>
           </>

@@ -176,8 +176,8 @@ const getColumns = (
       cell: (info: any) => {
         const status = info.getValue();
         const isActive = status === "active";
-        const handleUpdateStatus = (asset: any) => {
-          setAssetId(asset);
+        const handleUpdateStatus = (assetId: string) => {
+          setAssetId(assetId);
           setIsActiveDialog(true);
         };
         return (
