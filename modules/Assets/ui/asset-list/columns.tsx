@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const getColumns = (
-  setAsset: (asset: any) => void,
-  setNewStatus: any,
+  setAssetId: (assetId: string) => void,
+  setIsActiveDialog: (isOpen: boolean) => void,
   setSelectedDraft: any,
+  assetStatus?: string,
 ) => {
   return [
     {
@@ -175,14 +176,15 @@ const getColumns = (
       cell: (info: any) => {
         const status = info.getValue();
         const isActive = status === "active";
-        const handleUpdateStatus = (asset: any) => {
-          setAsset(asset);
-          setNewStatus(!isActive ? "active" : "inactive");
+        const handleUpdateStatus = (assetId: string) => {
+          setAssetId(assetId);
+          setIsActiveDialog(true);
         };
         return (
           <Switch
             checked={isActive}
-            onCheckedChange={() => handleUpdateStatus(info.row.original)}
+            disabled={isActive}
+            onCheckedChange={() => handleUpdateStatus(info.row.original._id)}
           />
         );
       },

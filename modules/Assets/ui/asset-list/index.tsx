@@ -31,11 +31,12 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import SendAssetDialog from "./SendAssetApprovalDialog";
 import SendAssetApprovalDialog from "./SendAssetApprovalDialog";
+import useActivateAsset from "../../hooks/asset-list/useActivateAsset";
 
 const Index: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const [asset, setAsset] = useState<any>(null);
+  const [assetId, setAssetId] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
@@ -43,34 +44,33 @@ const Index: React.FC = () => {
   const assetStatus = (queryParams?.status as string) || "approved";
   const currentPage = Number(queryParams?.page) || 1;
   const limit = Number(queryParams?.limit) || 10;
-  const [newStatus, setNewStatus] = useState<
-    "active" | "draft" | "pending" | ""
-  >("");
-  const [statusUpdate, setStatusUpdate] = useState<
-    "active" | "draft" | "pending" | ""
-  >("");
+
+  const [isActiveDialog, setIsActiveDialog] = useState<boolean>(false);
   const [selectedDraft, setSelectedDraft] = useState<any | null>(null);
 
   const { mutate: sendApproval, isPending: isSending } = useSendApproval();
+  const {
+    mutate: activateAsset,
+    isPending: isActivating,
+    isError,
+    error,
+  } = useActivateAsset();
 
   const searchTerm = useDebounce(search, 500);
   const PAGE_SIZE_OPTIONS = [5, 10, 25];
-  //   const {
-  //     assetList,
-  //     pagination,
-  //     getAssetList,
-  //     updateAssetStatus,
-  //     statusUpdate,
-  //     setStatusUpdate,
-  //     status,
-  // //   } = useAssetApi();
-  // const assetList = mockAssets;
+
   const { data: assetList, isLoading } = useAssetList({
     status: assetStatus,
     page: currentPage,
     limit: limit,
+    search: searchTerm,
   });
-  const columns = getColumns(setAsset, setNewStatus, setSelectedDraft);
+  const columns = getColumns(
+    setAssetId,
+    setIsActiveDialog,
+    setSelectedDraft,
+    assetStatus,
+  );
 
   const onPageChange = (page: number) => {
     router.push(
@@ -82,19 +82,23 @@ const Index: React.FC = () => {
     router.push(`${pathname}?status=${assetStatus}&page=1&limit=${pageSize}`);
   };
 
-  //   useEffect(() => {
-  //     getAssetList({
-  //       page,
-  //       limit,
-  //       search: searchTerm,
-  //       status: assetStatus === "draft" ? "inactive" : assetStatus ?? undefined,
-  //     });
-  //   }, [page, limit, searchTerm, assetStatus]);
-
-  const updateStatus = async (newStatus: string) => {
-    // if (asset) {
-    //   await updateAssetStatus(asset._id, newStatus);
-    // }
+  const updateStatus = async (updateAssetId: string, newStatus: string) => {
+    activateAsset(
+      { assetId: updateAssetId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success("Asset status updated successfully");
+          setAssetId(null);
+          setIsActiveDialog(false);
+        },
+        onError: (error: any) => {
+          console.error("Error updating asset status:", error);
+          toast.error(
+            error?.response?.data?.message || "Failed to update asset status",
+          );
+        },
+      },
+    );
   };
 
   const handleSendStatus = (assetId: string, message?: string) => {
@@ -124,6 +128,13 @@ const Index: React.FC = () => {
   };
 
   const tabs = [
+    {
+      id: "active",
+      title: "Active",
+      component: (
+        <AssetTable columns={columns} assetList={assetList?.data || []} />
+      ),
+    },
     {
       id: "approved",
       title: "Approved",
@@ -164,7 +175,6 @@ const Index: React.FC = () => {
         />
       ),
     },
-    
   ];
 
   return (
@@ -189,12 +199,14 @@ const Index: React.FC = () => {
       <AddAssetDialog open={open} setOpen={setOpen} />
 
       <UpdateAssetStatusDialog
-        asset={asset}
-        setAsset={setAsset}
+        assetId={assetId}
+        setAssetId={setAssetId}
+        open={isActiveDialog}
+        setOpen={setIsActiveDialog}
+        isLoading={isActivating}
         updateStatus={updateStatus}
-        status={statusUpdate}
-        setStatusUpdate={setStatusUpdate}
-        newStatus={newStatus}
+        isError={isError}
+        error={error?.response?.data?.message as any}
       />
 
       <div className="space-y-4">

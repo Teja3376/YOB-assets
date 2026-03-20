@@ -1,4 +1,3 @@
-// Extracted UpdateAssetStatusDialog component
 import React from "react";
 import {
   Dialog,
@@ -9,106 +8,84 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface UpdateAssetStatusDialogProps {
-  asset: any;
-  setAsset: (asset: any) => void;
-  updateStatus: (
-    newStatus: "active" | "pending" | "draft" | "",
-  ) => Promise<void>;
-  status: string;
-  setStatusUpdate: any;
-  newStatus: "active" | "pending" | "draft" | "";
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  assetId: string | null;
+  setAssetId: (assetId: string | null) => void;
+  updateStatus: (assetId: string, newStatus: string) => void;
+  isLoading: boolean;
+  isError?: boolean;
+  error?: string;
 }
 
 const UpdateAssetStatusDialog: React.FC<UpdateAssetStatusDialogProps> = ({
-  asset,
-  setAsset,
+  open,
+  setOpen,
+  assetId,
+  setAssetId,
   updateStatus,
-  status,
-  setStatusUpdate,
-  newStatus,
+  isLoading,
+  isError,
+  error,
 }) => {
-  const isStatusOpen = !!asset;
-
   const handleOnClose = () => {
-    setAsset(null);
-    setStatusUpdate("idle");
+    setAssetId(null);
+    setOpen(false);
+  };
+  const handleUpdateStatus = () => {
+    if (!assetId) return;
+    updateStatus(assetId!, "active");
   };
 
-  const isIncomplete = asset && asset?.completedStepsCount !== 9;
-
   return (
-    <Dialog open={isStatusOpen} onOpenChange={handleOnClose}>
+    <Dialog open={open} onOpenChange={handleOnClose}>
       <DialogContent>
-        {isIncomplete && (
+        {/* 🧊 IDLE (CONFIRMATION) */}
+        {!isLoading && !isError && (
           <>
             <DialogHeader>
               <DialogTitle className="text-lg font-bold">
-                Incomplete Asset Setup
-              </DialogTitle>
-              <DialogDescription className="text-sm text-gray-500">
-                Please wait while we update the asset status. This may take a
-                few moments.
-              </DialogDescription>
-            </DialogHeader>
-          </>
-        )}
-        {status === "success" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold">
-                Asset Status Updated Successfully
-              </DialogTitle>
-              <DialogDescription className="text-sm text-gray-500">
-                The asset status has been updated successfully.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button onClick={handleOnClose}>Close</Button>
-            </DialogFooter>
-          </>
-        )}
-        {status === "error" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-red-600">
-                Error Updating Asset Status
-              </DialogTitle>
-              <DialogDescription className="text-sm text-red-500">
-                There was an error updating the asset status. Please try again.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button onClick={handleOnClose}>Close</Button>
-            </DialogFooter>
-          </>
-        )}
-        {status === "idle" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold">
-                Do you want to update the Asset status?
+                Are you sure you want to activate this asset?
               </DialogTitle>
               <DialogDescription>
-                We will update the Asset status to{" "}
-                {/* {asset?.status === "active" ? "Inactive" : "Active"}. */}
-                {newStatus === "active"
-                  ? "Active"
-                  : newStatus === "pending"
-                    ? "Pending"
-                    : "Draft"}
-                .
+                This will change status to Asset to{" "}
+                <span className="font-semibold">Active</span>.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button type="button" onClick={() => updateStatus(newStatus)}>
-                Confirm
-              </Button>
-              <Button type="button" variant="outline" onClick={handleOnClose}>
+              <Button onClick={handleUpdateStatus}>Confirm</Button>
+              <Button variant="outline" onClick={handleOnClose}>
                 Cancel
               </Button>
             </DialogFooter>
+          </>
+        )}
+
+        {isLoading && (
+          <>
+            <LoadingSpinner />
+          </>
+        )}
+
+        {/* 💥 ERROR */}
+        {!isLoading && isError && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold text-red-600">
+                Activation Failed
+              </DialogTitle>
+              <DialogDescription className="text-red-500">
+                 We couldn't activate this asset. Please try again.
+                {error && (
+                  <span className="block font-normal mt-2">
+                    Details: {error}
+                  </span>
+                )}
+              </DialogDescription>
+            </DialogHeader>
           </>
         )}
       </DialogContent>

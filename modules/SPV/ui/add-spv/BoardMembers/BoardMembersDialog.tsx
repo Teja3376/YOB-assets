@@ -71,6 +71,7 @@ const BoardMembersDialog = ({
   };
 
   const onSubmit = async () => {
+    console.log("Submitting form for index:", index);
     trigger(`boardMembers.${index}`)
       .then(async (isValid) => {
         if (isValid) {
@@ -91,6 +92,7 @@ const BoardMembersDialog = ({
             clearErrors();
           } else {
             // Create new board member
+            console.log("Creating new board member with values:", values);
             await createAB({
               fullName: values.fullName,
               email: values.email,
