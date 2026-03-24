@@ -21,7 +21,7 @@ import {
 // } from "./governaceConfig";
 import { useFormContext } from "react-hook-form";
 import { daoFormConfig } from "@/modules/SPV/form-config/daoConfig";
-import { governanceConfig, proposalCreationConfig, votingRightsConfig } from "@/modules/SPV/form-config/governaceConfig";
+import { adminVetoPowerConfig, governanceConfig, proposalCreationConfig, votingRightsConfig } from "@/modules/SPV/form-config/governaceConfig";
 
 // const DAOCreation = ({ spv }: { spv: any }) => {
 const DAOCreation = () => {
@@ -176,6 +176,7 @@ const DAOCreation = () => {
                             <span className="font-medium text-sm">Veto Power</span>
                         </div>
                         {/* {FormGenerator(adminVetoPowerConfig({ spv }))} */}
+                        {FormGenerator(adminVetoPowerConfig())}
                     </div>
                 </div>
             </div>
