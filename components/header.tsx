@@ -18,7 +18,7 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
+            <Link href="/dashboard" className="flex items-center">
               <Image
                 src="/yob-assets-logo.png"
                 alt="YOB Assets Logo"
