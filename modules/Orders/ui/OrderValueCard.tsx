@@ -1,4 +1,5 @@
 import { formatCurrencyWithLocale } from "@/lib/format.utils";
+import { Coins } from "lucide-react";
 import React from "react";
 
 const OrderValueCard = ({
@@ -40,9 +41,7 @@ const OrderValueCard = ({
         </div>
         <div className="text-sm  flex justify-between">
           <p className="">Token Purchased:</p>
-          <p className="font-semibold">
-            {formatCurrencyWithLocale(tokenPurchased, assetCurrency)}
-          </p>
+          <p className="font-semibold"><Coins className="text-primary"/>{tokenPurchased}</p>
         </div>
       </div>
     </div>

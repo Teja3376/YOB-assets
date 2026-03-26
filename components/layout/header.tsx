@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronDown, Menu, X, LogOut } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
@@ -130,6 +130,15 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
               >
                 <LogOut size={16} />
                 Logout
+              </Button>
+              <Button
+                onClick={() => router.push("/dashboard")}
+                variant="outline"
+                className="px-6 py-2.5 bg-linear-to-r from-[#FF6B00] to-[#FF8A33] hover:shadow-lg text-white font-medium rounded-full transition-all"
+                id="logout-btn"
+              >
+                <ArrowRight size={16} />
+                DashBoard
               </Button>
             </div>
           )}
