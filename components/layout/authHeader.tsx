@@ -51,7 +51,7 @@ export default function AuthHeader({ hideNavigation = false }: HeaderProps) {
         <div className="flex h-[70px] items-center justify-between">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/dashboard" className="flex items-center gap-3">
             <Image
               src="/yob-assets-logo.png"
               alt="YOB Assets Logo"
