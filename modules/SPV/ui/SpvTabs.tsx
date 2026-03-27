@@ -1,23 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import useGetSpvWithId from "@/modules/SPV/hooks/ReactQuery/useGetSpvWithId";
+import normalizedSpv from "@/modules/SPV/utils/normalizedspv";
 
 const tabs = [
+  
   {
-    title: "Overview",
-    href: "overview",
-  },
-  {
-    title: "Investors",
-    href: "investors",
-  },
-  {
-    title: "Orders",
-    href: "orders",
-  },
-  {
-    title: "Documents",
-    href: "documents",
+    title: "Review",
+    href: "review",
   },
 ];
 
@@ -26,24 +17,22 @@ const SpvTabs = () => {
   const { spvId } = useParams();
   const router = useRouter();
 
-  console.log(pathname);
+  const { data } = useGetSpvWithId(spvId as string);
+  const normalized = normalizedSpv(data);
+  const displayName =
+    typeof normalized.name === "string" && normalized.name.trim()
+      ? normalized.name
+      : "SPV";
+
+  const segments = pathname.split("/").filter(Boolean);
+  const currentSegment = segments[segments.length - 1] ?? "";
+
   return (
     <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">Spv Name</h1>
-      <p className="text-sm text-muted-foreground">Created on </p>
+      <h1 className="text-2xl font-semibold">{displayName}</h1>
 
-      <div className="flex gap-2 items-center my-2">
-        {tabs.map((tab) => {
-          return (
-            <Button
-              key={tab.href}
-              variant={pathname.includes(tab.href) ? "default" : "ghost"}
-              onClick={() => router.push(`/spv/${spvId}/${tab.href}`)}
-            >
-              {tab.title}
-            </Button>
-          );
-        })}
+      <div className="flex flex-wrap gap-2 items-center my-2">
+        Review SPV
       </div>
     </div>
   );

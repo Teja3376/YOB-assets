@@ -222,7 +222,7 @@ export default function AssetPage() {
   const formData = watch();
 
   return (
-    <div className="p-2 flex gap-2 bg-white">
+    <div className="flex items-start gap-3 bg-white p-2">
       <div>
         <h1 className="text-2xl font-bold mb-8">
           {assetId ? "Update" : "Create"} Asset
@@ -293,13 +293,11 @@ export default function AssetPage() {
         </FormModeProvider>
       </FormProvider>
 
-      <div className="sticky top-4">
-        <AssetStages
-          currentStep={step}
-          asset={asset || {}}
-          formData={formData}
-        />
-      </div>
+      <AssetStages
+        currentStep={step}
+        asset={asset || {}}
+        formData={formData}
+      />
     </div>
   );
 }

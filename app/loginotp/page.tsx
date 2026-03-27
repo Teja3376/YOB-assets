@@ -57,7 +57,7 @@ function OTPPageContent() {
       const issuerStatus = response.data?.issuerStatus;
 
       if (kycStatus && kycStatus !== "approved") {
-        router.push("/kyb");
+        router.push("/onboarding-payment");
       } else if (issuerStatus !== "approved") {
         router.push("/apply");
       } else {
