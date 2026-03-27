@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo } from "react";
+import { Suspense, useCallback, useEffect, useMemo } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/LoadingSpinner";
@@ -110,6 +110,12 @@ const SpvFormPage = () => {
   // }, [normalizedSpvData, id, methods]);
 
   useEffect(() => {
+    if (searchParams.get("step") === "asset-review" && id) {
+      router.replace(`/spv/${id}/review`);
+    }
+  }, [searchParams, id, router]);
+
+  useEffect(() => {
     if (!id) return;
     if (!normalizedSpvData) return;
     if (getSpvWithIdStatus) return;
@@ -200,7 +206,51 @@ const SpvFormPage = () => {
       router.push(`${basePath}?step=${steps[currentIndex - 1].id}`);
   };
 
+  const completeDaoStep = useCallback(
+    async ({ skip }: { skip: boolean }) => {
+      if (!id) {
+        toast.error("Save the SPV first before continuing.");
+        return;
+      }
+      if (!skip) {
+        methods.setValue("daoConfiguration.skipped", false, {
+          shouldDirty: true,
+        });
+        const ok = await methods.trigger("daoConfiguration");
+        if (!ok) {
+          toast.error("Please fix the DAO fields or use Skip.");
+          return;
+        }
+      } else {
+        methods.setValue("daoConfiguration.skipped", true, { shouldDirty: true });
+      }
+
+      const nextCompleted = completedSteps.includes("dao-integration")
+        ? completedSteps
+        : [...completedSteps, "dao-integration"];
+
+      updateSpv(
+        { ...methods.getValues(), completedSteps: nextCompleted },
+        {
+          onSuccess: () => {
+            methods.setValue("completedSteps", nextCompleted, {
+              shouldDirty: false,
+            });
+            toast.success("DAO setup saved");
+            router.push(`/spv/${id}/review`);
+          },
+        },
+      );
+    },
+    [id, completedSteps, methods, updateSpv, router, basePath],
+  );
+
   const handleNext = async () => {
+    if (step === "dao-integration") {
+      await completeDaoStep({ skip: true });
+      return;
+    }
+
     const isValid = await methods.trigger();
     if (!isValid) return;
 
@@ -273,11 +323,16 @@ const SpvFormPage = () => {
       case "board-members":
         return <BoardMembers />;
       case "dao-integration":
-        return <DAOCreation />;
+        return (
+          <DAOCreation
+            onCompleteDao={completeDaoStep}
+            isCompleting={isSaving}
+          />
+        );
       default:
         return null;
     }
-  }, [step, normalizedSpvData]);
+  }, [step, normalizedSpvData, completeDaoStep, isSaving]);
 
   if ((getSpvWithIdStatus && id) || isSaving) {
     return <LoadingSpinner />;

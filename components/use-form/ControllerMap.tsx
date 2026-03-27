@@ -8,7 +8,7 @@ import TagsInputController from "./TagsInputController";
 import SwitchController from "./SwitchController";
 import { Control } from "react-hook-form";
 import InputGroupController from "./InputGroupController";
-import InputSelectController from "./InputSelectController.tsx";
+import InputAndSelectController from "./InputAndSelectController/index";
 import ButtonController from "./ButtonController";
 import ImageUploader from "./ImageController";
 import FileUploadController from "./FileController";
@@ -53,7 +53,7 @@ const ControllerMap = (props: any) => {
     case "inputGroup":
       return <InputGroupController {...props} />;
     case "inputSelectController":
-      return <InputSelectController {...props} />;
+      return <InputAndSelectController {...props} />;
     case "button":
       return <ButtonController {...props} />;
     case "image":
@@ -99,7 +99,9 @@ export type FormFieldConfig = {
     | "switch2"
     | "imageAndFile"
     | "multiImage"
-    | "phoneNumber";
+    | "phoneNumber"
+    | "inputAndSelectController";
+  allowCreate?: boolean;
   disabled?: boolean;
   options?: { value: string; label: string; disabled?: boolean }[];
   noOfFiles?: number;

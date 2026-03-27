@@ -24,21 +24,21 @@ const FeaturesAndAmenities = memo(({ tab, step }: Props) => {
 
   const tabs = [
     {
-      id: 'features',
-      title: 'Features',
-      component: <Feature />,
-    },
-    {
       id: 'amenities',
       title: 'Amenities',
       component: <Amenity />,
+    },
+    {
+      id: 'features',
+      title: 'Features',
+      component: <Feature />,
     },
   ];
 
   return (
     <Suspense fallback={<div>Loading Features and Amenities...</div>}>
       <div className='asset-information'>
-        <h1 className='text-2xl font-bold mb-4'>Features and Amenities</h1>
+        <h1 className='text-2xl font-bold mb-4'> Amenities and Features</h1>
         <CustomTabs
           defaultTab={tab}
           tabs={tabs}

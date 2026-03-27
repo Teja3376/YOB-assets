@@ -222,11 +222,9 @@ export default function AssetPage() {
   const formData = watch();
 
   return (
-    <div className="p-2 flex gap-2 bg-white">
+    <div className="flex items-start gap-3 bg-white p-2">
       <div>
-        <h1 className="text-2xl font-bold mb-8">
-          {assetId ? "Update" : "Create"} Asset
-        </h1>
+       
         <StepIndicator
           steps={ASSET_STEPS_TABS}
           currentStep={step}
@@ -277,29 +275,39 @@ export default function AssetPage() {
               </Button>
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={!isDirty || isUpdating}>
-                  <SaveIcon className="mr-2" />
-                  {isUpdating ? "Saving..." : "Save"}
-                </Button>
+               
 
                 {step !== "signature-verification" && (
                   <Button type="button" onClick={nextTab} disabled={!assetId}>
                     <ArrowRight /> Next
                   </Button>
                 )}
+
+                {step !== "signature-verification" && (
+                  <Button type="submit" disabled={!isDirty || isUpdating}>
+                  <SaveIcon className="mr-2" />
+                  {isUpdating ? "Saving..." : "Save"}
+                </Button>
+                )}
+                 {
+                  step === "signature-verification" && (
+                    <Button type="button" onClick={nextTab} disabled={!assetId}>
+                      <SaveIcon className="mr-2" />
+                      Review & Submit
+                    </Button>
+                  )
+                 }
               </div>
             </div>
           </form>
         </FormModeProvider>
       </FormProvider>
 
-      <div className="sticky top-4">
-        <AssetStages
-          currentStep={step}
-          asset={asset || {}}
-          formData={formData}
-        />
-      </div>
+      <AssetStages
+        currentStep={step}
+        asset={asset || {}}
+        formData={formData}
+      />
     </div>
   );
 }

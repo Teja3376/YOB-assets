@@ -72,13 +72,14 @@ export default function IssuerLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen overflow-hidden bg-white">
       <AuthHeader />
 
-      <div className="flex pt-20" style={{ height: "calc(100vh - 10px)" }}>
+      {/* Fixed header is h-[70px]; one scroll region below — avoids body + main double scrollbars */}
+      <div className="mt-[70px] flex h-[calc(100vh-70px)] min-h-0 w-full">
         <DashboardSidebar />
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 min-w-0">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
           {children}
         </main>
       </div>
