@@ -183,7 +183,7 @@ const getColumns = (
         return (
           <Switch
             checked={isActive}
-            disabled={isActive}
+            disabled={true}
             onCheckedChange={() => handleUpdateStatus(info.row.original._id)}
           />
         );

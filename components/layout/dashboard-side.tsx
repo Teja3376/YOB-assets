@@ -9,6 +9,7 @@ import {
   Users,
   LogOut,
   Home,
+  Banknote,
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ const menu = [
   { name: "Assets", href: "/assets", icon: Package, },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Investors", href: "/investors", icon: Users },
+  { name: "Payment Requests", href: "/payment-requests", icon: Banknote },
 ];
 
 export default function DashboardSidebar() {

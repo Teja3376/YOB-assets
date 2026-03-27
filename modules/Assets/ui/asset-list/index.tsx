@@ -32,6 +32,8 @@ import { Spinner } from "@/components/ui/spinner";
 import SendAssetDialog from "./SendAssetApprovalDialog";
 import SendAssetApprovalDialog from "./SendAssetApprovalDialog";
 import useActivateAsset from "../../hooks/asset-list/useActivateAsset";
+import { ListingFeeDialog } from "../ListingFeeAlert";
+import { PaymentDialog } from "@/modules/PaymentRequest/ui/PaymentTypeDialog";
 
 const Index: React.FC = () => {
   const router = useRouter();
@@ -47,6 +49,8 @@ const Index: React.FC = () => {
 
   const [isActiveDialog, setIsActiveDialog] = useState<boolean>(false);
   const [selectedDraft, setSelectedDraft] = useState<any | null>(null);
+  const [isListingFeeOpen, setIsListingFeeOpen] = useState<boolean>(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
 
   const { mutate: sendApproval, isPending: isSending } = useSendApproval();
   const {
@@ -67,7 +71,7 @@ const Index: React.FC = () => {
   });
   const columns = getColumns(
     setAssetId,
-    setIsActiveDialog,
+    setIsListingFeeOpen,
     setSelectedDraft,
     assetStatus,
   );
@@ -195,9 +199,7 @@ const Index: React.FC = () => {
           </Button>
         </div>
       </div>
-
       <AddAssetDialog open={open} setOpen={setOpen} />
-
       <UpdateAssetStatusDialog
         assetId={assetId}
         setAssetId={setAssetId}
@@ -208,7 +210,6 @@ const Index: React.FC = () => {
         isError={isError}
         error={error?.response?.data?.message as any}
       />
-
       <div className="space-y-4">
         <CustomTabs
           tabs={tabs}
@@ -224,7 +225,6 @@ const Index: React.FC = () => {
           />
         )}
       </div>
-
       <SendAssetApprovalDialog
         open={!!selectedDraft}
         onClose={() => setSelectedDraft(null)}
@@ -232,6 +232,26 @@ const Index: React.FC = () => {
         assetName={selectedDraft?.name}
         isSending={isSending}
         onSend={(id, message) => handleSendStatus(id as string, message)}
+      />
+      <ListingFeeDialog
+        open={isListingFeeOpen}
+        onOpenChange={setIsListingFeeOpen}
+        fee={5000}
+        onProceed={() => {
+          setIsListingFeeOpen(false);
+          setIsPaymentOpen(true);
+        }}
+      />
+      <PaymentDialog
+        open={isPaymentOpen}
+        onOpenChange={setIsPaymentOpen}
+        price={5000}
+        onPay={() => {
+          setIsPaymentOpen(false);
+          setIsActiveDialog(true);
+        }}
+        id={`listing-fee-${assetId}`}
+        onCancel={() => setIsPaymentOpen(false)}
       />
     </div>
   );

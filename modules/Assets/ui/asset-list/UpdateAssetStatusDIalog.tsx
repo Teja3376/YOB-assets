@@ -14,7 +14,6 @@ interface UpdateAssetStatusDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   assetId: string | null;
-  setAssetId: (assetId: string | null) => void;
   updateStatus: (assetId: string, newStatus: string) => void;
   isLoading: boolean;
   isError?: boolean;
@@ -25,14 +24,12 @@ const UpdateAssetStatusDialog: React.FC<UpdateAssetStatusDialogProps> = ({
   open,
   setOpen,
   assetId,
-  setAssetId,
   updateStatus,
   isLoading,
   isError,
   error,
 }) => {
   const handleOnClose = () => {
-    setAssetId(null);
     setOpen(false);
   };
   const handleUpdateStatus = () => {
