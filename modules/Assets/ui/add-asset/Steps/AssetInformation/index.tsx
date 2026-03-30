@@ -22,7 +22,7 @@ interface Props {
 }
 
 
-const AssetInformation = ({ tab, step, asset }: Props) => {
+const AssetInformation = ({tab, step, asset }: Props) => {
   const { assetId = null } = useParams<{ assetId?: string }>();
   const navigate = useRouter();
 

@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Header from "@/components/layout/header";
 
 const steps = [
   { id: 1, title: "Registration", route: "/register" },
   { id: 2, title: "OTP", route: "/otp" },
-  { id: 3, title: "KYB", route: "/kyb" },
-  { id: 4, title: "Issuer Submission", route: "/apply" },
+  { id: 3, title: "Payment", route: "/onboarding-payment" },
+  { id: 4, title: "KYB", route: "/kyb" },
+  { id: 5, title: "Issuer Submission", route: "/apply" },
 ];
 
 export default function GetStartedLayout({
@@ -18,8 +19,6 @@ export default function GetStartedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
   const pathname = usePathname();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -29,12 +28,6 @@ export default function GetStartedLayout({
     if (stepIndex !== -1) {
       setCurrentStep(stepIndex);
       setCompletedSteps(Array.from({ length: stepIndex }, (_, i) => i));
-  const handleStepClick = (index: number) => {
-    if (completedSteps.includes(index) || index === currentStep) {
-      router.push(steps[index].route);
-    }
-  };
-
     }
   }, [pathname]);
 

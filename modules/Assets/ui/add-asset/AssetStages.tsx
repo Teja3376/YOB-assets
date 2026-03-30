@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Check,
   Info,
@@ -6,6 +6,8 @@ import {
   BarChart,
   Link,
   ArrowRightIcon,
+  ChevronRight,
+  Sidebar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ASSET_STEPS_TABS } from "@/modules/Assets/utils/global";
@@ -41,6 +43,8 @@ export default function AssetStages({
   asset = {},
   formData = {},
 }: AssetStagesProps) {
+  const [collapsed, setCollapsed] = useState(false);
+
   const hasStepData = (stepId: string) => {
     const data = { ...asset, ...formData };
     // console.log(data);
@@ -178,144 +182,152 @@ export default function AssetStages({
   // console.log(assetData, "assetData");
 
   return (
-    <div className="flex h-[90px]">
-      <div className="flex-1 flex">
-        <div className="w-72 mx-auto p-6">
-          <div className="">
-            <div className="flex items-center justify-between mb-2">
-              <Badge className="text-[10px] rounded-full">
-                STEP {completedSteps} OF {totalSteps}
-              </Badge>
-              <div className="text-end text-xs font-medium">
-                {progress}% Complete
+    <aside
+      className={cn(
+        "sticky top-4 z-20 flex max-h-[calc(100vh-2rem)] shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200/90 bg-white shadow-[0_2px_12px_rgba(15,23,42,0.06)] ring-1 ring-black/4 transition-[width] duration-200 ease-out",
+        collapsed ? "w-11" : "w-72",
+      )}
+    >
+        {!collapsed && (
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="border-b border-gray-100 bg-linear-to-b from-gray-50/80 to-white px-5 pb-4 pt-5">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                Asset summary
+              </p>
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <Badge
+                  variant="secondary"
+                  className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold"
+                >
+                  Step {completedSteps} of {totalSteps}
+                </Badge>
+                <span className="shrink-0 text-xs font-semibold tabular-nums text-gray-900">
+                  {progress}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200/90">
+                <div
+                  className="h-full rounded-full bg-linear-to-r from-gray-900 to-gray-700 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
             </div>
-            <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-black rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
 
-          {/* <div className="flex justify-between items-center mb-2">
-            <div className="flex flex-col items-center">
-              <div className="w-26 h-26 rounded-md flex items-center justify-center mt-3">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 pb-2 pt-4">
+            <div className="mt-2">
+              <div className="mb-2 flex items-center justify-between px-2">
                 <img
                   src={"/svg/assets/building.svg"}
                   alt="property"
                   className="w-18 h-18 object-contain"
                 />
-              </div>
-              <span className="text-xs w-26 text-center text-gray-600 break-words">
-                {assetData.assetName}
-              </span>
-            </div>
-            <ArrowRightIcon />
-            <div className="flex flex-col items-center">
-              <div className="w-24 h-24 rounded-md flex items-center justify-center">
+                <ArrowRightIcon className="h-4 w-4" />
                 <img
                   src={"/svg/assets/token.svg"}
                   alt="tokens"
-                  className="w-16 h-16 object-contain"
+                  className="h-16 w-16 object-contain"
                 />
               </div>
+              <div className="flex items-center justify-between px-2">
+                <span className="line-clamp w-20 text-center text-xs text-gray-600 wrap-break-word">
+                  {assetData.assetName}
+                </span>
+                <span className="w-20 px-2 text-end text-xs text-gray-600">
+                  Tokens
+                </span>
+              </div>
+            </div>
 
-              <span className="text-xs text-center text-gray-600">Tokens</span>
-            </div>
-          </div> */}
-          <div className="mt-2">
-            <div className=" flex items-center justify-between mb-2 px-2">
-              <img
-                src={"/svg/assets/building.svg"}
-                alt="property"
-                className="w-18 h-18 object-contain"
+            <div className="mt-6 space-y-0">
+              <FormField
+                label="Asset ID"
+                value={maskId(assetData.assetId, "PROP")}
+                icon={<Info className="w-4 h-4" />}
+                classNameValue="uppercase"
               />
-              <ArrowRightIcon className="w-4 h-4" />
-              <img
-                src={"/svg/assets/token.svg"}
-                alt="tokens"
-                className="w-16 h-16 object-contain"
+              <FormField
+                label="Price Per Token"
+                value={
+                  typeof assetData.pricePerToken === "number"
+                    ? `${formatCurrencyFlexible(
+                        assetData?.pricePerToken || 0,
+                        assetData?.currency,
+                      )}`
+                    : assetData.pricePerToken
+                }
+                icon={<Info className="w-4 h-4" />}
               />
-            </div>
-            <div className="flex items-center justify-between px-2">
-              <span className="text-xs w-20 text-center text-gray-600 line-clamp break-words">
-                {assetData.assetName}
-              </span>
-              <span className="text-xs w-20 text-end text-gray-600 px-2">
-                Tokens
-              </span>
+              <FormField
+                label="Total Supply"
+                value={
+                  typeof assetData.totalSupply === "number"
+                    ? assetData.totalSupply.toLocaleString()
+                    : assetData.totalSupply
+                }
+                icon={<Info className="w-4 h-4" />}
+              />
+              <FormField
+                label="Investment Value"
+                value={
+                  typeof assetData.investmentValue === "number"
+                    ? `${formatCurrencyFlexible(
+                        assetData?.investmentValue || 0,
+                        assetData?.currency,
+                      )}`
+                    : assetData.investmentValue
+                }
+                icon={<DollarSign className="w-4 h-4" />}
+              />
+              <FormField
+                label="Expected IRR"
+                value={
+                  typeof assetData?.expectedIRR === "number"
+                    ? `${assetData?.expectedIRR?.toFixed(2)}%`
+                    : assetData?.expectedIRR || assetData?.expectedIRR
+                }
+                icon={<BarChart className="w-4 h-4" />}
+              />
+              <FormField
+                label="Offering Chain"
+                value={assetData.offeringChain}
+                icon={<Link className="w-4 h-4" />}
+                classNameValue="uppercase"
+              />
             </div>
           </div>
+          </div>
+        )}
 
-          <div className="space-y-4 mt-7">
-            <FormField
-              label="Asset ID"
-              value={maskId(assetData.assetId, "PROP")}
-              icon={<Info className="w-4 h-4" />}
-              classNameValue="uppercase"
-            />
-            <FormField
-              label="Price Per Token"
-              value={
-                typeof assetData.pricePerToken === "number"
-                  ? `${formatCurrencyFlexible(
-                      assetData?.pricePerToken || 0,
-                      assetData?.currency
-                    )}`
-                  : assetData.pricePerToken
-              }
-              icon={<Info className="w-4 h-4" />}
-            />
-            <FormField
-              label="Total Supply"
-              value={
-                typeof assetData.totalSupply === "number"
-                  ? assetData.totalSupply.toLocaleString()
-                  : assetData.totalSupply
-              }
-              icon={<Info className="w-4 h-4" />}
-            />
-            <FormField
-              label="Investment Value"
-              value={
-                typeof assetData.investmentValue === "number"
-                  ? `${formatCurrencyFlexible(
-                      assetData?.investmentValue || 0,
-                      assetData?.currency
-                    )}`
-                  : assetData.investmentValue
-              }
-              icon={<DollarSign className="w-4 h-4" />}
-            />
-            {/* <FormField
-              label="Expected Income"
-              value={
-                typeof assetData.expectedIncome === "number"
-                  ? `${formatCurrencyFlexible(assetData?.expectedIncome || 0, assetData?.currency)}`
-                  : assetData.expectedIncome
-              }
-              icon={<DollarSign className="w-4 h-4" />}
-            /> */}
-            <FormField
-              label="Expected IRR"
-              value={
-                typeof assetData?.expectedIRR === "number"
-                  ? `${assetData?.expectedIRR?.toFixed(2)}%`
-                  : assetData?.expectedIRR || assetData?.expectedIRR
-              }
-              icon={<BarChart className="w-4 h-4" />}
-            />
-            <FormField
-              label="Offering Chain"
-              value={assetData.offeringChain}
-              icon={<Link className="w-4 h-4" />}
-              classNameValue="uppercase"
-            />
+        {collapsed && <div className="min-h-0 flex-1" aria-hidden />}
+
+        <div className="mt-auto rounded-b-xl border-t border-gray-200/90 bg-gray-50/90 backdrop-blur-[2px]">
+          <div className={collapsed ? "p-2" : "px-3 pb-3 pt-2"}>
+            {!collapsed && (
+              <button
+                type="button"
+                onClick={() => setCollapsed(true)}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200/90 bg-white px-3 py-2.5 text-sm font-medium text-gray-800 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+                aria-label="Collapse asset summary"
+                title="Collapse panel"
+              >
+                <Sidebar size={18} strokeWidth={2} className="text-gray-600" />
+                Collapse
+              </button>
+            )}
+            {collapsed && (
+              <button
+                type="button"
+                onClick={() => setCollapsed(false)}
+                className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-transparent py-2.5 text-gray-600 transition hover:border-gray-200 hover:bg-white hover:text-gray-900"
+                aria-label="Expand asset summary"
+                title="Expand panel"
+              >
+                <ChevronRight size={20} strokeWidth={2} />
+              </button>
+            )}
           </div>
         </div>
-      </div>
-    </div>
+    </aside>
   );
 }
 
@@ -347,12 +359,24 @@ function FormField({
   classNameValue = "",
 }: any) {
   return (
-    <div className={`flex items-center justify-between ${className}`}>
-      <div className="flex items-center gap-2">
-        {icon}
-        <span className={`text-xs `}>{label}</span>
+    <div
+      className={cn(
+        "flex items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0 last:pb-0",
+        className,
+      )}
+    >
+      <div className="flex min-w-0 items-center gap-2 text-gray-600">
+        <span className="text-muted-foreground [&_svg]:shrink-0">{icon}</span>
+        <span className="text-xs leading-snug">{label}</span>
       </div>
-      <div className={`text-xs font-medium ${classNameValue}`}>{value}</div>
+      <div
+        className={cn(
+          "max-w-[55%] text-right text-xs font-medium leading-snug text-gray-900",
+          classNameValue,
+        )}
+      >
+        {value}
+      </div>
     </div>
   );
 }
