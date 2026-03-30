@@ -21,6 +21,7 @@ export default function useCreateAsset() {
       // Cache the created asset detail
       if (assetId) {
         queryClient.setQueryData(["asset", assetId], data);
+        queryClient.invalidateQueries({ queryKey: ["asset", assetId] });
       }
     },
   });
