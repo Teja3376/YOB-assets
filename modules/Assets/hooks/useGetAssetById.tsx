@@ -9,6 +9,5 @@ export default function useGetAssetById(assetId: string) {
       return response.data.data;
     },
     enabled: !!assetId,
-    staleTime: 5 * 60 * 1000, 
   });
 }

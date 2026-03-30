@@ -176,7 +176,7 @@ const DAOCreation = () => {
                             <span className="font-medium text-sm">Veto Power</span>
                         </div>
                         {/* {FormGenerator(adminVetoPowerConfig({ spv }))} */}
-                        {FormGenerator(adminVetoPowerConfig())}
+                        {/* {FormGenerator(adminVetoPowerConfig())} */}
                     </div>
                 </div>
             </div>
