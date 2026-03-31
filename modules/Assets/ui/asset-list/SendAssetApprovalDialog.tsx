@@ -13,6 +13,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Loading from "@/components/ui/Loading";
 
 // ✅ Schema
 const sendAssetSchema = z.object({
@@ -76,6 +77,8 @@ const SendAssetApprovalDialog = ({
       }}
     >
       <DialogContent>
+        {isSending&&<Loading/>}
+       { !isSending&&<div>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -107,10 +110,11 @@ const SendAssetApprovalDialog = ({
             </Button>
 
             <Button type="submit" disabled={isSending}>
-              {isSending ? <Spinner /> : "Send"}
+              { "Send"}
             </Button>
           </DialogFooter>
         </form>
+        </div>}
         {/* ✅ FORM END */}
       </DialogContent>
     </Dialog>

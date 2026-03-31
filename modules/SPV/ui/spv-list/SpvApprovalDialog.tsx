@@ -80,7 +80,7 @@ const SendSpvDialog = ({
         {isSending && <Loading />}
 
         {/* 🧊 Content (dim when loading) */}
-        <div className={isSending ? "opacity-50 pointer-events-none" : ""}>
+        {!isSending&&<div className={isSending ? "opacity-50 pointer-events-none" : ""}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>
@@ -116,7 +116,7 @@ const SendSpvDialog = ({
               </Button>
             </DialogFooter>
           </form>
-        </div>
+        </div>}
       </DialogContent>
     </Dialog>
   );
