@@ -8,9 +8,21 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
-import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+// ✅ Schema
+const sendAssetSchema = z.object({
+  message: z
+    .string()
+    .min(5, "Message must be at least 5 characters")
+    .max(500, "Message too long"),
+});
+
+type SendAssetFormValues = z.infer<typeof sendAssetSchema>;
 
 interface SendAssetDialogProps {
   open: boolean;
@@ -35,10 +47,34 @@ const SendAssetApprovalDialog = ({
   description = "This will notify the super admin to review this Asset",
   note = "Note: Once sent, Admin will be notified and can request changes before the asset goes live.",
 }: SendAssetDialogProps) => {
-  const [message, setMessage] = useState("");
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<SendAssetFormValues>({
+    resolver: zodResolver(sendAssetSchema),
+    defaultValues: {
+      message: "",
+    },
+  });
+
+  const onSubmit = (data: SendAssetFormValues) => {
+    onSend(assetId, data.message);
+    reset(); // clear after send
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        if (!val) {
+          reset(); // reset when closing
+          onClose();
+        }
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -50,21 +86,32 @@ const SendAssetApprovalDialog = ({
 
         <p className="text-sm text-gray-600">{note}</p>
 
-        <Textarea
-          placeholder="Enter the message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
+        {/* ✅ FORM START */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          
+          <Textarea
+            placeholder="Enter the message"
+            {...register("message")}
+          />
 
-        <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>
-            Close
-          </Button>
+          {/* ❌ Error */}
+          {errors.message && (
+            <p className="text-sm text-red-500">
+              {errors.message.message}
+            </p>
+          )}
 
-          <Button onClick={() => onSend(assetId, message)} disabled={isSending}>
-            {isSending ? <Spinner /> : "Send"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Close
+            </Button>
+
+            <Button type="submit" disabled={isSending}>
+              {isSending ? <Spinner /> : "Send"}
+            </Button>
+          </DialogFooter>
+        </form>
+        {/* ✅ FORM END */}
       </DialogContent>
     </Dialog>
   );
