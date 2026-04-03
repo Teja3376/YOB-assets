@@ -128,7 +128,7 @@ const AssetTabs = () => {
         isLoading={isActivating}
         updateStatus={updateStatus}
         isError={isError}
-        error={error?.response?.data?.message as any}
+        error={error?.message as any}
       />
       <PaymentSuccessDialog
         open={isSuccessOpen}
