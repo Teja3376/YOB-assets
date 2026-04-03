@@ -148,7 +148,7 @@ const getColumns = (
     },
     {
       header: "Investors",
-      accessorKey: "uniqueInvestorCount",
+      accessorKey: "uniqueInvestorsCount",
       cell: (info: any) => {
         const uniqueInvestorCount = info.getValue();
         const value = formatCompactNumber(uniqueInvestorCount || 0);

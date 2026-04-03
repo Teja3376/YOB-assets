@@ -47,6 +47,8 @@ const AssetTabs = () => {
     error,
   } = useActivateAsset();
 
+  
+
   const updateStatus = async (assetId: string, newStatus: string) => {
     activateAsset(
       { assetId, status: newStatus },

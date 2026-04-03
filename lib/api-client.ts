@@ -7,9 +7,9 @@ import axios, {
 } from "axios";
 import { toast } from "sonner";
 
-// const API_BASE_URL = "http://localhost:5050/api";
+const API_BASE_URL = "http://localhost:5050/api";
 
- const API_BASE_URL = "https://nexa-issuer-backend.vercel.app/api";
+//  const API_BASE_URL = "https://nexa-issuer-backend.vercel.app/api";
 
 /**
  * Main API instance
@@ -86,9 +86,9 @@ function handleLogout() {
 
   toast.error("Session expired. Please login again.");
 
-  if (typeof window !== "undefined") {
-    window.location.href = "/login";
-  }
+  // if (typeof window !== "undefined") {
+  //   window.location.href = "/login";
+  // }
 }
 
 api.interceptors.request.use(
@@ -119,7 +119,7 @@ api.interceptors.response.use(
 
     const status = error.response.status;
 
-    if ((status === 401 || status === 403) && !originalRequest._retry) {
+    if ((status === 401 ) && !originalRequest._retry) {
       originalRequest._retry = true;
 
       const refreshToken = getRefreshToken();

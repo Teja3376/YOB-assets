@@ -86,7 +86,7 @@ const OrderListPage = () => {
 
         <DashboardCard
           title="Completed Orders"
-          value={orderStats?.completed || 0}
+          value={orderStats?.completed || "0"}
           leftIcon={<CheckCheck size={25} className="text-emerald-600" />}
           titleIconClassName="bg-emerald-50 rounded-full p-2"
           containerClassName="rounded-lg"
@@ -94,7 +94,7 @@ const OrderListPage = () => {
 
         <DashboardCard
           title="Failed Orders"
-          value={orderStats?.failed || 0}
+          value={orderStats?.failed || "0"}
           leftIcon={<XCircle size={25} className="text-red-700" />}
           titleIconClassName="bg-red-50 rounded-full p-2"
           containerClassName="rounded-lg"

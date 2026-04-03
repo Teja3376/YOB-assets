@@ -11,6 +11,8 @@ import { mockSpvData } from "@/modules/SPV/mock-data/mock-data-spv";
 import { useRouter } from "next/navigation";
 import useGetAllSpv from "../../hooks/useGetAllSpv";
 import { z } from "zod";
+import { get } from "lodash";
+import { getLocalItem, setLocalItem } from "@/lib/localStorage";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25];
 
@@ -23,7 +25,8 @@ const searchSchema = z
 
 const SpvPage = () => {
   const [spv, setSpv] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("active");
+  const spvActiveTab=getLocalItem("spvActiveTab")||"active"
+  const [activeTab, setActiveTab] = useState(spvActiveTab||"active");
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
@@ -160,6 +163,7 @@ const SpvPage = () => {
         tabs={tabs}
         defaultTab={activeTab}
         handleTabChange={(tabId: string) => {
+          setLocalItem("spvActiveTab", tabId);
           setActiveTab(tabId);
           setCurrentPage(1);
         }}

@@ -71,7 +71,6 @@ export const EXCLUDED_FIELDS = [
   "lastModified",
   "webkitRelativePath",
   "size",
-  "type",
   "lastModifiedDate",
 ];
 
