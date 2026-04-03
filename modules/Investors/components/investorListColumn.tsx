@@ -20,7 +20,7 @@ const investorColumn = () => {
       },
     },
     {
-      header: "Investor",
+      header: "Investor Name",
       accessorKey: "name",
       cell: (info: any) => {
         const name = info.getValue();

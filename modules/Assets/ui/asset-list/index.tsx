@@ -34,6 +34,7 @@ import SendAssetApprovalDialog from "./SendAssetApprovalDialog";
 import useActivateAsset from "../../hooks/asset-list/useActivateAsset";
 import { ListingFeeDialog } from "../ListingFeeAlert";
 import { PaymentDialog } from "@/modules/PaymentRequest/ui/PaymentTypeDialog";
+import { getLocalItem, setLocalItem } from "@/lib/localStorage";
 
 const Index: React.FC = () => {
   const router = useRouter();
@@ -43,7 +44,9 @@ const Index: React.FC = () => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const queryParams = queryString.parse(searchParams.toString());
-  const assetStatus = (queryParams?.status as string) || "approved";
+  const activeTab = getLocalItem("activeAssetTab") || "active";
+  const assetStatus =
+    activeTab || (queryParams?.status as string) || "approved";
   const currentPage = Number(queryParams?.page) || 1;
   const limit = Number(queryParams?.limit) || 10;
 
@@ -128,6 +131,7 @@ const Index: React.FC = () => {
   };
 
   const handleTabChange = (tabId: string) => {
+    setLocalItem("activeAssetTab", tabId);
     router.push(`${pathname}?status=${tabId}&page=1&limit=${limit}`);
   };
 

@@ -270,6 +270,7 @@ const SpvFormPage = () => {
       : [...completedSteps, step];
 
     const payload = { ...data, completedSteps: nextCompleted };
+    console.log("Payload for update:", payload);
 
     updateSpv(payload, {
       onSuccess: () => {

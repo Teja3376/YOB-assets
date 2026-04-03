@@ -38,7 +38,6 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
               <Image
                 src="/yob-assets-logo.png"
                 alt="YOB Assets Logo"
@@ -47,7 +46,6 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                 className="h-12 w-auto"
                 priority
               />
-            </Link>
           </div>
 
           {/* Desktop Menu */}
@@ -131,15 +129,7 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                 <LogOut size={16} />
                 Logout
               </Button>
-              <Button
-                onClick={() => router.push("/dashboard")}
-                variant="outline"
-                className="px-6 py-2.5 bg-linear-to-r from-[#FF6B00] to-[#FF8A33] hover:shadow-lg text-white font-medium rounded-full transition-all"
-                id="logout-btn"
-              >
-                <ArrowRight size={16} />
-                DashBoard
-              </Button>
+              
             </div>
           )}
 

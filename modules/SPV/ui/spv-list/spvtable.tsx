@@ -156,18 +156,11 @@ const SPVTable: React.FC<SPVTableProps> = ({
       accessorKey: "status",
       size: 80,
       cell: (info: any) => {
-        const isActive = info.getValue() === "Approval";
+        const isActive = info.getValue() === "Active";
         console.log(data);
         return (
           <Switch
-            checked={isActive}
-            onCheckedChange={() =>
-              data?.map((item: any) =>
-                item._id === info.row.original._id
-                  ? { ...item, status: isActive ? "Approval" : "inactive" }
-                  : item,
-              )
-            }
+            checked={isActive}  
             disabled={true}
           />
         );

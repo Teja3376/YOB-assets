@@ -15,6 +15,7 @@ import { useFormContext } from "react-hook-form";
 import { LocationCard } from "./LocationCard";
 // import { NearbyPlaces, useGetPlaces } from "@/hooks/asset/useGetPlaces";
 import { useParams } from "next/navigation";
+import useGetPlaces from "@/modules/Assets/hooks/nearByLocations/useGetPlaces";
 
 interface MapHandlerProps {
   place: google.maps.places.PlaceResult | null;
@@ -47,19 +48,19 @@ const Index: React.FC = () => {
 
   // ✅ custom hook
   // const { places, loading, error, getPlaces } = useGetPlaces();
-  const [places, setPlaces] = useState<NearbyPlaces>({
-    school: [],
-    gym: [],
-    hospital: [],
-    cinema: [],
-    cafe: [],
-    "police-station": [],
-  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [getPlaces, setGetPlaces] = useState<any>(null);
+  const { data: nearByPlaces, isLoading: isNearByPlacesLoading } = useGetPlaces(
+    {
+      assetId: assetId || "",
+      lat: latitude.toString(),
+      lng: longitude.toString(),
+    },
+  );
 
-  /** Fetch places whenever lat/lng changes */
+  console.log("nearByPlaces", nearByPlaces, isNearByPlacesLoading);
+  const places = nearByPlaces?.data; /** Fetch places whenever lat/lng changes */
   // useEffect(() => {
   //   if (!latitude || !longitude || !assetId) return;
   //   getPlaces({
@@ -95,7 +96,7 @@ const Index: React.FC = () => {
       if (!placesLib || !inputRef.current) return;
       const options = { fields: ["geometry", "name", "formatted_address"] };
       setPlaceAutocomplete(
-        new placesLib.Autocomplete(inputRef.current, options)
+        new placesLib.Autocomplete(inputRef.current, options),
       );
     }, [placesLib]);
 
@@ -158,7 +159,7 @@ const Index: React.FC = () => {
         </CardHeader>
         <CardContent>
           <APIProvider
-            apiKey="AIzaSyDkthg2XSdFfiF-att92-ZeVpSi18rT1v8" 
+            apiKey="AIzaSyDkthg2XSdFfiF-att92-ZeVpSi18rT1v8"
             solutionChannel="GMP_devsite_samples_v3_rgmautocomplete"
           >
             <div className="w-full h-96 rounded-lg overflow-hidden">
@@ -232,7 +233,7 @@ const Index: React.FC = () => {
             isActive: boolean;
           }) => (
             <LocationCard key={location._id} location={location} />
-          )
+          ),
         )}
       </div>
     </div>
