@@ -59,8 +59,11 @@ const Index: React.FC = () => {
     },
   );
 
+  console.log("assetId, lat, lng", assetId, latitude, longitude);
+
   console.log("nearByPlaces", nearByPlaces, isNearByPlacesLoading);
-  const places = nearByPlaces?.data; /** Fetch places whenever lat/lng changes */
+  const places =
+    nearByPlaces?.data; /** Fetch places whenever lat/lng changes */
   // useEffect(() => {
   //   if (!latitude || !longitude || !assetId) return;
   //   getPlaces({
@@ -178,8 +181,8 @@ const Index: React.FC = () => {
                   onDragEnd={(e: any) => {
                     const lat = e.latLng?.lat() || 0;
                     const lng = e.latLng?.lng() || 0;
-                    setValue("latitude", lat);
-                    setValue("longitude", lng);
+                    setValue("latitude", lat, { shouldDirty: true });
+                    setValue("longitude", lng, { shouldDirty: true });
                   }}
                 />
                 <MapControl position={ControlPosition.TOP}>
