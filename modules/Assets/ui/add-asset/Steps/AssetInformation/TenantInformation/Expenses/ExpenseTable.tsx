@@ -54,6 +54,7 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
               );
             }}
             className="cursor-pointer"
+            disabled
           />
         );
       },
@@ -74,6 +75,7 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
               )
             }
             className="cursor-pointer"
+            disabled
           />
         );
       },
