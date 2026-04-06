@@ -1,16 +1,14 @@
 import { FormFieldConfig } from "@/components/use-form/ControllerMap";
 import { useFormContext } from "react-hook-form";
-import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useGetSpvNames from "@/modules/SPV/hooks/useGetSpvNames";
 import useGetSpvById from "@/modules/SPV/hooks/useGetSpvById";
 
 export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
-    // const { spvId } = useParams<{ spvId?: string }>();
   const { control, setValue } = useFormContext();
 
   const [selectedSpvId, setSelectedSpvId] = useState<string | undefined>(
-    asset?.spvId,
+    asset?.spvId
   );
 
   // Fetch SPV dropdown names
@@ -23,18 +21,21 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
   // Fetch selected SPV details
   const { data: selectedSpv } = useGetSpvById(selectedSpvId!);
 
-  // Sync SPV data into form when fetched
+  // Check availability
+  const hasSPVs = useMemo(() => names && names.length > 0, [names]);
+
+  // Sync selected SPV into form
   useEffect(() => {
     if (!selectedSpv) return;
-    console.log("selectedSpv", selectedSpv);
+
     setValue("company", selectedSpv);
     setValue("currency", selectedSpv.currency ?? "INR");
   }, [selectedSpv, setValue]);
 
   const { spvId, company } = asset || {};
 
-  // Edit Mode (locked company)
-  if (spvId && spvId) {
+  // Edit mode
+  if (spvId) {
     return [
       {
         name: "spvId",
@@ -43,7 +44,7 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
         label: "Company",
         options: [
           {
-            label: company ? company?.name : selectedSpv?.name,
+            label: company?.name || selectedSpv?.name,
             value: spvId,
           },
         ],
@@ -53,7 +54,7 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
     ];
   }
 
-  // Create Mode
+  // Create mode
   return [
     {
       name: "spvId",
@@ -61,16 +62,36 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
       type: "select",
       label: "Company",
 
-      options: names.map((spv: any) => ({
-        label: spv.name,
-        value: spv._id,
-      })),
+      // Dynamic options
+      options: hasSPVs
+        ? names.map((spv: any) => ({
+            label: spv.name,
+            value: spv._id,
+          }))
+        : [],
 
-      rules: { required: "Company is required" },
+      // Disable if no SPVs
+      disabled: !hasSPVs || isNamesLoading,
 
+      // Smart validation
+      rules: {
+        validate: (value: string) => {
+          if (!hasSPVs) {
+            return "No SPVs are available to link with the asset. Please create or activate an SPV.";
+          }
+
+          if (!value) {
+            return "Company is required";
+          }
+
+          return true;
+        },
+      },
+
+      // Handle selection
       onChange: (value) => {
-        console.log("selected spv id 123", value);
         setSelectedSpvId(value);
+
         setValue("spvId", value, {
           shouldDirty: true,
           shouldTouch: true,
@@ -78,6 +99,7 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
         });
       },
 
+      // Refresh on focus loss
       onBlur: () => {
         fetchSpvNames();
       },
