@@ -1,6 +1,11 @@
 import { FormFieldConfig } from "@/components/use-form/ControllerMap";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
+import {
+  getCountryCallingCode,
+  parsePhoneNumberFromString,
+  getCountries,
+} from "libphonenumber-js";
 
 export const boardMembersFormConfig = ({
   index,
@@ -9,60 +14,64 @@ export const boardMembersFormConfig = ({
 }): FormFieldConfig[] => {
   const params = useParams() as { id?: string; spvId?: string };
   const companyId = params?.spvId ?? params?.id;
+
   const { control } = useFormContext();
 
   const assetCountry = useWatch({
     control,
     name: "assetBasicDetails.country",
   }) as string | undefined;
+
   const watchedCountryCode = useWatch({
     control,
     name: `boardMembers.${index}.countryCode`,
   }) as string | undefined;
 
+  // ✅ Dynamic calling code
   const getCallingCode = (country?: string) => {
-    if (!country) return "+91";
-    const key = country.toUpperCase();
-    if (key === "IN" || key === "INDIA") return "+91";
-    if (key === "QA" || key === "QATAR") return "+974";
-    if (key === "AE" || key === "UAE" || key === "UNITED ARAB EMIRATES")
-      return "+971";
-    return "+91";
+    try {
+      if (!country) return "+91";
+      const code = getCountryCallingCode(country.toUpperCase());
+      return `+${code}`;
+    } catch {
+      return "+91";
+    }
   };
 
   const defaultCallingCode = getCallingCode(assetCountry);
 
-  const validatePhoneForCallingCode = (
-    callingCode: string | undefined,
-    rawNumber: string
-  ) => {
-    const num = (rawNumber || "").replace(/\s|-/g, "");
-    if (!num) return true; // Let `required` rule handle empty — keeps required message consistent
-    switch (callingCode) {
-      case "+91": {
-        const re = /^[6-9]\d{9}$/;
-        return (
-          re.test(num) ||
-          "Indian phone number must be 10 digits and start with 6,7,8 or 9"
-        );
+  const getAllCountryOptions = () => {
+    return getCountries()
+      .map((country) => {
+        try {
+          const code = getCountryCallingCode(country);
+          return {
+            label: `${country} (+${code})`,
+            value: `+${code}`,
+          };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean) as { label: string; value: string }[];
+  };
+
+  const validatePhone = (value: string, country?: string) => {
+    if (!value) return true;
+
+    try {
+      const phoneNumber = parsePhoneNumberFromString(
+        value,
+        country?.toUpperCase() as any
+      );
+
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        return "Invalid phone number";
       }
-      case "+974": {
-        const re = /^\d{8}$/;
-        return re.test(num) || "Qatari phone number must be 8 digits";
-      }
-      case "+971": {
-        const reLocal = /^5\d{8}$/;
-        const reE164 = /^\+9715\d{8}$/;
-        return (
-          reLocal.test(num) ||
-          reE164.test(rawNumber) ||
-          "UAE phone number should be like 5XXXXXXXX (9 digits after +971)"
-        );
-      }
-      default: {
-        const re = /^\d{6,15}$/;
-        return re.test(num) || "Phone number must be between 6 and 15 digits";
-      }
+
+      return true;
+    } catch {
+      return "Invalid phone number";
     }
   };
 
@@ -113,19 +122,15 @@ export const boardMembersFormConfig = ({
       rules: {
         required: "Phone Number is required",
         validate: (value: any) => {
-          const effectiveCallingCode = watchedCountryCode ?? defaultCallingCode;
-          const res = validatePhoneForCallingCode(effectiveCallingCode, value);
-          return res === true ? true : res;
+          return validatePhone(value, assetCountry);
         },
       },
       selectRules: {
         required: "Country Code is required",
       },
-      options: [
-        { label: "+91", value: "+91" },
-        { label: "+971", value: "+971" },
-        { label: "+974", value: "+974" },
-      ],
+
+      options: getAllCountryOptions(),
+
       position: "left",
       defaultValue: watchedCountryCode ?? defaultCallingCode,
     },
