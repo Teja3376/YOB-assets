@@ -19,8 +19,9 @@ export const boardMembersFormConfig = ({
 
   const assetCountry = useWatch({
     control,
-    name: "assetBasicDetails.country",
+    name: "jurisdiction",
   }) as string | undefined;
+  console.log("Watched asset country:", assetCountry);
 
   const watchedCountryCode = useWatch({
     control,
@@ -56,16 +57,16 @@ export const boardMembersFormConfig = ({
       .filter(Boolean) as { label: string; value: string }[];
   };
 
-  const validatePhone = (value: string, country?: string) => {
+  const validatePhone = (value: string, countryCode?: string) => {
     if (!value) return true;
 
     try {
-      const phoneNumber = parsePhoneNumberFromString(
-        value,
-        country?.toUpperCase() as any
-      );
+      const fullNumber = `${countryCode || ""}${value}`;
+
+      const phoneNumber = parsePhoneNumberFromString(fullNumber);
 
       if (!phoneNumber || !phoneNumber.isValid()) {
+        console.log("Invalid phone number:", fullNumber);
         return "Invalid phone number";
       }
 
@@ -122,7 +123,7 @@ export const boardMembersFormConfig = ({
       rules: {
         required: "Phone Number is required",
         validate: (value: any) => {
-          return validatePhone(value, assetCountry);
+          return validatePhone(value, watchedCountryCode);
         },
       },
       selectRules: {
