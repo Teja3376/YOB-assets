@@ -91,19 +91,19 @@ export const assetInfoConfig = ({ asset }: { asset: Asset }): FormFieldConfig[] 
       rules: { required: "Instrument type is required" },
       disabled: disable,
     },
-    
+
 
     {
       type: "select",
       name: "country",
       control,
       label: "Country",
-options:
+      options:
         COUNTRY_OPTIONS.length > 0
           ? COUNTRY_OPTIONS
           : country
-          ? [defaultCountry]
-          : [],      rules: { required: "Country is required" },
+            ? [defaultCountry]
+            : [], rules: { required: "Country is required" },
 
       onChange: async (value) => {
         setValue("country", value);
