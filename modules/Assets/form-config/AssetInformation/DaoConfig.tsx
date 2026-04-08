@@ -30,6 +30,7 @@ export const DaoConfig = ({ asset }: { asset: any }): FormFieldConfig[] => {
 
     setValue("company", selectedSpv);
     setValue("currency", selectedSpv.currency ?? "INR");
+    setValue("country", selectedSpv.jurisdiction ?? "");
   }, [selectedSpv, setValue]);
 
   const { spvId, company } = asset || {};
