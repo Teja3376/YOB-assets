@@ -31,6 +31,7 @@ const BoardMembersDialog = ({
   setIndex,
   fields,
   remove,
+  
 }: BoardMembersDialogProps) => {
   const { createAB, updateAB } = useABApi();
   const { getValues: formGetValues, clearErrors, trigger } = useFormContext();
