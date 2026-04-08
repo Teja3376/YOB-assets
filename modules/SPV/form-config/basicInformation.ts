@@ -19,14 +19,40 @@ export const basicInformationFormConfig = ({
   const autoSetCurrencyRef = useRef<string | null>(null);
   // console.log("spv in form config", spv);
 
-  const countryCurrencyMap: Record<string, string> = {
-    IN: "INR",
-    AE: "AED",
-    QA: "QAR",
-    US: "USD",
-    GB: "GBP",
-    IT: "EUR",
-  };
+const countryCurrencyMap: Record<string, string> = {
+  AT: "EUR",
+  BE: "EUR",
+  HR: "EUR",
+  CY: "EUR",
+  EE: "EUR",
+  FI: "EUR",
+  FR: "EUR",
+  DE: "EUR",
+  GR: "EUR",
+  IE: "EUR",
+  IT: "EUR",
+  LV: "EUR",
+  LT: "EUR",
+  LU: "EUR",
+  MT: "EUR",
+  NL: "EUR",
+  PT: "EUR",
+  SK: "EUR",
+  SI: "EUR",
+  ES: "EUR",
+
+  // EU - Non-Euro 💸
+  BG: "BGN", // Bulgaria
+  CZ: "CZK", // Czechia
+  DK: "DKK", // Denmark
+  HU: "HUF", // Hungary
+  PL: "PLN", // Poland
+  RO: "RON", // Romania
+  SE: "SEK", // Sweden
+
+  // Tanzania 🌍
+  TZ: "TZS",
+};
   useEffect(() => {
     const mapped = jurisdiction ? countryCurrencyMap[jurisdiction] : undefined;
 
