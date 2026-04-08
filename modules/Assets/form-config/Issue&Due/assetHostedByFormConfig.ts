@@ -56,6 +56,14 @@ const formConfig = (countryCode: string): FormFieldConfig[] => {
           value: /^[A-Za-z\s]+$/i,
           message: 'Only letters are allowed',
         },
+        maxLength: {
+          value: 50,
+          message: 'Name must be less than 50 characters',
+        },
+        minLength: {
+          value: 3,
+          message: 'Name must be at least 3 characters',
+        },
       },
     },
     {

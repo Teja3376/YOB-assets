@@ -6,6 +6,7 @@ import { ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 interface HeaderProps {
   hideNavigation?: boolean;
@@ -14,11 +15,13 @@ interface HeaderProps {
 export default function Header({ hideNavigation = false }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const token = sessionStorage.getItem("accessToken");
     setAccessToken(token);
+    setIsLoading(false);
   }, []);
 
   const handleLogout = () => {
@@ -118,7 +121,7 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
           )}
 
           {/* Logout Button (if logged in) */}
-          {accessToken && (
+          {!isLoading && accessToken && (
             <div className="flex items-center gap-3">
               <Button
                 onClick={handleLogout}
@@ -129,12 +132,16 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
                 <LogOut size={16} />
                 Logout
               </Button>
-              
+              <Button className="rounded-full">
+                <Link href="/dashboard">
+                  Dashboard
+                </Link>
+              </Button>
             </div>
           )}
 
           {/* CTA Buttons */}
-          {!accessToken && !hideNavigation && (
+          {!isLoading && !accessToken && !hideNavigation && (
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/login"
@@ -152,7 +159,7 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
           )}
 
           {/* Mobile Menu Button */}
-          {!hideNavigation && (
+          {!hideNavigation && !isLoading && (
             <button
               id="mobile-menu-btn"
               onClick={() => setIsOpen(!isOpen)}
@@ -161,6 +168,12 @@ export default function Header({ hideNavigation = false }: HeaderProps) {
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+          )}
+          {!hideNavigation && isLoading && (
+            <div className="hidden md:flex items-center gap-3">
+              <Skeleton className="h-10 w-24 rounded-full" />
+              <Skeleton className="h-10 w-28 rounded-full" />
+            </div>
           )}
         </div>
       </div>
