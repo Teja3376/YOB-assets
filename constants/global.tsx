@@ -65,19 +65,48 @@ export const EMPTY_TABLE_DATA = [
       icon: <Star size={44} />,
     },
   ];
-  export const COUNTRIES = [
-    { label: "India", value: "IN" },
-    { label: "UAE", value: "AE" },
-    { label: "Qatar", value: "QA" },
-    { label: "UK", value: "GB" },
-    { label: "United States", value: "US" },
-    { label: "Italy", value: "IT" },
-  ];
+export const COUNTRIES = [
+  { label: "Austria", value: "AT" },
+  { label: "Belgium", value: "BE" },
+  { label: "Bulgaria", value: "BG" },
+  { label: "Croatia", value: "HR" },
+  { label: "Cyprus", value: "CY" },
+  { label: "Czechia", value: "CZ" },
+  { label: "Denmark", value: "DK" },
+  { label: "Estonia", value: "EE" },
+  { label: "Finland", value: "FI" },
+  { label: "France", value: "FR" },
+  { label: "Germany", value: "DE" },
+  { label: "Greece", value: "GR" },
+  { label: "Hungary", value: "HU" },
+  { label: "Ireland", value: "IE" },
+  { label: "Italy", value: "IT" },
+  { label: "Latvia", value: "LV" },
+  { label: "Lithuania", value: "LT" },
+  { label: "Luxembourg", value: "LU" },
+  { label: "Malta", value: "MT" },
+  { label: "Netherlands", value: "NL" },
+  { label: "Poland", value: "PL" },
+  { label: "Portugal", value: "PT" },
+  { label: "Romania", value: "RO" },
+  { label: "Slovakia", value: "SK" },
+  { label: "Slovenia", value: "SI" },
+  { label: "Spain", value: "ES" },
+  { label: "Sweden", value: "SE" },
+  // Bonus guest 🌍
+  { label: "Tanzania", value: "TZ" },
+];
   export const CURRENCY_OPTIONS = [
-    { label: "INR", value: "INR" },
-    { label: "AED", value: "AED" },
-    { label: "QAR", value: "QAR" },
-    { label: "GBP", value: "GBP" },
-    { label: "USD", value: "USD" },
-    { label: "EUR", value: "EUR" },
-  ];
+  { label: "EUR", value: "EUR" },
+
+  { label: "BGN", value: "BGN" }, // Bulgaria
+  { label: "CZK", value: "CZK" }, // Czechia
+  { label: "DKK", value: "DKK" }, // Denmark
+  { label: "HUF", value: "HUF" }, // Hungary
+  { label: "PLN", value: "PLN" }, // Poland
+  { label: "RON", value: "RON" }, // Romania
+  { label: "SEK", value: "SEK" }, // Sweden
+
+  // Tanzania 🌍
+  { label: "TZS", value: "TZS" },
+];
