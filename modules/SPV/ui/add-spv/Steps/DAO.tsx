@@ -11,7 +11,9 @@ import {
     Siren,
     Edit2,
     Files,
+    ArrowLeft,
 } from "lucide-react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { daoFormConfig } from "@/modules/SPV/form-config/daoConfig";
 import {
@@ -31,6 +33,7 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
     const router = useRouter();
     const { watch, setValue } = useFormContext();
     const { spvId: id } = useParams();
+    const [isFormVisible, setIsFormVisible] = useState(false);
     const blockChain = watch("daoConfiguration.blockchain");
     const governanceModel = watch("daoConfiguration.governanceModel");
     const issuerRepSignature = watch("daoConfiguration.issuerRepSignature");
@@ -55,28 +58,39 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                         DAO Creation
                     </h1>
                 </div>
-                {
-                    skippedFromApi === false && (
+                <div className="flex gap-2">
+                    {!isFormVisible ? (
+                        <>
+                            <Button
+                                type="button"
+                                variant="default"
+                                disabled={isCompleting}
+                                onClick={() => router.push(`/spv/${id}/review`)}
+                            >
+                                Skip
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                disabled={isCompleting}
+                                onClick={() => setIsFormVisible(true)}
+                            >
+                                Review
+                            </Button>
+                        </>
+                    ) : (
                         <Button
                             type="button"
-                            variant="default"
+                            variant="ghost"
+                            className="flex items-center gap-2"
                             disabled={isCompleting}
-                            onClick={() => onCompleteDao({ skip: true })}
+                            onClick={() => setIsFormVisible(false)}
                         >
-                            Skip
+                            <ArrowLeft size={16} />
+                            Back
                         </Button>
                     )}
-                    {skippedFromApi === true && (
-                        <Button
-                            type="button"
-                            variant="default"
-                            disabled={isCompleting}
-                            onClick={() => router.push(`/spv/${id}/review`)}
-                        >
-                            Review
-                        </Button>
-                    )
-                } 
+                </div> 
              
             </div>
             <div>
@@ -88,39 +102,23 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                     <div
                         className={cn(
                             "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-lg  px-4 py-8 text-center",
-                            skippedFromApi
+                            isFormVisible === false
                                 ? "border-amber-200/90 bg-black/75 backdrop-blur-[1px]"
-                                : "border-gray-200 bg-black/75 opacity-90 backdrop-blur-sm",
+                                : "hidden",
                         )}
                     >
                         <p className="max-w-md bg-white height-[150px] width-[400px] rounded-lg p-4 text-sm text-gray-700 drop-shadow-lg">
-                            {skippedFromApi ? (
-                                <>
-                                    <span className="font-medium">
-                                        DAO setup was skipped
-                                    </span>{" "}
-                                    
-                                    for this SPV. The fields below are shown for
-                                    reference only.
-                                </>
-                            ) : (
-                                <>
-                                    DAO setup is optional. Use{" "}
-                                   
-
-                                    above to continue without configuring a DAO.
-                                    <br />
-                                    <Button variant="outline" className="font-medium " onClick={() => onCompleteDao({ skip: true })}>
-                                        Skip And Review
-                                    </Button>
-                                </>
-                            )}
+                            <span className="font-medium">
+                                DAO setup - Hidden Form
+                            </span>{" "}
+                            
+                            Click Review button to view and edit the form.
                         </p>
                     </div>
                     <div
                         className={cn(
-                            "pointer-events-none select-none",
-                            skippedFromApi ? "opacity-[01]" : "opacity-40",
+                            "relative",
+                            isFormVisible === false && "pointer-events-none select-none opacity-40",
                         )}
                     >
                         {/* Main Content */}
