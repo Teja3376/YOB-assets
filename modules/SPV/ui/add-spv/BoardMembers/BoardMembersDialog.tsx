@@ -13,7 +13,7 @@ import FormGenerator from "@/components/use-form/FormGenerator";
 import { boardMembersFormConfig } from "@/modules/SPV/form-config/boardMembers";
 import { useFormContext } from "react-hook-form";
 import { useABApi } from "@/hooks/spv/useABApi";
-import { useEffect } from "react";
+
 
 interface BoardMembersDialogProps {
   index: number | null;
@@ -37,14 +37,6 @@ const BoardMembersDialog = ({
 
   const isOpen = index !== null;
   const isEdit = index !== -1;
-
-  useEffect(() => {
-  if (index !== null) {
-    clearErrors();
-  }
-}, [index]);
-
-  
 
   // const handleClose = () => {
   //   if (index !== null) {
@@ -153,9 +145,9 @@ const BoardMembersDialog = ({
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-4">
-          {index !== null && FormGenerator(
+          {FormGenerator(
             boardMembersFormConfig({
-              index: index,
+              index: index ?? -1,
             }),
           )}
         </div>
