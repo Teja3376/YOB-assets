@@ -13,8 +13,7 @@ import FormGenerator from "@/components/use-form/FormGenerator";
 import { boardMembersFormConfig } from "@/modules/SPV/form-config/boardMembers";
 import { useFormContext } from "react-hook-form";
 import { useABApi } from "@/hooks/spv/useABApi";
-import { useParams } from "next/navigation";
-import { clear } from "console";
+
 
 interface BoardMembersDialogProps {
   index: number | null;
@@ -74,8 +73,15 @@ const BoardMembersDialog = ({
     console.log("Submitting form for index:", index);
     trigger(`boardMembers.${index}`)
       .then(async (isValid) => {
+        console.log("Form validation result for index", index, ":", isValid);
         if (isValid) {
           const data = formGetValues();
+          console.log(
+            "Form values for index",
+            index,
+            ":",
+            data.boardMembers?.[index ?? 0],
+          );
           const values = data.boardMembers?.[index ?? -1];
           if (isEdit) {
             // Update existing board member
