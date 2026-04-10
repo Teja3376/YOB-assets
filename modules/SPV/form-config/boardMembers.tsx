@@ -5,6 +5,7 @@ import {
   getCountryCallingCode,
   parsePhoneNumberFromString,
   getCountries,
+  CountryCode,
 } from "libphonenumber-js";
 
 export const boardMembersFormConfig = ({
@@ -32,7 +33,7 @@ export const boardMembersFormConfig = ({
   const getCallingCode = (country?: string) => {
     try {
       if (!country) return "+91";
-      const code = getCountryCallingCode(country.toUpperCase());
+      const code = getCountryCallingCode(country.toUpperCase() as CountryCode);
       return `+${code}`;
     } catch {
       return "+91";
