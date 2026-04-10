@@ -49,13 +49,13 @@ const TextareaController: React.FC<TextareaControllerProps> = ({
                 <Textarea
                   disabled={disabled}
                   id={name}
+                  wrap="soft"
                   value={value || ""}
                   onChange={(e) => {
                     controllerOnChange(e);
                     onChange && onChange(e);
                   }}
-                
-                  className="resize-none overflow-auto max-h-50 scrollbar-hide"
+                  className="resize-none overflow-x-hidden overflow-y-auto max-h-72 min-h-[120px] scrollbar-hide break-all whitespace-pre-wrap"
                 />
                 {bottomText && (
                   <span className="text-sm text-gray-500">{bottomText}</span>
