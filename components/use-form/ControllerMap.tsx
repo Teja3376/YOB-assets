@@ -148,6 +148,8 @@ export type FormFieldConfig = {
   dayDisabled?: (date: Date) => boolean;
   isDirty?: boolean;
   countryCode?: string;
+  withSearch?: boolean;
+  placeHolder?: string;
 };
 
 export default ControllerMap;
