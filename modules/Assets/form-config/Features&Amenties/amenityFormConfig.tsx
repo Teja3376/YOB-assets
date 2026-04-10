@@ -25,9 +25,28 @@ export const AMENITY_DEFAULT_DESCRIPTIONS: Record<string, string> = {
 
 export const amenityFormConfig = (index: number): FormFieldConfig[] => {
   const { assetId } = useParams<{ assetId: string }>();
-  const { control, setValue } = useFormContext();
+  const { control, setValue,watch } = useFormContext();
 
   const descriptionPath = `amenities.${index}.description` as const;
+
+  const watchAmenityName = watch(`amenities.${index}.name`);
+
+  const baseOptions = [
+  { label: "Swimming Pool", value: "swimming-pool" },
+  { label: "Fitness Center", value: "fitness-center" },
+  { label: "Restaurant", value: "restaurant" },
+  { label: "Bar", value: "bar" },
+  { label: "Room Service", value: "room-service" },
+  { label: "Business Center", value: "business-center" },
+  { label: "Meeting Rooms", value: "meeting-rooms" },
+  { label: "Event Space", value: "event-space" },
+  { label: "Conference Rooms", value: "conference-rooms" },
+];
+
+const options = watchAmenityName &&
+  !baseOptions.some(opt => opt.value === watchAmenityName)
+  ? [{ label: watchAmenityName, value: watchAmenityName }, ...baseOptions]
+  : baseOptions;
 
   const onAmenityNameChange = (value: string) => {
     const preset = AMENITY_DEFAULT_DESCRIPTIONS[value];
@@ -41,17 +60,7 @@ export const amenityFormConfig = (index: number): FormFieldConfig[] => {
       type: 'inputSelectController',
       name: `amenities.${index}.name`,
       control,
-      options : [
-        { label: "Swimming Pool", value: "swimming-pool" },
-        { label: "Fitness Center", value: "fitness-center" },
-        { label: "Restaurant", value: "restaurant" },
-        { label: "Bar", value: "bar" },
-        { label: "Room Service", value: "room-service" },
-        { label: "Business Center", value: "business-center" },
-        { label: "Meeting Rooms", value: "meeting-rooms" },
-        { label: "Event Space", value: "event-space" },
-        { label: "Conference Rooms", value: "conference-rooms" },
-      ],
+      options : options,
       label: `Amenity Name `,
       placeholder: `Enter Name`,
       rules: {

@@ -1,3 +1,4 @@
+import { allCountries } from "country-telephone-data";
 
 
 export const assetCategories = [
@@ -281,3 +282,16 @@ export const iso3ToDialCode: Record<string, string> = {
 export const getDialCodeFromIso3 = (iso3: string): string => {
   return iso3ToDialCode[iso3?.toUpperCase()] ?? "";
 };
+
+// export const countryOptions = allCountries.map((c) => ({
+//   label: `${c.name} (+${c.dialCode})`,
+//   value: `+${c.dialCode}`,
+//   iso2: c.iso2.toUpperCase(),
+// }));
+// export function getFlagEmoji(countryCode: string) {
+//   return countryCode
+//     .toUpperCase()
+//     .replace(/./g, char =>
+//       String.fromCodePoint(127397 + char.charCodeAt(0))
+//     );
+// }
