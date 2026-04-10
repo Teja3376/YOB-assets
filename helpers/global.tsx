@@ -49,16 +49,59 @@ export const COUNTRY_OPTIONS = [
   // { label: "UK", value: "GB" },
   { label: "Qatar", value: "QA" },
   { label: "United States", value: "US" },
-  {label: "Italy", value: "IT"}
+  // {label: "Italy", value: "IT"},
+
+  { label: "Austria", value: "AT" },
+  { label: "Belgium", value: "BE" },
+  { label: "Bulgaria", value: "BG" },
+  { label: "Croatia", value: "HR" },
+  { label: "Cyprus", value: "CY" },
+  { label: "Czechia", value: "CZ" },
+  { label: "Denmark", value: "DK" },
+  { label: "Estonia", value: "EE" },
+  { label: "Finland", value: "FI" },
+  { label: "France", value: "FR" },
+  { label: "Germany", value: "DE" },
+  { label: "Greece", value: "GR" },
+  { label: "Hungary", value: "HU" },
+  { label: "Ireland", value: "IE" },
+  { label: "Italy", value: "IT" },
+  { label: "Latvia", value: "LV" },
+  { label: "Lithuania", value: "LT" },
+  { label: "Luxembourg", value: "LU" },
+  { label: "Malta", value: "MT" },
+  { label: "Netherlands", value: "NL" },
+  { label: "Poland", value: "PL" },
+  { label: "Portugal", value: "PT" },
+  { label: "Romania", value: "RO" },
+  { label: "Slovakia", value: "SK" },
+  { label: "Slovenia", value: "SI" },
+  { label: "Spain", value: "ES" },
+  { label: "Sweden", value: "SE" },
+
+  // Tanzania 🌍
+  { label: "Tanzania", value: "TZ" },
 ];
+
 export const CURRENCY_OPTIONS = [
   { label: "INR", value: "INR" },
   { label: "AED", value: "AED" },
   { label: "QAR", value: "QAR" },
   { label: "GBP", value: "GBP" },
   { label: "USD", value: "USD" },
-  { label: "EUR", value: "EUR" }
-  ,
+  { label: "EUR", value: "EUR" },
+
+  // Added EU non-Euro 💸
+  { label: "BGN", value: "BGN" },
+  { label: "CZK", value: "CZK" },
+  { label: "DKK", value: "DKK" },
+  { label: "HUF", value: "HUF" },
+  { label: "PLN", value: "PLN" },
+  { label: "RON", value: "RON" },
+  { label: "SEK", value: "SEK" },
+
+  // Added Tanzania 🌍
+  { label: "TZS", value: "TZS" },
 ];
 
 export const EXCLUDED_FIELDS = [
@@ -71,7 +114,6 @@ export const EXCLUDED_FIELDS = [
   "lastModified",
   "webkitRelativePath",
   "size",
-  "type",
   "lastModifiedDate",
 ];
 

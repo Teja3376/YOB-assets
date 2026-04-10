@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -52,14 +52,19 @@ const InputGroupController: React.FC<InputGroupControllerProps> = ({
 }) => {
   // Early return if required props are missing
   if (!name || !selectName || !control) {
-    console.error("InputGroupController: Missing required props", { name, selectName, control });
+    console.error("InputGroupController: Missing required props", {
+      name,
+      selectName,
+      control,
+    });
     return null;
   }
 
   const isRequired = rules?.required || selectRules?.required;
-  const objectName = name && typeof name === "string" && name.includes(".")
-    ? name.substring(0, name.indexOf("."))
-    : "";
+  const objectName =
+    name && typeof name === "string" && name.includes(".")
+      ? name.substring(0, name.indexOf("."))
+      : "";
   return (
     <div className="space-y-2">
       {/* InputGroupCombo */}
@@ -68,10 +73,11 @@ const InputGroupController: React.FC<InputGroupControllerProps> = ({
         {isRequired && <span className="text-destructive"> *</span>}
       </Label>
       <div
-        className={`flex items-start ${position === "left"
-          ? "flex-row-reverse space-x-2 space-x-reverse"
-          : "flex-row space-x-2"
-          }`}
+        className={`flex items-start ${
+          position === "left"
+            ? "flex-row-reverse space-x-2 space-x-reverse"
+            : "flex-row space-x-2"
+        }`}
       >
         <Controller
           name={name}
@@ -92,17 +98,17 @@ const InputGroupController: React.FC<InputGroupControllerProps> = ({
                     onChange(e);
                   }
                   controllerOnChange(value);
-                  if (inputType === 'number') {
+                  if (inputType === "number") {
                     const num = Number(value);
-                    controllerOnChange(isNaN(num) ? '' : num);
+                    controllerOnChange(isNaN(num) ? "" : num);
                   }
                 }}
                 onBlur={onBlur}
                 value={value || ""}
                 className={`${error ? "border-red-500" : ""}`}
               />
-              {objectName && errors?.[objectName] && (
-                <span className=" text-sm">{error?.message}</span>
+              {error && (
+                <span className="text-sm text-red-500">{error.message}</span>
               )}
             </div>
           )}
@@ -119,22 +125,25 @@ const InputGroupController: React.FC<InputGroupControllerProps> = ({
                 disabled={disabled}
                 value={value || ""}
               >
-                <SelectTrigger className={`${error ? "border-red-500" : ""} w-full`}>
+                <SelectTrigger
+                  className={`${error ? "border-red-500" : ""} w-full`}
+                >
                   <SelectValue placeholder={`select `} />
                 </SelectTrigger>
                 <SelectContent
-                  className={`max-h-[300px] overflow-y-auto ${error ? "border-red-500" : ""
-                    }`}
+                  className={`max-h-[300px] overflow-y-auto ${
+                    error ? "border-red-500" : ""
+                  }`}
                 >
                   {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem key={`${option.label}-${option.value}`} value={option.value}>
                       {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {objectName && errors?.[objectName] && (
-                <span className=" text-sm">{error?.message}</span>
+              {error && (
+                <span className="text-sm text-red-500">{error.message}</span>
               )}
             </div>
           )}

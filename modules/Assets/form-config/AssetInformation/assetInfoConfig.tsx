@@ -1,8 +1,5 @@
 import { FormFieldConfig } from "@/components/use-form/ControllerMap";
-import {
-  ASSET_STYLE,
-  INSTRUMENT_TYPE,
-} from "@/modules/Assets/utils/global";
+import { ASSET_STYLE, INSTRUMENT_TYPE } from "@/modules/Assets/utils/global";
 import { useFormContext } from "react-hook-form";
 import { COUNTRY_OPTIONS, CURRENCY_OPTIONS } from "@/helpers/global";
 
@@ -18,11 +15,16 @@ interface Asset {
   };
   company?: {
     currency?: string;
+    jurisdiction?: string;
   };
   currency?: string;
 }
 
-export const assetInfoConfig = ({ asset }: { asset: Asset }): FormFieldConfig[] => {
+export const assetInfoConfig = ({
+  asset,
+}: {
+  asset: Asset;
+}): FormFieldConfig[] => {
   const param = useParams();
   const disable = !!param.id;
 
@@ -91,19 +93,20 @@ export const assetInfoConfig = ({ asset }: { asset: Asset }): FormFieldConfig[] 
       rules: { required: "Instrument type is required" },
       disabled: disable,
     },
-    
 
     {
       type: "select",
       name: "country",
       control,
       label: "Country",
-options:
+      options:
         COUNTRY_OPTIONS.length > 0
           ? COUNTRY_OPTIONS
           : country
-          ? [defaultCountry]
-          : [],      rules: { required: "Country is required" },
+            ? [defaultCountry]
+            : [],
+      defaultValue: asset?.company?.jurisdiction ?? "",
+      rules: { required: "Country is required" },
 
       onChange: async (value) => {
         setValue("country", value);
@@ -111,7 +114,7 @@ options:
         setValue("city", "");
       },
 
-      disabled: disable,
+      disabled: true,
     },
 
     {
@@ -135,7 +138,11 @@ options:
       control,
       label: "City",
       disabled: !selectedState || disable,
-      options: cities.length ? cities : city ? [{ label: city, value: city }] : [],
+      options: cities.length
+        ? cities
+        : city
+          ? [{ label: city, value: city }]
+          : [],
       rules: { required: "City is required" },
     },
 
@@ -159,4 +166,3 @@ options:
     },
   ];
 };
-

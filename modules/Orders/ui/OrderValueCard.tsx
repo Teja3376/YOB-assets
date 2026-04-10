@@ -41,7 +41,7 @@ const OrderValueCard = ({
         </div>
         <div className="text-sm  flex justify-between">
           <p className="">Token Purchased:</p>
-          <p className="font-semibold"><Coins className="text-primary"/>{tokenPurchased}</p>
+          <p className="font-semibold flex items-center gap-1"><Coins size={15} className="text-primary"/>{tokenPurchased}</p>
         </div>
       </div>
     </div>

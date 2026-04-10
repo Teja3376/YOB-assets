@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import useSendStatus from "@/modules/SPV/hooks/useSendStatus";
 import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
+import SendSpvDialog from "./SpvApprovalDialog";
 
 interface SPVTableProps {
   data?: any[];
@@ -40,8 +41,8 @@ const SPVTable: React.FC<SPVTableProps> = ({
   const [selectedDraft, setSelectedDraft] = useState<any | null>(null);
   const router = useRouter();
   const { mutate: sendStatus, isPending: isSendingStatus } = useSendStatus();
-  const handleSendStatus = (spvId: string) => {
-    sendStatus({ spvId, status: "Pending" });
+  const handleSendStatus = (spvId: string, message?: string) => {
+    sendStatus({ spvId, status: "Pending", });
     setSelectedDraft(null);
   };
   const columns: ColumnDef<any, any>[] = [
@@ -155,18 +156,11 @@ const SPVTable: React.FC<SPVTableProps> = ({
       accessorKey: "status",
       size: 80,
       cell: (info: any) => {
-        const isActive = info.getValue() === "Approval";
+        const isActive = info.getValue() === "Active";
         console.log(data);
         return (
           <Switch
-            checked={isActive}
-            onCheckedChange={() =>
-              data?.map((item: any) =>
-                item._id === info.row.original._id
-                  ? { ...item, status: isActive ? "Approval" : "inactive" }
-                  : item,
-              )
-            }
+            checked={isActive}  
             disabled={true}
           />
         );
@@ -187,8 +181,14 @@ const SPVTable: React.FC<SPVTableProps> = ({
               </Link>
             )}
             {info.row.original.status !== "Draft" && (
-
-              <Button variant="outline" size="icon" disabled onClick={() => {router.push(`/asset/${id}/overview`)}}>
+              <Button
+                variant="outline"
+                size="icon"
+                disabled
+                onClick={() => {
+                  router.push(`/asset/${id}/overview`);
+                }}
+              >
                 <Eye className="h-5 w-5" />
               </Button>
             )}
@@ -209,18 +209,18 @@ const SPVTable: React.FC<SPVTableProps> = ({
 
   const visibleColumns = hideDraftFields
     ? columns.filter(
-      (col: any) =>
-        !["totalInvestors", "aum", "OnchainAddress", "status"].includes(
-          (col as any).accessorKey,
-        ),
-    )
+        (col: any) =>
+          !["totalInvestors", "aum", "OnchainAddress", "status"].includes(
+            (col as any).accessorKey,
+          ),
+      )
     : columns;
 
   return (
     <>
       <TableComponent columns={visibleColumns} data={data || []} model="spv" />
 
-      <Dialog
+      {/* <Dialog
         open={!!selectedDraft}
         onOpenChange={() => setSelectedDraft(null)}
       >
@@ -238,7 +238,7 @@ const SPVTable: React.FC<SPVTableProps> = ({
             the SPV before it goes live and if any changes required admin send u
             request for changes you need to make changes and submit again .
           </p>
-          <Textarea placeholder="Enter the message" />
+          <Textarea required placeholder="Enter the message" />
           <DialogFooter>
             <Button variant="secondary" onClick={() => setSelectedDraft(null)}>
               Close
@@ -251,7 +251,15 @@ const SPVTable: React.FC<SPVTableProps> = ({
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
+      <SendSpvDialog
+        open={!!selectedDraft}
+        onClose={() => setSelectedDraft(null)}
+        spvName={selectedDraft?.name}
+        spvId={selectedDraft?._id}
+        isSending={isSendingStatus}
+        onSend={handleSendStatus}
+      />
     </>
   );
 };

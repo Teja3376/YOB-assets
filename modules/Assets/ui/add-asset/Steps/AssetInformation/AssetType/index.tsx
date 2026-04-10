@@ -13,7 +13,9 @@ function Index({ asset }: { asset: any }) {
 
   useEffect(() => {
     if (asset?.company?.currency) {
+      console.log("Auto-setting currency to", asset.company);
       setValue("currency", asset.company.currency);
+      setValue("country", asset.company.jurisdiction ?? "");
     }
   }, [asset?.company?.currency, setValue]);
 

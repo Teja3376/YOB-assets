@@ -244,7 +244,7 @@ export default function IssuerDashboard() {
 
                           {/* Asset Information */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-start gap-3">
+                            {/* <div className="flex items-start gap-3">
                               <Package className="h-5 w-5 text-gray-400 mt-0.5" />
                               <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-900">
@@ -254,7 +254,7 @@ export default function IssuerDashboard() {
                                   {application.assetCategory}
                                 </p>
                               </div>
-                            </div>
+                            </div> */}
                             <div className="flex items-start gap-3">
                               <Globe className="h-5 w-5 text-gray-400 mt-0.5" />
                               <div className="flex-1">
