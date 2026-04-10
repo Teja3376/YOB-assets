@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import React from "react";
 import { Controller } from "react-hook-form";
+import SearchableSelect from "./SearchableSelect";
 
 interface Option {
   value: string;
@@ -29,6 +30,7 @@ interface InputGroupControllerProps {
   errors?: any;
   position?: "left" | "right";
   inputType?: "text" | "number";
+  withSearch?: boolean;
 }
 
 /**
@@ -49,6 +51,7 @@ const InputGroupController: React.FC<InputGroupControllerProps> = ({
   options = [],
   position = "right",
   inputType = "text",
+  withSearch = false,
 }) => {
   // Early return if required props are missing
   if (!name || !selectName || !control) {
@@ -117,31 +120,39 @@ const InputGroupController: React.FC<InputGroupControllerProps> = ({
           name={selectName}
           control={control}
           rules={selectRules}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
+          render={({ field, fieldState: { error } }) => (
             <div className="w-1/3">
-              <Select
-                onValueChange={onChange}
-                defaultValue={value}
-                disabled={disabled}
-                value={value || ""}
-              >
-                <SelectTrigger
-                  className={`${error ? "border-red-500" : ""} w-full`}
+              {withSearch ? (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    control.clearErrors?.("root"); // optional
+                  }}
+                  options={options}
+                  error={!!error}
+                />
+              ) : (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
                 >
-                  <SelectValue placeholder={`select `} />
-                </SelectTrigger>
-                <SelectContent
-                  className={`max-h-[300px] overflow-y-auto ${
-                    error ? "border-red-500" : ""
-                  }`}
-                >
-                  {options.map((option) => (
-                    <SelectItem key={`${option.label}-${option.value}`} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectTrigger
+                    className={`w-full ${error ? "border-red-500" : ""}`}
+                  >
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {options.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
               {error && (
                 <span className="text-sm text-red-500">{error.message}</span>
               )}

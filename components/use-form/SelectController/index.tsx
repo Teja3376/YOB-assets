@@ -22,6 +22,7 @@ interface IndexProps {
   rules?: any;
   onChange?: (value: string) => void;
   onBlur?: () => void;
+  placeHolder?: string;
 }
 
 const Index: React.FC<IndexProps> = ({
@@ -33,7 +34,9 @@ const Index: React.FC<IndexProps> = ({
   rules,
   onChange,
   onBlur,
+  placeHolder,
 }) => {
+  
   return (
     <FormField
       control={control}
@@ -65,7 +68,9 @@ const Index: React.FC<IndexProps> = ({
             >
               <FormControl>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={`Select ${label}`} />
+                  <SelectValue
+                    placeholder={placeHolder ? placeHolder : `Select ${label}`}
+                  />
                 </SelectTrigger>
               </FormControl>
 
