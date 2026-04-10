@@ -1,6 +1,6 @@
 import FormGenerator from "@/components/use-form/FormGenerator";
 import { useFormContext } from "react-hook-form";
-import { DaoConfig } from "@/modules/Assets/form-config/AssetInformation/DaoConfig";
+import {  useDaoConfig } from "@/modules/Assets/form-config/AssetInformation/DaoConfig";
 import SelectCompany from "./SelectCompany";
 import NoCompanySelected from "./NoCompanySelected";
 import DAOConfigurationDetails from "./DAOConfigurationDetails";
@@ -22,11 +22,12 @@ const Index = ({ asset }: { asset: any }) => {
   const hasSPVs = useMemo(() => {
     return !!names?.data?.length;
   }, [names]);
+  const config=useDaoConfig({ asset }, { names, fetchSpvNames, isNamesLoading })
   return (
     <div>
       <SelectCompany />
       {FormGenerator(
-        DaoConfig({ asset }, { names, fetchSpvNames, isNamesLoading }),
+        config,
       )}
       {hasSPVs &&
         (!company ? (

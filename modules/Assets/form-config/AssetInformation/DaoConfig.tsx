@@ -4,7 +4,7 @@ import useGetSpvNames from "@/modules/SPV/hooks/useGetSpvNames";
 import { useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-export const DaoConfig = (
+export const useDaoConfig = (
   { asset }: { asset: any },
   {
     names,
@@ -18,22 +18,14 @@ export const DaoConfig = (
     asset?.spvId,
   );
 
-  // Fetch SPV dropdown names
-  // const {
-  //   data: names = [],
-  //   refetch: fetchSpvNames,
-  //   isFetching: isNamesLoading,
-  // } = useGetSpvNames();
+  
 
-  // ✅ Safe fetch (only if ID exists)
   const { data: selectedSpv } = useGetSpvById(selectedSpvId ?? "");
 
-  // ✅ Cleaner check
   const hasSPVs = useMemo(() => {
     return !!names?.data?.length;
   }, [names]);
 
-  // ✅ Memoize options (performance + stability)
   const options = useMemo(() => {
     if (!hasSPVs) return [];
 
@@ -43,7 +35,6 @@ export const DaoConfig = (
     }));
   }, [names, hasSPVs]);
 
-  // ✅ Sync selected SPV into form
   useEffect(() => {
     if (!selectedSpv) return;
 
@@ -54,7 +45,6 @@ export const DaoConfig = (
 
   const { spvId, company } = asset || {};
 
-  // 🔒 Edit mode
   if (spvId) {
     return [
       {
@@ -74,7 +64,6 @@ export const DaoConfig = (
     ];
   }
 
-  // 🆕 Create mode
   return [
     {
       name: "spvId",
