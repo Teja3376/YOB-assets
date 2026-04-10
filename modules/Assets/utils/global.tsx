@@ -32,10 +32,10 @@ export const ASSET_STEPS_TABS = [
   },
   {
     id: "features-amenities",
-    title: "Features & Amenities",
+    title: "Amenities & Features",
     tabs: [
-      { id: "features", title: "Features" },
       { id: "amenities", title: "Amenities" },
+      { id: "features", title: "Features" },
     ],
   },
   {
