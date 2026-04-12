@@ -22,11 +22,7 @@ const menu = [
   { name: "Assets", href: "/assets", icon: Package, },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Investors", href: "/investors", icon: Users },
-<<<<<<< HEAD
-  { name: "Services", href: "/payment-requests", icon: Banknote },
-=======
-  { name: "Payment Services", href: "/payment-services", icon: Banknote },
->>>>>>> 9a5f1a9aae768bb734a36eaf094895b5a9fbf39e
+  { name: "Services", href: "/payment-service", icon: Banknote },
 ];
 
 export default function DashboardSidebar() {

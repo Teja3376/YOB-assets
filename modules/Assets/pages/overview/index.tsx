@@ -9,11 +9,16 @@ import Investors from "../../ui/overview/Investors";
 import KeyPerformance from "../../ui/overview/KeyPerformance";
 import TokenInfo from "../../ui/overview/TokenInfo";
 import AssetHostedBy from "../../ui/overview/AssetHostedBy";
-import Dao from "../../ui/overview/Dao";
+import SoftcapIssuerNotification from "../../ui/overview/SoftcapIssuerNotification";
+import { sanitizeHostedByAbout } from "@/modules/Assets/utils/assetOverview";
 
 const AssetOverviewPage = () => {
   const { assetid } = useParams();
-  const { data: assetOverview, isFetching } = useGetOverview(assetid as string);
+  const {
+    data: assetOverview,
+    isFetching,
+    refetch,
+  } = useGetOverview(assetid as string);
 
   if (isFetching && !assetOverview) {
     return <LoadingSpinner />;
@@ -22,6 +27,12 @@ const AssetOverviewPage = () => {
   return (
     <div className="mt-5">
       <div className="grid grid-cols-5 gap-3 items-stretch">
+        <SoftcapIssuerNotification
+          assetId={assetid as string}
+          notification={assetOverview?.data?.softcapNotification}
+          currency={assetOverview?.data?.currency}
+          onAfterDecision={() => refetch()}
+        />
         <div className="col-span-3 space-y-3">
           <PropertyDetails
             name={assetOverview?.data?.assetName}
@@ -72,7 +83,9 @@ const AssetOverviewPage = () => {
         <div className="col-span-full">
           <AssetHostedBy
             name={assetOverview?.data?.assetHostedBy?.name}
-            description={assetOverview?.data?.assetHostedBy?.about}
+            description={sanitizeHostedByAbout(
+              assetOverview?.data?.assetHostedBy?.about,
+            )}
             logo={assetOverview?.data?.assetHostedBy?.logo}
             url={assetOverview?.data?.assetHostedBy?.website}
             address={assetOverview?.data?.assetHostedBy?.address}

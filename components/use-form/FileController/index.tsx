@@ -1,8 +1,12 @@
+"use client";
+
 import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import get from "lodash/get";
 import { useFormContext, Controller, RegisterOptions } from "react-hook-form";
 import { Upload, Check, FileIcon, X, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -13,6 +17,17 @@ import {
 import useSinglePresignedUrl from "../../../modules/FileUpload/useSinglePresignedUrl";
 import useSingleFileUpload from "../../../modules/FileUpload/useSingleFileUpload";
 import useGetSingleFileUrl from "../../../modules/FileUpload/useGetSingleFileUrl";
+
+function getUploadErrorMessage(error: unknown): string {
+  console.log(error, "error called")
+  if (error && typeof error === "object" && "response" in error) {
+    const data = (error as { response?: { data?: { message?: string } } })
+      .response?.data;
+    if (data?.message && typeof data.message === "string") return data.message;
+  }
+  if (error instanceof Error) return error.message;
+  return "Upload failed. Please try again.";
+}
 
 interface FileUploadProps {
   name: string;
@@ -28,6 +43,8 @@ interface FileUploadProps {
   };
   isDirty?: boolean;
 }
+
+const SUCCESS_DISMISS_MS = 4000;
 
 function FileUploadController({
   name,
@@ -48,18 +65,34 @@ function FileUploadController({
     control,
     formState: { errors },
     setError,
+    clearErrors,
   } = useFormContext();
   const values = watch(name);
   const file = values?.name;
   const fileUrl = values?.url;
 
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    onChange: (value: File | null) => void
-  ) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const successDismissRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (successDismissRef.current) clearTimeout(successDismissRef.current);
+    };
+  }, []);
+
+  const dismissSuccessSoon = () => {
+    if (successDismissRef.current) clearTimeout(successDismissRef.current);
+    successDismissRef.current = setTimeout(() => {
+      setSuccessMessage(null);
+      successDismissRef.current = null;
+    }, SUCCESS_DISMISS_MS);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
-    // Validate file size if maxSize is provided
+
     if (maxSize && selectedFile.size > maxSize) {
       setError(
         name,
@@ -69,42 +102,72 @@ function FileUploadController({
         },
         { shouldFocus: true }
       );
+      e.target.value = "";
       return;
     }
-    await getSinglePresignedUrl({
-      fileName: selectedFile.name,
-      mimeType: selectedFile.type,
-      fileSize: selectedFile.size,
-      refId: meta?.refId || "",
-      belongsTo: meta?.belongsTo || "",
-      isPublic: meta?.isPublic || false,
-    }).then(async (res) => {
-      await uploadFile({ url: res.data.uploadUrl, file: selectedFile }).then(
-        async (r) => {
-          if (r.status === 200) {
-            await getFileUrl(res.data.assetS3Object._id).then((fileReponse) => {
-              console.log("fileReponse", fileReponse.data);
-              setValue(
-                name,
-                {
-                  name: selectedFile.name,
-                  url: fileReponse.data.url,
-                },
-                {
-                  shouldDirty: isDirty,
-                  shouldTouch: isDirty,
-                  shouldValidate: isDirty,
-                }
-              );
-            });
-          }
+
+    clearErrors(name);
+    setSuccessMessage(null);
+    setIsUploading(true);
+
+    try {
+      const presigned = await getSinglePresignedUrl({
+        fileName: selectedFile.name,
+        mimeType: selectedFile.type,
+        fileSize: selectedFile.size,
+        refId: meta?.refId || "",
+        belongsTo: meta?.belongsTo || "",
+        isPublic: meta?.isPublic || false,
+      });
+
+      const uploadRes = await uploadFile({
+        url: presigned.data.uploadUrl,
+        file: selectedFile,
+      });
+
+      if (uploadRes.status !== 200) {
+        throw new Error(`Upload failed with status ${uploadRes.status}`);
+      }
+
+      const fileResponse = await getFileUrl(presigned.data.assetS3Object._id);
+
+      setValue(
+        name,
+        {
+          name: selectedFile.name,
+          url: fileResponse.data.url,
+        },
+        {
+          shouldDirty: isDirty,
+          shouldTouch: isDirty,
+          shouldValidate: isDirty,
         }
       );
-    });
-    // onChange(selectedFile);
+
+      setSuccessMessage("File uploaded successfully.");
+      dismissSuccessSoon();
+    } catch (err) {
+      setError(
+        name,
+        {
+          type: "manual",
+          message: getUploadErrorMessage(err),
+        },
+        { shouldFocus: true }
+      );
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
+    }
   };
 
   const handleRemove = (onChange: (value: null) => void) => {
+    if (successDismissRef.current) {
+      clearTimeout(successDismissRef.current);
+      successDismissRef.current = null;
+    }
+    setSuccessMessage(null);
+    clearErrors(name);
     setValue(
       name,
       {
@@ -123,7 +186,13 @@ function FileUploadController({
   }`;
 
   const error = get(errors, name)?.message as string;
-    //  const error = "Replace the file";
+
+  const describedBy = [
+    error ? `${name}-error` : null,
+    successMessage ? `${name}-success` : null,
+  ]
+    .filter(Boolean)
+    .join(" ") || undefined;
 
   return (
     <div className={cn(className)}>
@@ -150,11 +219,19 @@ function FileUploadController({
               className={cn(
                 "flex items-center gap-4 border rounded-lg p-3 w-full",
                 errors[name] && "border-destructive",
-                error && "border-destructive"
+                error && "border-destructive",
+                successMessage && !error && "border-green-600/50"
               )}
             >
               <div className="flex flex-1 items-center gap-2 min-w-0">
-                {file ? (
+                {isUploading ? (
+                  <>
+                    <Spinner className="shrink-0 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      Uploading…
+                    </span>
+                  </>
+                ) : file ? (
                   <>
                     <Check className="h-5 w-5 shrink-0 text-green-500" />
                     <p className="truncate text-sm max-w-75">{file}</p>
@@ -190,7 +267,7 @@ function FileUploadController({
               </div>
 
               <div className="flex items-center gap-2">
-                {file ? (
+                {file && !isUploading ? (
                   <Button
                     type="button"
                     variant="outline"
@@ -211,8 +288,15 @@ function FileUploadController({
                   size="sm"
                   className="h-8"
                   asChild
+                  disabled={isUploading}
                 >
-                  <label htmlFor={`file-${name}`} className="cursor-pointer">
+                  <label
+                    htmlFor={`file-${name}`}
+                    className={cn(
+                      "cursor-pointer",
+                      isUploading && "pointer-events-none opacity-50"
+                    )}
+                  >
                     <Upload className="h-4 w-4 mr-1" />
                     <span>{file ? "Replace" : "Upload"}</span>
                   </label>
@@ -223,14 +307,25 @@ function FileUploadController({
                   className="sr-only"
                   id={`file-${name}`}
                   accept={accept?.map((ext) => `.${ext}`).join(",")}
-                  onChange={(e) => handleFileChange(e, onChange)}
-                  aria-describedby={`${name}-error`}
+                  onChange={(e) => handleFileChange(e)}
+                  disabled={isUploading}
+                  aria-describedby={describedBy}
+                  aria-busy={isUploading}
                 />
               </div>
             </div>
             {error && (
               <p id={`${name}-error`} className="text-sm text-destructive mt-1">
                 {error}
+              </p>
+            )}
+            {successMessage && !error && (
+              <p
+                id={`${name}-success`}
+                role="status"
+                className="text-sm text-green-600 mt-1"
+              >
+                {successMessage}
               </p>
             )}
           </div>

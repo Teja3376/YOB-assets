@@ -115,6 +115,11 @@ export const EXCLUDED_FIELDS = [
   "webkitRelativePath",
   "size",
   "lastModifiedDate",
+  /** Computed / read-only from API; not accepted on create/update */
+  "softcapNotification",
+  "bookmarks",
+  "company"
+
 ];
 
 export const cleanUpdateData = (data: any): any => {
@@ -133,7 +138,16 @@ export const cleanUpdateData = (data: any): any => {
     const cleaned: any = {};
     for (const key in data) {
       if (!EXCLUDED_FIELDS.includes(key)) {
-        cleaned[key] = cleanUpdateData(data[key]);
+        let value = data[key];
+        if (
+          key === "tokenInformation" &&
+          value &&
+          typeof value === "object" &&
+          !Array.isArray(value)
+        ) {
+          value = removeKeyFromObject(value, ["softCap", "softCapPercentage"]);
+        }
+        cleaned[key] = cleanUpdateData(value);
       }
     }
     return cleaned;

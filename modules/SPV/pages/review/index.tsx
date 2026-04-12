@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Pencil, Send } from "lucide-react";
+import { ArrowLeft, Eye, MoveLeft, MoveRight, Pencil, Send } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import SpvAssetReview from "@/modules/SPV/ui/overview/SpvAssetReview";
 import useGetSpvWithId from "@/modules/SPV/hooks/ReactQuery/useGetSpvWithId";
@@ -95,6 +95,18 @@ const SpvReviewPage = () => {
               Send for approval
             </Button>
           )}
+
+{data?.status === "Pending" && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/spv`)}
+            >
+              <MoveLeft className="mr-2 h-4 w-4" />
+              Back to SPV list
+            </Button>
+          )}
           <Button
             type="button"
             variant="outline"
@@ -106,6 +118,7 @@ const SpvReviewPage = () => {
             <Pencil className="mr-2 h-4 w-4" />
             Edit SPV
           </Button>
+          
         </div>
       </div>
 

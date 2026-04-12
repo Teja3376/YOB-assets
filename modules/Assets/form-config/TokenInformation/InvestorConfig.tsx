@@ -49,12 +49,6 @@ const investorConfig = (): FormFieldConfig[] => {
   let netRent = grossRent - expenses || 0;
   const netAnnualRent = netRent * 12 || 0;
 
-  console.log(
-    "totalPropertyValueAfterFees",
-    totalPropertyValueAfterFees,
-    "netAnnualRent",
-    netAnnualRent,
-  );
 
   const rentalYield = parseFloat(
     totalPropertyValueAfterFees && netAnnualRent
