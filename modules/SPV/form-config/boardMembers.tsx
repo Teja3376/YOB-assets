@@ -5,7 +5,9 @@ import {
   getCountryCallingCode,
   parsePhoneNumberFromString,
   getCountries,
+  CountryCode,
 } from "libphonenumber-js";
+import { countryOptions } from "@/lib/utils";
 
 export const boardMembersFormConfig = ({
   index,
@@ -32,7 +34,7 @@ export const boardMembersFormConfig = ({
   const getCallingCode = (country?: string) => {
     try {
       if (!country) return "+91";
-      const code = getCountryCallingCode(country.toUpperCase());
+      const code = getCountryCallingCode(country.toUpperCase() as CountryCode);
       return `+${code}`;
     } catch {
       return "+91";
@@ -42,13 +44,17 @@ export const boardMembersFormConfig = ({
   const defaultCallingCode = getCallingCode(assetCountry);
 
   const getAllCountryOptions = () => {
-    return getCountries()
+    return countryOptions
       .map((country) => {
         try {
-          const code = getCountryCallingCode(country);
+          const code = getCountryCallingCode(
+            country.iso2.toUpperCase() as CountryCode,
+          );
           return {
-            label: `${country} (+${code})`,
+            label: `${country.label}`,
             value: `+${code}`,
+            iso2: country.iso2,
+            key: country.iso2,
           };
         } catch {
           return null;
@@ -67,7 +73,7 @@ export const boardMembersFormConfig = ({
 
       if (!phoneNumber || !phoneNumber.isValid()) {
         console.log("Invalid phone number:", fullNumber);
-        return "Invalid phone number";
+        return "Invalid phone number for the selected country";
       }
 
       return true;
@@ -120,6 +126,7 @@ export const boardMembersFormConfig = ({
       selectName: `boardMembers.${index}.countryCode`,
       type: "inputGroup",
       fullWidth: false,
+      withSearch: true,
       rules: {
         required: "Phone Number is required",
         validate: (value: any) => {

@@ -30,6 +30,8 @@ const Amenities = () => {
     trigger,
   } = useFormContext();
 
+  console.log("watch", watch("amenities"));
+
   const { fields, append, update, remove } = useFieldArray({
     control: control,
     name: "amenities",
