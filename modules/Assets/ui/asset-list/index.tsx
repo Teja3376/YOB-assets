@@ -183,6 +183,40 @@ const Index: React.FC = () => {
         />
       ),
     },
+    {
+      id: "fully-funded",
+      title: "Fully Funded",
+      component: (
+        <AssetTable
+          columns={columns}
+          assetList={assetList?.data || []}
+          hideDraftFields
+        />
+      ),
+
+    },
+    {
+      id: "waitlist",
+      title: "Waitlist",
+      component: (
+        <AssetTable
+          columns={columns}
+          assetList={assetList?.data || []}
+          hideDraftFields
+        />
+      ),
+    },
+    {
+      id: "listing-ended",
+      title: "Listing Ended",
+      component: (
+        <AssetTable
+          columns={columns}
+          assetList={assetList?.data || []}
+          hideDraftFields
+        />
+      ),
+    },
   ];
 
   return (
@@ -206,13 +240,12 @@ const Index: React.FC = () => {
       <AddAssetDialog open={open} setOpen={setOpen} />
       <UpdateAssetStatusDialog
         assetId={assetId}
-        setAssetId={setAssetId}
         open={isActiveDialog}
         setOpen={setIsActiveDialog}
         isLoading={isActivating}
         updateStatus={updateStatus}
         isError={isError}
-        error={error?.response?.data?.message as any}
+        error={error?.message as any}
       />
       <div className="space-y-4">
         <CustomTabs

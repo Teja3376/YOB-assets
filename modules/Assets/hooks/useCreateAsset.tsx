@@ -1,3 +1,4 @@
+import { cleanUpdateData } from "@/helpers/global";
 import api from "@/lib/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -8,7 +9,8 @@ export default function useCreateAsset() {
     mutationKey: ["create-asset"],
 
     mutationFn: async (assetData) => {
-      const response = await api.post("/real-estate", assetData);
+      const cleaned = cleanUpdateData(assetData);
+      const response = await api.post("/real-estate", cleaned);
       return response.data.data;
     },
 

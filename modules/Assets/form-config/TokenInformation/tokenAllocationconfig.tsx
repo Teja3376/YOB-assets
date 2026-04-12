@@ -6,13 +6,15 @@ import { Asset } from "@/modules/Assets/utils/interfaces";
 
 const formConfig = (asset: Asset): FormFieldConfig[] => {
   const { control, setValue, watch } = useFormContext();
-  const [tokenSupply, minimumTokenToBuy,totalNumberOfSfts,pricePerSft,basePropertyValue] = watch([
-    "tokenInformation.tokenSupply",
-    "tokenInformation.minimumTokenToBuy",
-    'totalNumberOfSfts',
-    'pricePerSft',
-    'basePropertyValue'
-  ]);
+  const [tokenSupply, minimumTokenToBuy, totalNumberOfSfts, pricePerSft, basePropertyValue] =
+    watch([
+      "tokenInformation.tokenSupply",
+      "tokenInformation.minimumTokenToBuy",
+      "totalNumberOfSfts",
+      "pricePerSft",
+      "basePropertyValue",
+
+    ]);
 
   const param = useParams();
 
@@ -143,6 +145,42 @@ const formConfig = (asset: Asset): FormFieldConfig[] => {
     {
       name: "basePropertyValue",
       label: `Base Property Value (${asset?.currency })`,
+      type: "number",
+      control: control,
+      disabled: true,
+    },
+    {
+      name: "totalPropertyValueAfterFees",
+      label: "Total Property Value After Fees",
+      type: "number",
+      control: control,
+      disabled: true,
+      
+    },
+
+    {
+      name: "tokenInformation.softcap",
+      label: "Softcap (% of base property value)",
+      type: "number",
+      control: control,
+      disabled: false,
+      placeholder: "e.g. 60",
+      rules: {
+        min: { value: 0, message: "Softcap must be at least 0%" },
+        max: { value: 100, message: "Softcap cannot exceed 100%" },
+        validate: (value: number | string) => {
+          if (value === "" || value === undefined || value === null)
+            return true;
+          const n = Number(value);
+          if (Number.isNaN(n)) return "Enter a valid percentage";
+          return true;
+        },
+      },
+    },
+
+    {
+      name: "tokenInformation.softcapAmount",
+      label: `Softcap Amount (${asset?.currency ?? ""})`,
       type: "number",
       control: control,
       disabled: true,

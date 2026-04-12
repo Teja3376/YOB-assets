@@ -13,7 +13,7 @@ import {
     Files,
     ArrowLeft,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { daoFormConfig } from "@/modules/SPV/form-config/daoConfig";
 import {
@@ -34,12 +34,24 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
     const { watch, setValue } = useFormContext();
     const { spvId: id } = useParams();
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const daoName = watch("daoConfiguration.daoName");
+    const tokenSymbol = watch("daoConfiguration.tokenSymbol");
     const blockChain = watch("daoConfiguration.blockchain");
     const governanceModel = watch("daoConfiguration.governanceModel");
     const issuerRepSignature = watch("daoConfiguration.issuerRepSignature");
-    const daoSkipped = watch("daoConfiguration.skipped");
 
-    const skippedFromApi = daoSkipped === true;
+    const hasDaoConfiguration =
+        Boolean(String(daoName ?? "").trim()) ||
+        Boolean(String(tokenSymbol ?? "").trim());
+
+    /** Intro overlay + dimming only when there is no saved DAO data yet */
+    const showDraftMask = !isFormVisible && !hasDaoConfiguration;
+
+    useEffect(() => {
+        if (hasDaoConfiguration) {
+            setIsFormVisible(true);
+        }
+    }, [hasDaoConfiguration]);
 
     const handleChainSelect = (chain: string) => {
         setValue("daoConfiguration.blockchain", chain);
@@ -59,7 +71,7 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                     </h1>
                 </div>
                 <div className="flex gap-2">
-                    {!isFormVisible ? (
+                    {!isFormVisible && !hasDaoConfiguration ? (
                         <>
                             <Button
                                 type="button"
@@ -75,10 +87,19 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                                 disabled={isCompleting}
                                 onClick={() => setIsFormVisible(true)}
                             >
-                                Review
+                                Create A Doa
                             </Button>
                         </>
-                    ) : (
+                    ) : hasDaoConfiguration ? (
+                        <Button
+                            type="button"
+                            variant="default"
+                            disabled={isCompleting}
+                            onClick={() => router.push(`/spv/${id}/review`)}
+                        >
+                            Review the SPV
+                        </Button>
+                    ) : isFormVisible ? (
                         <Button
                             type="button"
                             variant="ghost"
@@ -89,7 +110,7 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                             <ArrowLeft size={16} />
                             Back
                         </Button>
-                    )}
+                    ) : null}
                 </div> 
              
             </div>
@@ -102,23 +123,23 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                     <div
                         className={cn(
                             "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-lg  px-4 py-8 text-center",
-                            isFormVisible === false
+                            showDraftMask
                                 ? "border-amber-200/90 bg-black/75 backdrop-blur-[1px]"
                                 : "hidden",
                         )}
                     >
-                        <p className="max-w-md bg-white height-[150px] width-[400px] rounded-lg p-4 text-sm text-gray-700 drop-shadow-lg">
+                        <p className="w-full max-w-[400px] min-h-[150px] bg-white rounded-lg p-4 text-sm text-gray-700 drop-shadow-lg">
                             <span className="font-medium">
                                 DAO setup - Hidden Form
                             </span>{" "}
-                            
                             Click Review button to view and edit the form.
                         </p>
                     </div>
                     <div
                         className={cn(
                             "relative",
-                            isFormVisible === false && "pointer-events-none select-none opacity-40",
+                            showDraftMask &&
+                                "pointer-events-none select-none opacity-40",
                         )}
                     >
                         {/* Main Content */}

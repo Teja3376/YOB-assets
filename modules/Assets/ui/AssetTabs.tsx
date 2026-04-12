@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useGetAssetBasic from "../hooks/assetDashBoard/useGetAssetBasic";
+import useWaitlistRegistrations from "../hooks/assetDashBoard/useWaitlistRegistrations";
 import { format } from "date-fns";
 import Loading from "@/components/ui/Loading";
 import SendAssetApprovalDialog from "./asset-list/SendAssetApprovalDialog";
@@ -20,12 +21,20 @@ const tabs = [
     href: "overview",
   },
   {
+    title: "Fundraising",
+    href: "fundraising",
+  },
+  {
     title: "Investors",
     href: "investors",
   },
   {
     title: "Orders",
     href: "orders",
+  },
+  {
+    title: "Waitlist",
+    href: "waitlist",
   },
 ];
 
@@ -40,6 +49,8 @@ const AssetTabs = () => {
   const [isSuccessOpen, setIsSuccessOpen] = useState<boolean>(false);
   const [isFailureOpen, setIsFailureOpen] = useState<boolean>(false);
   const { data: assetName, isFetching } = useGetAssetBasic(assetid as string);
+  const isWaitlistRoute = pathname.includes("/waitlist");
+  useWaitlistRegistrations(assetid as string, isWaitlistRoute);
   const {
     mutate: activateAsset,
     isPending: isActivating,
@@ -130,7 +141,7 @@ const AssetTabs = () => {
         isLoading={isActivating}
         updateStatus={updateStatus}
         isError={isError}
-        error={error?.response?.data?.message as any}
+        error={error?.message as any}
       />
       <PaymentSuccessDialog
         open={isSuccessOpen}
