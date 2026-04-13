@@ -24,6 +24,7 @@ interface InputControllerProps {
   iconPosition?: "left" | "right";
   placeholder?: string;
   defaultValue?: string | number;
+  bottomText?: string;
 }
 
 const InputController: React.FC<InputControllerProps> = ({
@@ -38,6 +39,7 @@ const InputController: React.FC<InputControllerProps> = ({
   onChange,
   placeholder,
   defaultValue,
+  bottomText,
 }) => {
   return (
     <FormField
@@ -108,6 +110,11 @@ const InputController: React.FC<InputControllerProps> = ({
                 )}
               </div>
             </FormControl>
+            {bottomText && (
+              <p className="text-sm text-muted-foreground mt-1.5">
+                {bottomText}
+              </p>
+            )}
             {error && <FormMessage>{error.message}</FormMessage>}
           </FormItem>
         );

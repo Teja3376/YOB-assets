@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import FormGenerator from "@/components/use-form/FormGenerator";
 import formConfig from "@/modules/Assets/form-config/TokenInformation/tokenAllocationconfig";
 import Investor from "../Investor";
@@ -17,19 +17,31 @@ interface Category {
 }
 
 const Index = ({ asset }: { asset: any }) => {
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
   const categories = watch("allocationStats.categories") || [];
   const tokenSymbol = watch("tokenInformation.tokenSymbol") || "";
+  const totalPropertyValueAfterFees = watch("totalPropertyValueAfterFees");
+  const softcap = watch("tokenInformation.softcap");
 
-  const labels = categories.map(
-    (category: Category) => category.category
-  ) as string[];
-  const values = categories.map(
-    (category: Category) => category.tokens
-  ) as number[];
+  useEffect(() => {
+    const base = Number(totalPropertyValueAfterFees) || 0;
+    const raw = softcap;
+    const pct =
+      raw === "" || raw === undefined || raw === null ? NaN : Number(raw);
+    if (!Number.isNaN(pct)) {
+      setValue("tokenInformation.softcapAmount", (base * pct) / 100, {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
+    } else {
+      setValue("tokenInformation.softcapAmount", "", {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
+    }
+  }, [totalPropertyValueAfterFees, softcap, setValue]);
 
-  console.log(asset, "asset called")
-
+ 
   return (
     <div className="">
       <h2 className="text-xl font-bold text-gray-900 mb-2">

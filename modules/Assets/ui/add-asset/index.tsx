@@ -152,6 +152,11 @@ export default function AssetPage() {
     if (next) router.push(buildUrl(next.id, next.tabs?.[0]?.id));
   };
 
+  const reviewAndSubmit = () => {
+    if (!assetId) return;
+    router.push(`/assets/review/${assetId}`);
+  };
+
   const previousStep = () => {
     if (!assetId) return;
     const idx = ASSET_STEPS_TABS.findIndex((s: any) => s.id === step);
@@ -291,7 +296,7 @@ export default function AssetPage() {
                 )}
                  {
                   step === "signature-verification" && (
-                    <Button type="button" onClick={nextTab} disabled={!assetId}>
+                    <Button type="button" onClick={reviewAndSubmit} disabled={!assetId}>
                       <SaveIcon className="mr-2" />
                       Review & Submit
                     </Button>

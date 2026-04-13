@@ -121,7 +121,7 @@ const DateController: React.FC<DateControllerProps> = ({
                         : undefined
                   }
                   captionLayout="dropdown"
-                  startMonth={new Date(1900, 0)}
+                  startMonth={new Date(2024, 0)}
                   endMonth={allowFutureDates ? new Date(2100, 11) : today}
                   disabled={(date) => {
                     const blockedByFutureFlag = allowFutureDates
@@ -137,7 +137,6 @@ const DateController: React.FC<DateControllerProps> = ({
                   }}
                   onSelect={(date) => {
                     if (date) {
-                      console.log("Selected date:", date);
                       field.onChange(date);
                       field.onBlur();
                       if (autoClose) setOpen(false);
