@@ -13,6 +13,7 @@ function OTPPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
+
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
@@ -42,7 +43,11 @@ function OTPPageContent() {
     try {
       // Call verify OTP API
 
-      const response = await authAPI.verifyOTP({ otp: otp, email: email });
+      const response = await authAPI.verifyOTP({
+        otp: otp,
+        email: email,
+        context: "login",
+      });
       console.log("OTP verification successful:", response);
 
       // Update tokens if new ones are provided
@@ -55,9 +60,23 @@ function OTPPageContent() {
       const userData = response.data?.user;
       const kycStatus = userData?.kycStatus;
       const issuerStatus = response.data?.issuerStatus;
+      const isMobileApproved = userData?.isMobileApproved;
+      const isPaymentDone = userData?.subscription;
+      const isKybDone = userData?.iskyb;
+      // const mobileNumber = `+${userData?.countryCode}${userData?.phoneNumber}`;
+      if (!isMobileApproved && !kycStatus) {
+        const params = new URLSearchParams({
+          mobile: userData?.phoneNumber || "",
+          countryCode: userData?.countryCode || "",
+        });
 
-      if (kycStatus && kycStatus !== "approved") {
+        router.push(`/verify-mobile-otp?${params.toString()}`);
+        return;
+      }
+      if (kycStatus && kycStatus !== "approved" && !isPaymentDone) {
         router.push("/onboarding-payment");
+      } else if (kycStatus && kycStatus !== "approved" && !isKybDone) {
+        router.push("/kyb");
       } else if (issuerStatus !== "approved") {
         router.push("/apply");
       } else {

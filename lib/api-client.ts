@@ -5,6 +5,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { verify } from "crypto";
 import { toast } from "sonner";
 
 // const API_BASE_URL = "http://localhost:5050/api";
@@ -119,7 +120,7 @@ api.interceptors.response.use(
 
     const status = error.response.status;
 
-    if ((status === 401 ) && !originalRequest._retry) {
+    if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       const refreshToken = getRefreshToken();
@@ -201,8 +202,24 @@ export const authAPI = {
     return res.data;
   },
 
-  verifyOTP: async (data: { otp: string; email: string }) => {
+  verifyOTP: async (data: { otp: string; email: string; context: string }) => {
     const res = await api.post("/auth-issuer/verify-otp", data);
+    return res.data;
+  },
+
+  verifyMobileOTP: async (data: {
+    otp: string;
+    phoneNumber: string;
+    countryCode: string;
+  }) => {
+    const res = await api.post("/auth-issuer/verify-mobile-otp", data);
+    return res.data;
+  },
+  resendMobileOTP: async (data: {
+    phoneNumber: string;
+    countryCode: string;
+  }) => {
+    const res = await api.post("/auth-issuer/resend-mobile-otp", data);
     return res.data;
   },
 };
