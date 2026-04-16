@@ -151,11 +151,17 @@ import {
   
                   {/* Inline Input for adding new */}
                   {allowCreate && isAdding && (
-                    <div className="p-2 border-t space-y-2">
+                    <div
+                      className="p-2 border-t space-y-2"
+                      onPointerDown={(event) => event.stopPropagation()}
+                    >
                       <Input
                         placeholder={`Enter new ${label}`}
                         value={newValue}
                         onChange={(e) => setNewValue(e.target.value)}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
+                        onKeyDown={(event) => event.stopPropagation()}
                         autoFocus
                       />
                       <div className="flex gap-2">
