@@ -157,6 +157,8 @@ import {
                         value={newValue}
                         onChange={(e) => setNewValue(e.target.value)}
                         autoFocus
+                        
+
                       />
                       <div className="flex gap-2">
                         <Button size="sm" onClick={handleAddNew}>
