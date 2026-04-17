@@ -83,6 +83,14 @@ function clearTokens() {
 }
 
 function handleLogout() {
+  if (
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/signup" ||
+    window.location.pathname === "/verify-otp" ||
+    window.location.pathname === "/loginotp"
+  ) {
+    return;
+  }
   clearTokens();
 
   toast.error("Session expired. Please login again.");
