@@ -2,7 +2,7 @@ export const mockSpvData = [
     {
       _id: "665a1f9c1234567890abcd01",
       name: "Alpha Infra SPV",
-      type: "real_estate",
+      type: "LLC",
       totalInvestors: 124,
       aum: 4500000,
       currency: "USD",
@@ -14,7 +14,7 @@ export const mockSpvData = [
     {
       _id: "665a1f9c1234567890abcd02",
       name: "Green Energy SPV",
-      type: "energy",
+      type: "Private Limited",
       totalInvestors: 78,
       aum: 2100000,
       currency: "USD",

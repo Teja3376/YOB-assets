@@ -65,6 +65,14 @@ const options = watchAmenityName &&
       placeholder: `Enter Name`,
       rules: {
         required: 'Name is required',
+        minLength: {
+          value: 3,
+          message: 'Name must be at least 3 characters',
+        },
+        maxLength: {
+          value: 100,
+          message: 'Name must be at most 100 characters',
+        },
       },
       allowCreate: true,
       onChange: onAmenityNameChange,
