@@ -28,7 +28,7 @@ const BoardMembers: React.FC<BoardMembersProps> = ({ spv }) => {
   const { control, reset } = useFormContext<any>();
   const { deleteAB } = useABApi();
   const [index, setIndex] = useState<number | null>(null);
-  const [deleteIndex, setDeleteIndex] = useState<any | null>(null);
+  // const [deleteIndex, setDeleteIndex] = useState<any | null>(null);
   const { fields, append, remove, update } = useFieldArray({
     name: "boardMembers",
     control,
@@ -38,15 +38,17 @@ const BoardMembers: React.FC<BoardMembersProps> = ({ spv }) => {
     setIndex(-1);
     reset();
   };
-  const isDelete = deleteIndex !== null;
-  const onSubmit = async () => {
-    if (deleteIndex !== null) {
+  // const isDelete = deleteIndex !== null;
+  const onSubmit = async (rowData:any) => {
+    if (rowData !== null) {
       const findIndex = fields.findIndex(
-        (field) => field.a_id === deleteIndex.a_id,
+        (field) => field.a_id === rowData.a_id,
       );
+      console.log("Removed from UI with index:", findIndex);
+      console.log("Deleting AB with ID:", rowData._id,spv);
+      await deleteAB({ id: spv._id, indexNo: findIndex });
       remove(findIndex);
-      await deleteAB(deleteIndex._id);
-      setDeleteIndex(null);
+      // setDeleteIndex(null);
     }
   };
 
@@ -65,7 +67,8 @@ const BoardMembers: React.FC<BoardMembersProps> = ({ spv }) => {
       <BoardMembersTable
         fields={fields}
         setIndex={setIndex}
-        setDeleteIndex={setDeleteIndex}
+        // setDeleteIndex={setDeleteIndex}
+        onSubmit={onSubmit}
       />
 
       <BoardMembersDialog

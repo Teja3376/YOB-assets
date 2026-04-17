@@ -3,12 +3,13 @@ import OTPInput from "@/components/features/auth/otp-input";
 import GetStartedLayout from "@/components/layout/get-started";
 import { Button } from "@/components/ui/button";
 import { authAPI } from "@/lib/api-client";
+import { setSession } from "@/lib/sessionStorage";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function VerifyMobileOTPPage() {
+function VerifyMobileOTPContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   //   const email = searchParams.get("email") || "";
@@ -38,8 +39,8 @@ export default function VerifyMobileOTPPage() {
         countryCode: countryCode,
       });
       if (response.data?.accessToken && response.data?.refreshToken) {
-        sessionStorage.setItem("accessToken", response.data.accessToken);
-        sessionStorage.setItem("refreshToken", response.data.refreshToken);
+        setSession("accessToken", response.data.accessToken);
+        setSession("refreshToken", response.data.refreshToken);
       }
       router.push("/onboarding-payment");
     } catch (err: any) {
@@ -151,5 +152,19 @@ export default function VerifyMobileOTPPage() {
         </div> */}
       </div>
     </GetStartedLayout>
+  );
+}
+
+export default function OTPPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-gray-600">Loading...</div>
+        </div>
+      }
+    >
+      <VerifyMobileOTPContent />
+    </Suspense>
   );
 }

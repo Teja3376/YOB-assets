@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import OTPInput from "@/components/features/auth/otp-input";
 import { authAPI } from "@/lib/api-client";
 import AuthLayout from "@/components/layout/auth-layout";
+import { getSession, setSession } from "@/lib/sessionStorage";
 
 function OTPPageContent() {
   const router = useRouter();
@@ -52,8 +53,8 @@ function OTPPageContent() {
 
       // Update tokens if new ones are provided
       if (response.data?.accessToken && response.data?.refreshToken) {
-        sessionStorage.setItem("accessToken", response.data.accessToken);
-        sessionStorage.setItem("refreshToken", response.data.refreshToken);
+        setSession("accessToken", response.data.accessToken);
+        setSession("refreshToken", response.data.refreshToken);
       }
 
       // Check status and redirect accordingly
@@ -116,7 +117,7 @@ function OTPPageContent() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-  const accessToken = sessionStorage.getItem("accessToken");
+  const accessToken = getSession("accessToken");
 
   const isCheck = accessToken ? false : true;
 

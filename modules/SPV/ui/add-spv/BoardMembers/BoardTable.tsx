@@ -6,10 +6,11 @@ import TableComponent from '@/common/TableComponent';
 type BoardMembersTableProps = {
   fields: any[];
   setIndex: (index: number) => void;
-  setDeleteIndex: (rowData: any) => void;
+  // setDeleteIndex: (rowData: any) => void;
+  onSubmit: (rowData: any) => void;
 };
 
-const BoardMembersTable: React.FC<BoardMembersTableProps> = ({ fields, setIndex, setDeleteIndex }) => {
+const BoardMembersTable: React.FC<BoardMembersTableProps> = ({ fields, setIndex,onSubmit }) => {
   const columns = [
     { header: 'Name', accessorKey: 'fullName' },
     { header: 'Email', accessorKey: 'email' },
@@ -38,7 +39,8 @@ const BoardMembersTable: React.FC<BoardMembersTableProps> = ({ fields, setIndex,
               variant="outline"
               className=""
               onClick={() => {
-                setDeleteIndex(rowData);
+                
+                onSubmit(rowData);
               }}
             >
               <TrashIcon size={16} />
