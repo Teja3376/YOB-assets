@@ -14,7 +14,7 @@ import {
   } from "@/components/ui/select";
   import { Input } from "@/components/ui/input";
   import { Button } from "@/components/ui/button";
-  import React, { useEffect, useState } from "react";
+  import React, { useEffect, useRef, useState } from "react";
   import { cn } from "@/lib/utils";
   
   
@@ -51,20 +51,47 @@ import {
     const [localOptions, setLocalOptions] = useState(options);
     const [isAdding, setIsAdding] = useState(false);
     const [newValue, setNewValue] = useState("");
+    // Track user-created options so they survive parent re-renders
+    const createdOptionsRef = useRef<{ value: string; label: string }[]>([]);
   
   
     useEffect(() => {
-      setLocalOptions(options);
+      // Merge prop options with any user-created options
+      const createdValues = new Set(createdOptionsRef.current.map((o) => o.value));
+      const merged = [
+        ...options,
+        ...createdOptionsRef.current.filter(
+          (co) => !options.some((o) => o.value === co.value)
+        ),
+      ];
+      setLocalOptions(merged);
     }, [options]);
   
   
-    const handleAddNew = () => {
+    const handleAddNew = (fieldOnChange: (value: string) => void) => {
       if (!newValue.trim()) return;
       const normalized = newValue.trim().toLowerCase();
-      const newOption = { label: newValue.trim(), value: normalized };
-      setLocalOptions((prev) => [...prev, newOption]);
-      control.setValue(name, normalized, { shouldDirty: true, shouldValidate: true });
-      if (onChange) onChange(normalized);
+
+      // Check if an option with the same label or value already exists
+      const existing = localOptions.find(
+        (opt) =>
+          opt.value.toLowerCase() === normalized ||
+          opt.label.toLowerCase() === normalized
+      );
+
+      if (existing) {
+        // Option already exists — just select it
+        fieldOnChange(existing.value);
+        if (onChange) onChange(existing.value);
+      } else {
+        // Truly new — add to the list, persist in ref, and select it
+        const newOption = { label: newValue.trim(), value: normalized };
+        createdOptionsRef.current = [...createdOptionsRef.current, newOption];
+        setLocalOptions((prev) => [...prev, newOption]);
+        fieldOnChange(normalized);
+        if (onChange) onChange(normalized);
+      }
+
       setNewValue("");
       setIsAdding(false);
     };
@@ -87,6 +114,22 @@ import {
               : defaultValue || undefined;
   
   
+
+          // Compute display options: include DB value if not in localOptions
+          const displayOptions =
+            selectedValue &&
+            !localOptions.some((opt) => opt.value === selectedValue)
+              ? [
+                  ...localOptions,
+                  {
+                    label: selectedValue
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (c: string) => c.toUpperCase()),
+                    value: selectedValue,
+                  },
+                ]
+              : localOptions;
+
           return (
             <FormItem className={cn("w-full", className)}>
               <FormLabel>
@@ -118,8 +161,8 @@ import {
                     <SelectItem value="loading" disabled>
                       Loading...
                     </SelectItem>
-                  ) : localOptions.length > 0 ? (
-                    localOptions.map((option) =>
+                  ) : displayOptions.length > 0 ? (
+                    displayOptions.map((option) =>
                       option.value ? (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
@@ -159,7 +202,7 @@ import {
                         autoFocus
                       />
                       <div className="flex gap-2">
-                        <Button size="sm" onClick={handleAddNew}>
+                        <Button size="sm" onClick={() => handleAddNew(field.onChange)}>
                           Add
                         </Button>
                         <Button
