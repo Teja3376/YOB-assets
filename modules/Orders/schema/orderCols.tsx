@@ -4,6 +4,7 @@ import { formatDate } from "date-fns";
 import { Coins, Eye, Send } from "lucide-react";
 import { Cell } from "recharts";
 import StatusBadge from "../ui/StatusBadge";
+import { maskId } from "@/helpers/global";
 
 export const orderCols = (router: any) => {
   return [
@@ -13,7 +14,7 @@ export const orderCols = (router: any) => {
       cell: (info: any) => {
         const id = info.getValue();
 
-        return <div className="flex gap-2">{id}</div>;
+        return <div className="flex gap-2">{`${maskId(id, "ORD")}`}</div>;
       },
       enableResizing: true,
       size: 100,
