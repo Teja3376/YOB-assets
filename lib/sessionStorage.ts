@@ -4,20 +4,25 @@ export function setSession(key: string, value: any) {
   if (typeof window === "undefined") return;
 
   try {
-    const val =
-      typeof value === "string" ? value : JSON.stringify(value);
+    const val = typeof value === "string" ? value : JSON.stringify(value);
     sessionStorage.setItem(key, val);
   } catch (err) {
     console.error("setSession error:", err);
   }
 }
 
-export function getSession<T = any>(key: string): T | null {
+export function getSession<T = any>(key: string): T | string | null {
   if (typeof window === "undefined") return null;
 
   try {
     const item = sessionStorage.getItem(key);
-    return item ? JSON.parse(item) : null;
+    if (!item) return null;
+
+    try {
+      return JSON.parse(item);
+    } catch {
+      return item;
+    }
   } catch (err) {
     console.error("getSession error:", err);
     return null;
