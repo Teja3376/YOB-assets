@@ -63,11 +63,10 @@ const SpvPage = () => {
   // Filters
   // -------------------------
   const handleFilterToggle = (value: string) => {
-    const normalized = value.toLowerCase().replace(/\s+/g, "").trim();
     setSelectedFilters((prev) =>
-      prev.includes(normalized)
-        ? prev.filter((v) => v !== normalized)
-        : [...prev, normalized],
+      prev.includes(value)
+        ? prev.filter((v) => v !== value)
+        : [...prev, value],
     );
   };
 

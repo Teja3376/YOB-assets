@@ -14,8 +14,9 @@ interface FiltersProps {
   selectedFilters: string[];
   handleFilterToggle: (value: string) => void;
   removeFilter: (value: string) => void;
-  clearAllFilters: () => void;
+  clearAllFilters: () => void;  
 }
+
 
 const Filters: React.FC<FiltersProps> = ({
   searchTerm,
@@ -56,9 +57,7 @@ const Filters: React.FC<FiltersProps> = ({
                 >
                   <Checkbox
                     id={option.value}
-                    checked={selectedFilters.includes(
-                      option.value.toLowerCase().replace(/\s+/g, "").trim()
-                    )}
+                    checked={selectedFilters.includes(option.value)}
                     onCheckedChange={() => handleFilterToggle(option.value)}
                   />
                   <label
