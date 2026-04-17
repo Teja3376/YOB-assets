@@ -8,10 +8,10 @@ import Header from "@/components/layout/header";
 
 const steps = [
   { id: 1, title: "Registration", route: "/register" },
-  { id: 2, title: "OTP", route: "/otp" },
-  { id: 3, title: "Payment", route: "/onboarding-payment" },
-  { id: 4, title: "KYB", route: "/kyb" },
-  { id: 5, title: "Issuer Submission", route: "/apply" },
+  // { id: 2, title: "OTP", route: "/otp" },
+  { id: 2, title: "Payment", route: "/onboarding-payment" },
+  { id: 3, title: "KYB", route: "/kyb" },
+  { id: 4, title: "Issuer Submission", route: "/apply" },
 ];
 
 export default function GetStartedLayout({
