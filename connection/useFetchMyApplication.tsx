@@ -57,9 +57,15 @@ const fetchMyApplications = async (): Promise<MyApplicationsResponse> => {
 };
 
 export const useFetchMyApplication = () => {
+  const accessToken =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("accessToken")
+      : null;
+
   return useQuery({
     queryKey: ["my-applications"],
     queryFn: fetchMyApplications,
     retry: 1,
+    enabled: !!accessToken,
   });
 };

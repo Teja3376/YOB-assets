@@ -99,9 +99,9 @@ export const boardMembersFormConfig = ({
           value: 50,
           message: "Full Name must be at most 50 characters",
         },
-        pattern: {
-          value: /^[a-zA-Z0-9\s\-&,.'()]+$/,
-          message: "Full Name contains invalid characters",
+       pattern: {
+          value: /^[A-Za-z\s]+$/,
+          message: "Full Name must contain only alphabets",
         },
       },
     },

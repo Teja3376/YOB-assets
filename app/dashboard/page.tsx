@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import IssuerLayout from "@/components/layout/issuer-layout";
 import { useFetchMyApplication } from "@/connection/useFetchMyApplication";
 import {
@@ -91,8 +92,9 @@ export default function IssuerDashboard() {
   const { data, isLoading, error, refetch } = useFetchMyApplication();
 
   return (
-    <IssuerLayout>
-      <div className="space-y-6">
+    <ProtectedRoute>
+      <IssuerLayout>
+        <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
@@ -350,6 +352,7 @@ export default function IssuerDashboard() {
           )}
         </div>
       </div>
-    </IssuerLayout>
+      </IssuerLayout>
+    </ProtectedRoute>
   );
 }
