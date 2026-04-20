@@ -79,7 +79,7 @@ export const assetInfoConfig = ({
       control,
       label: "Currency",
       options: CURRENCY_OPTIONS,
-      defaultValue: asset?.company?.currency ?? "",
+      // defaultValue: asset?.company?.currency ?? "",
       rules: { required: "Currency is required" },
       disabled: true,
     },

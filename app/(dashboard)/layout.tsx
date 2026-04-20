@@ -1,16 +1,19 @@
 "use client";
+import ProtectedRoute from "@/components/auth/ProtectedRoutes";
 import IssuerLayout from "@/components/layout/issuer-layout";
 
 export default function DashboardLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    return (
+  return (
+    <>
+      <ProtectedRoute>
         <div className="flex flex-col h-screen overflow-hidden bg-white">
-           <IssuerLayout>
-            {children}
-           </IssuerLayout>
+          <IssuerLayout>{children}</IssuerLayout>
         </div>
-    );
+      </ProtectedRoute>
+    </>
+  );
 }
