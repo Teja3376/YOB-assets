@@ -117,6 +117,7 @@ export const EXCLUDED_FIELDS = [
   "lastModifiedDate",
   /** Computed / read-only from API; not accepted on create/update */
   "softcapNotification",
+  "softcapIssuerDecision",
   "bookmarks",
   "company"
 
