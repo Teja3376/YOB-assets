@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Header from "@/components/layout/header";
+import clsx from "clsx";
 
 const steps = [
   { id: 1, title: "Registration", route: "/register" },
   // { id: 2, title: "OTP", route: "/otp" },
-  { id: 2, title: "Payment", route: "/onboarding-payment" },
-  { id: 3, title: "KYB", route: "/kyb" },
-  { id: 4, title: "Issuer Submission", route: "/apply" },
+  // { id: 2, title: "Payment", route: "/onboarding-payment" },
+  { id: 2, title: "KYB", route: "/kyb" },
+  { id: 3, title: "Issuer Submission", route: "/apply" },
 ];
 
 export default function GetStartedLayout({
@@ -41,14 +42,20 @@ export default function GetStartedLayout({
           {/* LEFT — normal flow (scrolls with page) */}
           <div className="lg:col-span-5">
             {/* Stepper */}
-            <div className="p-6">
-              <div className="flex items-center justify-between">
+            <div className="p-6  flex  items-center justify-center">
+              <div className="flex items-center justify-between w-full ">
                 {steps.map((step, index) => {
                   const isActive = currentStep === index;
                   const isCompleted = completedSteps.includes(index);
 
                   return (
-                    <div key={step.id} className="flex items-center flex-1">
+                    <div
+                      key={step.id}
+                      className={clsx(
+                        index === steps.length - 1 ? "" : "flex-1",
+                        "flex items-center ",
+                      )}
+                    >
                       <div className="flex flex-col items-center">
                         <motion.div
                           animate={{ scale: isActive ? 1.1 : 1 }}

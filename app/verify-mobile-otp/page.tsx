@@ -42,7 +42,7 @@ function VerifyMobileOTPContent() {
         setSession("accessToken", response.data.accessToken);
         setSession("refreshToken", response.data.refreshToken);
       }
-      router.push("/onboarding-payment");
+      router.push("/kyb");
     } catch (err: any) {
       setError(
         err.response?.data?.message ||

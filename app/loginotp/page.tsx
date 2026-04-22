@@ -74,9 +74,10 @@ function OTPPageContent() {
         router.push(`/verify-mobile-otp?${params.toString()}`);
         return;
       }
-      if (kycStatus && kycStatus !== "approved" && !isPaymentDone) {
-        router.push("/onboarding-payment");
-      } else if (kycStatus && kycStatus !== "approved" && !isKybDone) {
+      // if (kycStatus && kycStatus !== "approved" && !isPaymentDone) {
+      //   router.push("/onboarding-payment");
+      // } 
+      else if (kycStatus && kycStatus !== "approved" && !isKybDone) {
         router.push("/kyb");
       } else if (issuerStatus !== "approved") {
         router.push("/apply");

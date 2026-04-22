@@ -14,3 +14,9 @@ export const countryOptions = getCountries().map((country) => ({
   value: `+${getCountryCallingCode(country)}`,
   iso2: country,
 }));
+
+export const getCountryFromCallingCode = (code: string) => {
+  return countryOptions.find(
+    (c) => c.iso2 === code
+  );
+};
