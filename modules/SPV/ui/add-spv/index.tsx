@@ -322,7 +322,7 @@ const SpvFormPage = () => {
       case "legal-documents":
         return <LegalDocuments />;
       case "board-members":
-        return <BoardMembers />;
+        return <BoardMembers spv={normalizedSpvData} />;
       case "dao-integration":
         return (
           <DAOCreation
