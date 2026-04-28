@@ -17,7 +17,7 @@ interface HeaderProps {
   hideNavigation?: boolean;
 }
 
-const ProfilePopover = (router:any) => {
+const ProfilePopover = (router: any) => {
   const handleLogout = () => {
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("refreshToken");
@@ -50,7 +50,7 @@ const ProfilePopover = (router:any) => {
 };
 
 export default function AuthHeader({ hideNavigation = false }: HeaderProps) {
-    const router = useRouter();
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
   const { data: user, isFetching: isLoading } = useGetMe();
@@ -76,8 +76,13 @@ export default function AuthHeader({ hideNavigation = false }: HeaderProps) {
 
           {/* Center Title */}
           <div className="flex items-center gap-2">
-            {!user?.data?.isYobPaySetup && (
-              <Button onClick={()=>router.push('/yobpay-setup')} className="rounded-full">Setup YobPay</Button>
+            {!user?.data?.user?.isYobPaySetup && (
+              <Button
+                onClick={() => router.push("/yobpay-setup")}
+                className="rounded-full"
+              >
+                Setup YobPay
+              </Button>
             )}
             <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-semibold">
               Issuer Panel

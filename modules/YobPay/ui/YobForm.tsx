@@ -34,6 +34,7 @@ import useGetCompanyMe from "@/hooks/me/useGetCompanyMe";
 import useRegisterYobPay from "../hooks/useRegisterYobPay";
 import { getCountryCallingCode } from "libphonenumber-js";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name required"),
@@ -52,14 +53,15 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function YobPayForm() {
+  const router = useRouter();
   const { data: userData, isFetching: isLoading } = useGetCompanyMe();
   console.log("User Data:", userData, "Loading:", isLoading);
-    const {
-      mutate: registerYobPay,
-      isPending: isRegistering,
-      isError,
-      error,
-    } = useRegisterYobPay();
+  const {
+    mutate: registerYobPay,
+    isPending: isRegistering,
+    isError,
+    error,
+  } = useRegisterYobPay();
   // console.log("User Data:", userData, "Loading:", isLoading);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -100,6 +102,8 @@ export default function YobPayForm() {
     registerYobPay(payload, {
       onSuccess: (res) => {
         console.log("YOB Pay Registered:", res);
+        toast.success("YOB Pay account created successfully");
+        router.push("/dashboard/wallet");
       },
       onError: (err) => {
         console.error("Registration Error:", err);

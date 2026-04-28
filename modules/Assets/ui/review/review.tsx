@@ -24,6 +24,7 @@ import {
   Scale
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 interface AssetReviewProps {
   data: any;
@@ -40,12 +41,12 @@ const Section = ({ title, children, badge }: { title: string, children: React.Re
     initial={{ opacity: 0, y: 10 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6"
+    className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-6"
   >
     <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-      <h3 className="font-bold text-slate-800 tracking-tight">{title}</h3>
+      <h3 className="font-semibold text-black tracking-tight">{title}</h3>
       {badge && (
-        <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded-md uppercase tracking-wider">
+        <span className="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-md uppercase tracking-wider">
           {badge}
         </span>
       )}
@@ -59,10 +60,10 @@ const Section = ({ title, children, badge }: { title: string, children: React.Re
 const DataItem = ({ label, value, subValue, highlight = false }: { label: string, value: string | number, subValue?: string, highlight?: boolean }) => (
   <div className="group p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
     <div className="flex items-center gap-2 mb-1">
-      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</span>
+      <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">{label}</span>
     </div>
-    <div className="flex items-baseline gap-2">
-      <span className={`text-sm font-bold ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}>
+    <div className="flex items-baseline gap-2 ">
+      <span className={`text-sm font-semibold capitalize ${highlight ? 'text-primary' : 'text-black'}`}>
         {value}
       </span>
       {subValue && <span className="text-[10px] text-slate-400 font-medium">{subValue}</span>}
@@ -164,30 +165,31 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24">
+    <div className=" min-h-screen bg-[#F8FAFC] pb-24">
       {/* Top Banner - Role Indicator */}
-      <div className="bg-slate-900 text-white py-2 px-4 text-center">
+      <div className='sticky -top-5  z-40 w-full'>
+      <div className=" bg-slate-900 text-white py-2 px-4 text-center">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2">
-          <ShieldCheck size={12} className="text-indigo-400" /> Reviewer Mode • Internal Use Only
+          <ShieldCheck size={12} className="text-primary" /> Reviewer Mode • Internal Use Only
         </p>
       </div>
 
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/60">
+      <header className=" bg-white/90 backdrop-blur-xl border-b border-slate-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 sm:h-20 gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white shadow-xl shadow-primary/20">
                 <Building2 size={24} />
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-900 tracking-tight">{data.name}</h1>
+                <h1 className="text-lg font-semibold text-slate-900 tracking-tight">{data.name}</h1>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="flex items-center gap-1 text-[10px] font-black text-indigo-600 uppercase tracking-wider">
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-primary uppercase tracking-wider">
                     ID: {data._id.slice(-6)}
                   </span>
                   <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                     {data.city}, {data.state}
                   </span>
                 </div>
@@ -195,53 +197,28 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <button 
+              <Button 
                 onClick={() => onEdit(data._id)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-95"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm  text-black bg-white border border-slate-200  hover:bg-slate-50 transition-all active:scale-95 rounded-lg"
               >
                 <Edit3 size={16} /> Edit
-              </button>
-              <button 
+              </Button>
+              <Button 
                 onClick={() => onSubmitToAdmin(data._id)}
-                className="flex-[2] sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
+                className="flex-2 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-primary  text-sm rounded-lg hover:bg-primary/90 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
               >
                 <Send size={16} /> Submit to Admin
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </header>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Left Column - Navigation Sidebar (Desktop) */}
-          <div className="hidden lg:block lg:col-span-2">
-            <nav className="sticky top-28 space-y-1">
-              {[
-                { id: 'overview', label: 'Overview', icon: Info },
-                { id: 'financials', label: 'Financials', icon: TrendingUp },
-                { id: 'legal', label: 'Legal', icon: Scale },
-                { id: 'tenants', label: 'Tenants', icon: Users },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl transition-all ${
-                    activeTab === tab.id 
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
-                      : 'text-slate-500 hover:bg-slate-100'
-                  }`}
-                >
-                  <tab.icon size={16} />
-                  <span className="uppercase tracking-wider">{tab.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-
           {/* Middle Column - Main Content */}
-          <div className="lg:col-span-6 space-y-8">
+          <div className="lg:col-span-8 space-y-8">
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
                 <motion.div
@@ -260,9 +237,9 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
                       <DataItem label="Currency" value={data.currency} />
                       <DataItem label="Instrument" value={data.instrumentType} />
                     </div>
-                    <div className="mt-8 p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Project Description</h4>
-                      <p className="text-sm text-slate-600 leading-relaxed font-medium">{data.about}</p>
+                    <div className="mt-8 p-5 bg-slate-50 rounded-2xl border border-slate-300">
+                      <h4 className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-3">Project Description</h4>
+                      <p className="text-sm text-black leading-relaxed font-medium">{data.about}</p>
                     </div>
                   </Section>
 
@@ -283,7 +260,7 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
                         </div>
                       </div>
                       <div className="space-y-4">
-                        <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+                        {/* <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
                           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
                           <div className="relative z-10">
                             <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center text-white mb-4 border border-white/20">
@@ -299,7 +276,7 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
                               OPEN ON YOUTUBE <ExternalLink size={12} />
                             </a>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-2 gap-3">
                           {data.media.gallery.map((img: string, i: number) => (
                             <div key={i} className="aspect-square rounded-xl overflow-hidden border border-slate-200">
@@ -449,15 +426,15 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
               <Section title="Review Summary">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-xs font-bold text-slate-500 uppercase">Total Raised</span>
-                    <span className="text-sm font-black text-slate-900">{formatCurrency(data.totalFundsRaised)}</span>
+                    <span className="text-xs font-medium text-slate-500 uppercase">Total Raised</span>
+                    <span className="text-sm font-semibold text-slate-900">{formatCurrency(data.totalFundsRaised)}</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="text-xs font-bold text-slate-500 uppercase">Investors</span>
-                    <span className="text-sm font-black text-slate-900">{data.investors.length} Verified</span>
+                    <span className="text-xs font-medium text-slate-500 uppercase">Investors</span>
+                    <span className="text-sm font-semibold text-slate-900">{data.investors.length} Verified</span>
                   </div>
                   <div className="pt-2">
-                    <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase mb-2">
+                    <div className="flex justify-between text-[10px] font-medium text-slate-400 uppercase mb-2">
                       <span>Funding Progress</span>
                       <span>{((data.totalFundsRaised / data.totalPropertyValueAfterFees) * 100).toFixed(1)}%</span>
                     </div>
@@ -465,7 +442,7 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${(data.totalFundsRaised / data.totalPropertyValueAfterFees) * 100}%` }}
-                        className="h-full bg-indigo-600 rounded-full"
+                        className="h-full bg-primary rounded-full"
                       />
                     </div>
                   </div>
@@ -485,20 +462,20 @@ export const AssetReview: React.FC<AssetReviewProps> = ({
                     )
                   ))}
                   <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
-                    <span className="text-xs font-black text-slate-900 uppercase">Total Fees</span>
-                    <span className="text-sm font-black text-indigo-600">
+                    <span className="text-xs font-medium text-slate-900 uppercase">Total Fees</span>
+                    <span className="text-sm font-semibold text-primary">
                       {formatCurrency(data.totalPropertyValueAfterFees - data.basePropertyValue)}
                     </span>
                   </div>
                 </div>
               </Section>
 
-              <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
+              <div className="bg-slate-900 rounded-lg p-6 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-4">
                     <ShieldCheck size={20} className="text-indigo-400" />
-                    <h3 className="font-black text-sm uppercase tracking-widest">On-Chain Data</h3>
+                    <h3 className="font-seibold text-sm uppercase tracking-widest">On-Chain Data</h3>
                   </div>
                   <div className="space-y-4">
                     <div>

@@ -20,3 +20,8 @@ export const getCountryFromCallingCode = (code: string) => {
     (c) => c.iso2 === code
   );
 };
+
+export const formatWalletAddress = (address: string) => {
+  if (!address) return "";
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+};

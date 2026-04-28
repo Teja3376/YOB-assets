@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Sidebar,
   Banknote,
+  Wallet,
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,7 +23,8 @@ const menu = [
   { name: "Assets", href: "/assets", icon: Package, },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Investors", href: "/investors", icon: Users },
-  { name: "Services", href: "/payment-service", icon: Banknote },
+  { name: "Services", href: "/payment-services", icon: Banknote },
+  { name: "Wallet", href: "/wallet", icon: Wallet },
 ];
 
 export default function DashboardSidebar() {
