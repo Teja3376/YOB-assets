@@ -5,12 +5,14 @@ interface AssetTableProps {
   columns: any;
   assetList: any[];
   hideDraftFields?: boolean;
+  isLoading?: boolean;
 }
 
 export const AssetTable: React.FC<AssetTableProps> = ({
   columns,
   assetList,
   hideDraftFields = false,
+  isLoading = false,
 }) => {
   const visibleColumns = hideDraftFields
     ? columns.filter(
@@ -30,7 +32,7 @@ export const AssetTable: React.FC<AssetTableProps> = ({
   return (
     <div>
       {" "}
-      <TableComponent columns={visibleColumns} data={assetList} model="asset" />
+      <TableComponent columns={visibleColumns} data={assetList} model="asset" isLoading={isLoading} />
     </div>
   );
 };

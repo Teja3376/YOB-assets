@@ -140,14 +140,22 @@ const Index: React.FC = () => {
       id: "active",
       title: "Active",
       component: (
-        <AssetTable columns={columns} assetList={assetList?.data || []} />
+        <AssetTable
+          columns={columns}
+          assetList={assetList?.data || []}
+          isLoading={isLoading}
+        />
       ),
     },
     {
       id: "approved",
       title: "Approved",
       component: (
-        <AssetTable columns={columns} assetList={assetList?.data || []} />
+        <AssetTable
+          columns={columns}
+          assetList={assetList?.data || []}
+          isLoading={isLoading}
+        />
       ),
     },
     {
@@ -158,6 +166,7 @@ const Index: React.FC = () => {
           columns={columns}
           assetList={assetList?.data || []}
           hideDraftFields
+          isLoading={isLoading}
         />
       ),
     },
@@ -169,6 +178,7 @@ const Index: React.FC = () => {
           columns={columns}
           assetList={assetList?.data || []}
           hideDraftFields
+          isLoading={isLoading}
         />
       ),
     },
@@ -180,6 +190,7 @@ const Index: React.FC = () => {
           columns={columns}
           assetList={assetList?.data || []}
           hideDraftFields
+          isLoading={isLoading}
         />
       ),
     },
@@ -191,9 +202,9 @@ const Index: React.FC = () => {
           columns={columns}
           assetList={assetList?.data || []}
           hideDraftFields
+          isLoading={isLoading}
         />
       ),
-
     },
     {
       id: "waitlist",
@@ -203,6 +214,7 @@ const Index: React.FC = () => {
           columns={columns}
           assetList={assetList?.data || []}
           hideDraftFields
+          isLoading={isLoading}
         />
       ),
     },
@@ -214,6 +226,7 @@ const Index: React.FC = () => {
           columns={columns}
           assetList={assetList?.data || []}
           hideDraftFields
+          isLoading={isLoading}
         />
       ),
     },

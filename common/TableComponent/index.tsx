@@ -15,9 +15,15 @@ interface TableComponentProps<TData> {
   columns: ColumnDef<any, any>[];
   data: any[];
   model?: string;
+  isLoading?: boolean;
 }
 
-function TableComponent<TData>({ columns, data, model }: TableComponentProps<TData>) {
+function TableComponent<TData>({
+  columns,
+  data,
+  model,
+  isLoading = false,
+}: TableComponentProps<TData>) {
   const [columnSizing, setColumnSizing] = React.useState({});
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
@@ -44,7 +50,7 @@ function TableComponent<TData>({ columns, data, model }: TableComponentProps<TDa
     <div className="overflow-auto">
       <table className="min-w-full table-fixed border border-gray-300">
         <THeader headerGroups={table.getHeaderGroups()} />
-        <TBody data={tableData} model={model} />
+        <TBody data={tableData} model={model} isLoading={isLoading} />
       </table>
     </div>
   );

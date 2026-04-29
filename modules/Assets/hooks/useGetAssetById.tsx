@@ -8,6 +8,7 @@ export default function useGetAssetById(assetId: string) {
       const response = await api.get(`/real-estate/${assetId}`);
       return response.data.data;
     },
+    refetchOnMount: "always",
     enabled: !!assetId,
   });
 }
