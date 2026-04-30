@@ -49,7 +49,7 @@ const IssuesDue = memo(({ tab, step, asset }: Props) => {
   const handleTabChange = useCallback(
 
     (tabId: string) => {
-      const basePath = assetId ? `/assets/edit-asset/${assetId}` : '/assets/add-asset';
+      const basePath = assetId ? `/assets/edit-asset/${assetId}/real-estate` : '/assets/add-asset/real-estate';
       router.push(`${basePath}?step=${step}&tab=${tabId}`);
     },
     [assetId, step]
