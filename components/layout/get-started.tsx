@@ -57,7 +57,7 @@ export default function GetStartedLayout({
                               isCompleted
                                 ? "bg-green-500 text-white"
                                 : isActive
-                                  ? "bg-[#FF6B00] text-white"
+                                  ? "bg-primary text-white"
                                   : "bg-gray-300 text-gray-600"
                             }`}
                         >
@@ -68,7 +68,7 @@ export default function GetStartedLayout({
                           className={`text-xs mt-2 font-medium whitespace-nowrap
                             ${
                               isActive
-                                ? "text-[#FF6B00]"
+                                ? "text-primary"
                                 : isCompleted
                                   ? "text-green-600"
                                   : "text-gray-500"
@@ -81,7 +81,7 @@ export default function GetStartedLayout({
                       {index < steps.length - 1 && (
                         <div className="flex-1 h-0.5 bg-gray-200 -mt-6">
                           <motion.div
-                            className="h-full bg-[#FF6B00]"
+                            className="h-full bg-primary"
                             animate={{ width: isCompleted ? "100%" : "0%" }}
                           />
                         </div>
