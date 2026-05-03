@@ -232,8 +232,8 @@ const getColumns = (
               className="cursor-pointer"
               type="button"
               onClick={() => {
-                // router.push(`/assets/edit-asset/${info.row.original._id}`);
-                router.push(route.edit!);
+                router.push(`/assets/edit-asset/${info.row.original._id}/real-estate`);
+                // router.push(route.edit!);
               }}
             >
               <Edit className="h-5 w-5 text-gray-600" />

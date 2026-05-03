@@ -8,9 +8,9 @@ import axios, {
 import { verify } from "crypto";
 import { toast } from "sonner";
 
-// const API_BASE_URL = "http://localhost:5050/api";
+const API_BASE_URL = "http://localhost:5050/api";
 
- const API_BASE_URL = "https://nexa-issuer-backend.vercel.app/api";
+//  const API_BASE_URL = "https://nexa-issuer-backend.vercel.app/api";
 
 /**
  * Main API instance
@@ -176,7 +176,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        handleLogout();
+        handleLogout()
         console.log("Refresh error:", refreshError);
         return Promise.reject(refreshError);
       } finally {

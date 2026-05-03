@@ -129,19 +129,15 @@ export const vehicleIdentification = ({
       rules: { required: "Interior color is required" },
       disabled: disable,
     },
-
-    
-
-    
-    
-    // {
-    //   type: "textarea",
-    //   name: "about",
-    //   control,
-    //   label: "Asset Description",
-    //   fullWidth: true,
-    //   rules: { required: "Asset description is required" },
-    //   disabled: disable,
-    // },
+ 
+    {
+      type: "textarea",
+      name: "about",
+      control,
+      label: "Car  Description",
+      fullWidth: true,
+      rules: { required: "Asset description is required" },
+      disabled: disable,
+    },
   ];
 };

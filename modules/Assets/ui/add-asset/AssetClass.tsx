@@ -48,7 +48,7 @@ export const getRouteForAssetClass = (
       };
     case "vehicles":
       return {
-        add: "/assets/add-asset/vehicles",
+        add: "/assets/add-asset/vehicle",
         edit: assetId
           ? `/assets/edit-asset/${assetId}/vehicle`
           : "/assets/edit-asset/:assetId/vehicle",

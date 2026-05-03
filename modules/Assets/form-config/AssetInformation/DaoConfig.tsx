@@ -1,8 +1,8 @@
 import { FormFieldConfig } from "@/components/use-form/ControllerMap";
 import useGetSpvById from "@/modules/SPV/hooks/useGetSpvById";
 import useGetSpvNames from "@/modules/SPV/hooks/useGetSpvNames";
-import { useEffect, useMemo, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { useEffect, useMemo } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
 export const useDaoConfig = (
   { asset }: { asset: any },
@@ -14,13 +14,14 @@ export const useDaoConfig = (
 ): FormFieldConfig[] => {
   const { control, setValue } = useFormContext();
 
-  const [selectedSpvId, setSelectedSpvId] = useState<string | undefined>(
-    asset?.spvId,
-  );
+  const watchedSpvId = useWatch({ control, name: "spvId" }) as unknown;
+  const assetSpvId =
+    typeof asset?.spvId === "string" ? asset.spvId.trim() : "";
+  const formSpvId =
+    typeof watchedSpvId === "string" ? watchedSpvId.trim() : "";
+  const effectiveSpvId = formSpvId || assetSpvId;
 
-  
-
-  const { data: selectedSpv } = useGetSpvById(selectedSpvId ?? "");
+  const { data: selectedSpv } = useGetSpvById(effectiveSpvId);
 
   const hasSPVs = useMemo(() => {
     return !!names?.data?.length;
@@ -36,12 +37,16 @@ export const useDaoConfig = (
   }, [names, hasSPVs]);
 
   useEffect(() => {
+    if (!effectiveSpvId) {
+      setValue("company", undefined);
+      return;
+    }
     if (!selectedSpv) return;
 
     setValue("company", selectedSpv);
     setValue("currency", selectedSpv.currency ?? "INR");
     setValue("country", selectedSpv.jurisdiction ?? "");
-  }, [selectedSpv, setValue]);
+  }, [effectiveSpvId, selectedSpv, setValue]);
 
   const { spvId, company } = asset || {};
 
@@ -87,7 +92,6 @@ export const useDaoConfig = (
       },
 
       onChange: (value: string) => {
-        setSelectedSpvId(value);
         setValue("spvId", value, {
           shouldDirty: true,
           shouldTouch: true,

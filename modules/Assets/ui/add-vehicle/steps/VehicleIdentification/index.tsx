@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import FormGenerator from "@/components/use-form/FormGenerator";
-import { assetCategory } from "@/modules/Assets/form-config/AssetInformation/assetCategory";
-import { assetStageConfig } from "@/modules/Assets/form-config/AssetInformation/assetStageConfig";
-import DAO from "../../../add-asset/Steps/AssetInformation/AssetType/DAO";
+import VehicleDao from "../../VehicleDao";
 import { useFormContext } from "react-hook-form";
 import { vehicleIdentification } from "@/modules/Assets/form-config/Vehicles/VehicleIdentification/vehicleIdentification";
 
@@ -19,10 +17,11 @@ function Index({ asset }: { asset: any }) {
     }
   }, [asset?.company?.currency, setValue]);
 
+  console.log("asset", asset);
   return (
     <div>
       <div className="space-y-4">
-        <DAO asset={asset} />
+        <VehicleDao asset={asset} />
 
         {hasCompany && (
           <>

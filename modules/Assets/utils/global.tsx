@@ -69,12 +69,6 @@ export const VEHICLE_STEPS_TABS = [
   {
     id: "vehicle-identification",
     title: "Vehicle Identification",
-    // tabs: [
-    //   { id: "asset-type", title: "Asset Type" },
-    //   { id: "investment-details", title: "Investment Details" },
-    //   { id: "rent-information", title: "Rent Information" },
-    //   { id: "escrow-legal", title: "Escrow & Legal Details" },
-    // ],
   },
   {
     id: "engine-specs",
