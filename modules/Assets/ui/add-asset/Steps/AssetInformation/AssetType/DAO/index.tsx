@@ -12,13 +12,14 @@ const Index = ({ asset }: { asset: any }) => {
   const { watch } = useFormContext();
   const company = watch("company");
   console.log("company in dao", company);
-  const { daoConfiguration: daoConfig, currency } = company || {};
+  const { daoConfiguration: daoConfig, currency } = asset?.company || {};
   const {
     data: names = [],
     refetch: fetchSpvNames,
     isFetching: isNamesLoading,
   } = useGetSpvNames();
 
+  console.log("names", names);
   const hasSPVs = useMemo(() => {
     return !!names?.data?.length;
   }, [names]);

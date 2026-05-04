@@ -11,13 +11,14 @@ import {
   BarChart3,
   ShoppingBag,
   FileText,
+  Car,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 type AssetClass =
   | "commodity"
-  | "hardware"
+  | "vehicles"
   | "equity"
   | "debt"
   | "real-estate"
@@ -33,6 +34,31 @@ interface AssetOption {
   isDisabled: boolean;
 }
 
+export const getRouteForAssetClass = (
+  assetClass: AssetClass,
+  assetId?: string,
+) => {
+  switch (assetClass) {
+    case "real-estate":
+      return {
+        add: "/assets/add-asset/real-estate",
+        edit: assetId
+          ? `/assets/edit-asset/${assetId}/real-estate`
+          : "/assets/edit-asset/:assetId/real-estate",
+      };
+    case "vehicles":
+      return {
+        add: "/assets/add-asset/vehicle",
+        edit: assetId
+          ? `/assets/edit-asset/${assetId}/vehicle`
+          : "/assets/edit-asset/:assetId/vehicle",
+      };
+    // Add more cases as needed
+    default:
+      return { add: "/assets/add-asset" };
+  }
+};
+
 export default function AssetClass({
   setOpen,
 }: {
@@ -44,19 +70,33 @@ export default function AssetClass({
 
   const assetOptions: AssetOption[] = [
     {
+      id: "real-estate",
+      title: "Real Estate",
+      description: "Stake in land, property",
+      icon: <Building className="h-5 w-5" />,
+      isDisabled: false,
+    },
+    {
+      id: "vehicles",
+      title: "Luxury Vehicles",
+      description: "Luxury Cars, motorcycles",
+      icon: <Car className="h-5 w-5" />,
+      isDisabled: false,
+    },
+    {
       id: "commodity",
       title: "Commodity",
       description: "Metals, energy, agriculture",
       icon: <Diamond className="h-5 w-5" />,
       isDisabled: true,
     },
-    {
-      id: "hardware",
-      title: "Hardware",
-      description: "Physical computing",
-      icon: <Monitor className="h-5 w-5" />,
-      isDisabled: true,
-    },
+    // {
+    //   id: "hardware",
+    //   title: "Hardware",
+    //   description: "Physical computing",
+    //   icon: <Monitor className="h-5 w-5" />,
+    //   isDisabled: true,
+    // },
     {
       id: "equity",
       title: "Equity",
@@ -72,19 +112,13 @@ export default function AssetClass({
       isDisabled: true,
     },
     {
-      id: "real-estate",
-      title: "Real Estate",
-      description: "Stake in land, property",
-      icon: <Building className="h-5 w-5" />,
-      isDisabled: false,
-    },
-    {
       id: "fund",
       title: "Fund",
       description: "Pooled capital for diversified investments",
       icon: <BarChart3 className="h-5 w-5" />,
       isDisabled: true,
     },
+
     {
       id: "goods",
       title: "Goods",
@@ -110,10 +144,10 @@ export default function AssetClass({
               key={option.id}
               variant="outline"
               disabled={option.isDisabled}
-              className={`p-4 h-full cursor-pointer flex items-start gap-3 transition-all hover:bg-yob-primary-light/30  ${
+              className={`p-4 h-full cursor-pointer flex items-start gap-3 transition-all hover:bg-yob-primary-light/30 hover:ring-1 hover:ring-yob-primary group ${
                 selectedAsset === option.id
                   ? "ring-1 ring-yob-primary bg-yob-primary/10 "
-                  : "hover:bg-yob-primary-light"
+                  : " "
               }`}
               onClick={() => setSelectedAsset(option.id)}
             >
@@ -121,7 +155,7 @@ export default function AssetClass({
                 className={`${
                   selectedAsset === option.id
                     ? "text-yob-primary bg-yob-primary/10 "
-                    : "text-gray-500 bg-gray-100 "
+                    : "text-gray-500 bg-gray-100 group-hover:text-yob-primary group-hover:bg-yob-primary/10 "
                 } mt-1 p-2 rounded-full`}
               >
                 {option.icon}
@@ -145,7 +179,9 @@ export default function AssetClass({
           </Button>
           <Button
             className="bg-yob-primary text-white"
-            onClick={() => router.push(`/assets/add-asset`)}
+            onClick={() =>
+              router.push(getRouteForAssetClass(selectedAsset).add)
+            }
           >
             Next Step
             <ChevronRight className="ml-1 h-4 w-4" />

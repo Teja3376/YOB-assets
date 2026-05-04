@@ -1,14 +1,14 @@
 import api from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useGetAssetById(assetId: string) {
+export default function useGetVehicleById(vehicleId: string) {
   return useQuery({
-    queryKey: ["asset", assetId],
+    queryKey: ["vehicle", vehicleId],
     queryFn: async () => {
-      const response = await api.get(`/real-estate/${assetId}`);
+      const response = await api.get(`/vehicle/${vehicleId}`);
       return response.data.data;
     },
     refetchOnMount: "always",
-    enabled: !!assetId,
+    enabled: !!vehicleId,
   });
 }

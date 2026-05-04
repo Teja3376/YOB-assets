@@ -121,7 +121,7 @@ export default function AssetPage() {
   const buildUrl = (stepId: string, tabId?: string) => {
     const params = new URLSearchParams({ step: stepId });
     if (tabId) params.set("tab", tabId);
-    return `/assets/${assetId ? `edit-asset/${assetId}` : "add-asset"}?${params}`;
+    return `/assets/${assetId ? `edit-asset/${assetId}/real-estate` : "add-asset/real-estate"}?${params}`;
   };
 
   const disabledSteps = useMemo(
@@ -201,7 +201,7 @@ export default function AssetPage() {
           console.log("Asset created successfully:", res);
           const newAssetId = res._id;
           router.replace(
-            `/assets/edit-asset/${newAssetId}?step=asset-information&tab=asset-type`,
+            `/assets/edit-asset/${newAssetId}/real-estate?step=asset-information&tab=asset-type`,
           );
         },
         onError: (error: any) => {
@@ -229,7 +229,6 @@ export default function AssetPage() {
   return (
     <div className="flex items-start gap-3 bg-white p-2">
       <div>
-       
         <StepIndicator
           steps={ASSET_STEPS_TABS}
           currentStep={step}
@@ -280,8 +279,6 @@ export default function AssetPage() {
               </Button>
 
               <div className="flex gap-4">
-               
-
                 {step !== "signature-verification" && (
                   <Button type="button" onClick={nextTab} disabled={!assetId}>
                     <ArrowRight /> Next
@@ -290,29 +287,27 @@ export default function AssetPage() {
 
                 {step !== "signature-verification" && (
                   <Button type="submit" disabled={!isDirty || isUpdating}>
-                  <SaveIcon className="mr-2" />
-                  {isUpdating ? "Saving..." : "Save"}
-                </Button>
+                    <SaveIcon className="mr-2" />
+                    {isUpdating ? "Saving..." : "Save"}
+                  </Button>
                 )}
-                 {
-                  step === "signature-verification" && (
-                    <Button type="button" onClick={reviewAndSubmit} disabled={!assetId}>
-                      <SaveIcon className="mr-2" />
-                      Review & Submit
-                    </Button>
-                  )
-                 }
+                {step === "signature-verification" && (
+                  <Button
+                    type="button"
+                    onClick={reviewAndSubmit}
+                    disabled={!assetId}
+                  >
+                    <SaveIcon className="mr-2" />
+                    Review & Submit
+                  </Button>
+                )}
               </div>
             </div>
           </form>
         </FormModeProvider>
       </FormProvider>
 
-      <AssetStages
-        currentStep={step}
-        asset={asset || {}}
-        formData={formData}
-      />
+      <AssetStages currentStep={step} asset={asset || {}} formData={formData} />
     </div>
   );
 }

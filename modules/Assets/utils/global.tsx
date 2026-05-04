@@ -1,4 +1,3 @@
-
 export const ASSET_STEPS_TABS = [
   {
     id: "asset-information",
@@ -65,12 +64,44 @@ export const ASSET_STEPS_TABS = [
     title: "Investors Signature",
   },
 ];
+
+export const VEHICLE_STEPS_TABS = [
+  {
+    id: "vehicle-identification",
+    title: "Vehicle Identification",
+  },
+  {
+    id: "engine-specs",
+    title: "Engine & Specs",
+  },
+  {
+    id: "valuation-investment",
+    title: "Valuation & Investment",
+  },
+  {
+    id: "ownership-documents",
+    title: "Ownership Documents",
+  },
+  {
+    id: "marketplace-connectors",
+    title: "Marketplace Connectors",
+  },
+];
 export const ASSET_STYLE = [
   { label: "Tower", value: "tower" },
   { label: "Villa", value: "villa" },
   { label: "Building", value: "building" },
   { label: "Developed Land", value: "developed-land" },
   { label: "Individual Land", value: "individual-land" },
+];
+export const VEHICLE_BODY_STYLE = [
+  { label: "Coupe", value: "coupe" },
+  { label: "Berlinitta", value: "berlinitta" },
+  { label: "Targa", value: "targa" },
+  { label: "SUV", value: "suv" },
+  { label: "Spider", value: "spider" },
+  { label: "Hypercar", value: "hypercar" },
+  { label: "Convertible/Roadster", value: "convertible" },
 ];
 export const INSTRUMENT_TYPE = [
   { label: "Equity", value: "equity" },
@@ -189,14 +220,30 @@ export enum EInvestorAcreditation {
   ACCREDITED_ONLY = "accredited-only",
   INSTITUTIONAL_ONLY = "institutional-only",
   QUALIFIED = "qualified",
-  CUSTOM_APPROVAL = "custom-approval"
+  CUSTOM_APPROVAL = "custom-approval",
 }
 export const INVESTOR_ACREDITATION = [
   { label: "Open to all", value: EInvestorAcreditation.OPEN_TO_ALL },
-  { label: "Accredited only", value: EInvestorAcreditation.ACCREDITED_ONLY, disabled: true },
-  { label: "Institutional only", value: EInvestorAcreditation.INSTITUTIONAL_ONLY, disabled: true },
-  { label: "Qualified", value: EInvestorAcreditation.QUALIFIED, disabled: true },
-  { label: "Custom approval", value: EInvestorAcreditation.CUSTOM_APPROVAL, disabled: true },
+  {
+    label: "Accredited only",
+    value: EInvestorAcreditation.ACCREDITED_ONLY,
+    disabled: true,
+  },
+  {
+    label: "Institutional only",
+    value: EInvestorAcreditation.INSTITUTIONAL_ONLY,
+    disabled: true,
+  },
+  {
+    label: "Qualified",
+    value: EInvestorAcreditation.QUALIFIED,
+    disabled: true,
+  },
+  {
+    label: "Custom approval",
+    value: EInvestorAcreditation.CUSTOM_APPROVAL,
+    disabled: true,
+  },
 ];
 
 export enum EKycOrAmlRequirements {
@@ -204,11 +251,19 @@ export enum EKycOrAmlRequirements {
   ACCREDITED_ONLY = "accredited-only",
   ENHANCED = "enhanced",
   OPTIONAL = "optional",
-  NONE = "none"
+  NONE = "none",
 }
 export const KYC_OR_AML_REQUIREMENTS = [
-  { label: "Required for all", value: EKycOrAmlRequirements.REQUIRED_FOR_ALL, disabled: false },
-  { label: "Accredited only", value: EKycOrAmlRequirements.ACCREDITED_ONLY, disabled: true },
+  {
+    label: "Required for all",
+    value: EKycOrAmlRequirements.REQUIRED_FOR_ALL,
+    disabled: false,
+  },
+  {
+    label: "Accredited only",
+    value: EKycOrAmlRequirements.ACCREDITED_ONLY,
+    disabled: true,
+  },
   { label: "Enhanced", value: EKycOrAmlRequirements.ENHANCED, disabled: true },
   { label: "Optional", value: EKycOrAmlRequirements.OPTIONAL, disabled: true },
   { label: "None", value: EKycOrAmlRequirements.NONE, disabled: true },

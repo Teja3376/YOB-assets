@@ -14,7 +14,7 @@ const TermsAndConditions = memo(({ tab }: Props) => {
   const { assetId = null } = useParams<{ assetId?: string }>();
   const router = useRouter();
   const handleTabChange = (tabId: string) => {
-    const basePath = assetId ? `/assets/edit-asset/${assetId}` : '/assets/add-asset';
+    const basePath = assetId ? `/assets/edit-asset/${assetId}/real-estate` : '/assets/add-asset/real-estate';
     router.push(`${basePath}?step=tandc-faq&tab=${tabId}`);
   };
 

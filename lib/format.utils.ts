@@ -14,7 +14,7 @@ export const getCurrencySymbol = (currency: string): string => {
         USDT: "USDT",
         USDC: "USDC",
     };
-    return symbols[currency.toUpperCase()] || currency + " ";
+    return symbols[currency?.toUpperCase()] || currency + " ";
 };
 const formatWithNotation = (value: number, currency: string): string => {
     // For INR, use Indian notation (Lakh, Crore)

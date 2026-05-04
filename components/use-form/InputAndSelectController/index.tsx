@@ -206,6 +206,8 @@ import {
                         onClick={(event) => event.stopPropagation()}
                         onKeyDown={(event) => event.stopPropagation()}
                         autoFocus
+                        
+
                       />
                       <div className="flex gap-2">
                         <Button size="sm" onClick={() => handleAddNew(field.onChange)}>

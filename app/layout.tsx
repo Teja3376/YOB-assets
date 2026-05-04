@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`font-sans ${poppins.variable} antialiased text-gray-900 overflow-x-hidden overflow-y-auto`}
+        className={`font-sans ${poppins.variable} antialiased text-gray-900 overflow-x-hidden overflow-y-hidden`}
       >
         <QueryProvider>{children}</QueryProvider>
         <Toaster richColors theme="light" />

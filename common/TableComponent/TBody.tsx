@@ -1,15 +1,17 @@
 import { flexRender } from "@tanstack/react-table";
 import Empty from "./Empty";
 import { EMPTY_TABLE_DATA } from "@/constants/global";
+import Loading from "@/components/ui/Loading";
 
 interface TBodyProps {
   data: any[];
   model?: string;
+  isLoading?: boolean;
 }
 
-const TBody: React.FC<TBodyProps> = ({ data, model }) => {
+const TBody: React.FC<TBodyProps> = ({ data, model, isLoading }) => {
   const emptyData = EMPTY_TABLE_DATA.find((item) => item.id === model);
-  if (!data || data.length === 0) {
+  if ((!data || data.length === 0) && !isLoading) {
     return (
       <tbody>
         <tr>
@@ -22,6 +24,27 @@ const TBody: React.FC<TBodyProps> = ({ data, model }) => {
               icon={emptyData?.icon}
               actionButton={emptyData?.actionButton}
             />
+          </td>
+        </tr>
+      </tbody>
+    );
+  }
+  if (isLoading) {
+    return (
+      <tbody>
+        <tr>
+          <td colSpan={100}>
+            {/* <Empty
+              title={emptyData?.title || "No Data Available"}
+              description={
+                emptyData?.description || "No data found for this table."
+              }
+              icon={emptyData?.icon}
+              actionButton={emptyData?.actionButton}
+            /> */}
+            <div className="flex items-center justify-center py-10">
+              <Loading />
+            </div>
           </td>
         </tr>
       </tbody>

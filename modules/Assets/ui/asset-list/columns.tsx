@@ -7,6 +7,7 @@ import { formatCompactNumber } from "@/lib/format.utils";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getRouteForAssetClass } from "../add-asset/AssetClass";
 
 const getColumns = (
   setAssetId: (assetId: string) => void,
@@ -219,6 +220,10 @@ const getColumns = (
       accessorKey: "actions",
       cell: (info: any) => {
         const router = useRouter();
+        const route = getRouteForAssetClass(
+          info.row.original?.class,
+          info.row.original?._id,
+        );
         return (
           <div className="flex items-center gap-2">
             <Button
@@ -227,7 +232,8 @@ const getColumns = (
               className="cursor-pointer"
               type="button"
               onClick={() => {
-                router.push(`/assets/edit-asset/${info.row.original._id}`);
+                router.push(`/assets/edit-asset/${info.row.original._id}/real-estate`);
+                // router.push(route.edit!);
               }}
             >
               <Edit className="h-5 w-5 text-gray-600" />

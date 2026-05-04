@@ -176,7 +176,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        handleLogout();
+        handleLogout()
         console.log("Refresh error:", refreshError);
         return Promise.reject(refreshError);
       } finally {
