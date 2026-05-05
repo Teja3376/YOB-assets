@@ -42,9 +42,10 @@ const fetchAdminAssets = async (
   page: number,
   limit: number,
   search: string,
+  assetClass: string
 ): Promise<AssetResponse> => {
   const res = await api.get(
-    `/real-estate/asset-list?status=${status}&page=${page}&limit=${limit}&search=${search}`,
+    `/real-estate/asset-list?status=${status}&page=${page}&limit=${limit}&search=${search}&class=${assetClass}`,
   );
   return res.data;
 };
@@ -54,14 +55,16 @@ export const useAssetList = ({
   page,
   limit,
   search,
+  assetClass
 }: {
   status: string;
   page: number;
   limit: number;
   search: string;
+  assetClass: string;
 }) => {
   return useQuery({
-    queryKey: ["assetList", status, page, limit, search],
-    queryFn: () => fetchAdminAssets(status, page, limit, search),
+    queryKey: ["assetList", status, page, limit, search, assetClass],
+    queryFn: () => fetchAdminAssets(status, page, limit, search, assetClass),
   });
 };

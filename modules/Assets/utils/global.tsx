@@ -1,3 +1,10 @@
+import { Building, Car } from "lucide-react";
+
+export const ASSET_CLASS_TABS = [
+  { id: "real-estate", title: "Real Estate", icon: Building },
+  { id: "vehicles", title: "Luxury Vehicles", icon: Car },
+];
+
 export const ASSET_STEPS_TABS = [
   {
     id: "asset-information",

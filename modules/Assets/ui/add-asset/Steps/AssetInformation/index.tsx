@@ -89,7 +89,7 @@ const getComponentByTabId = (tabId: string): JSX.Element => {
   return (
     <Suspense fallback={<div>Loading Asset Information...</div>}>
       <div className='asset-information shadow-none'>
-        <h1 className='text-2xl font-bold mb-4'>Asset Information</h1>
+        <h1 className='text-2xl font-semibold mb-4'>Asset Information</h1>
         <CustomTabs
           defaultTab={tab}
           tabs={tabs}

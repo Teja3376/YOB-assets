@@ -26,6 +26,7 @@ export const AssetTable: React.FC<AssetTableProps> = ({
             "percentageOfTokensSold",
             "blockchainProjectAddress",
             "orderCount",
+            "uniqueInvestorsCount"
           ].includes((col as any).accessorKey),
       )
     : columns;

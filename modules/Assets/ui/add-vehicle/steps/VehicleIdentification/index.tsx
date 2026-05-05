@@ -20,6 +20,8 @@ function Index({ asset }: { asset: any }) {
   console.log("asset", asset);
   return (
     <div>
+      <h1 className="text-2xl font-semibold mb-4">Vehicle Identification</h1>
+
       <div className="space-y-4">
         <VehicleDao asset={asset} />
 

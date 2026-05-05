@@ -35,6 +35,8 @@ import useActivateAsset from "../../hooks/asset-list/useActivateAsset";
 import { ListingFeeDialog } from "../ListingFeeAlert";
 import { PaymentDialog } from "@/modules/PaymentRequest/ui/PaymentTypeDialog";
 import { getLocalItem, setLocalItem } from "@/lib/localStorage";
+import { ASSET_CLASS_TABS } from "../../utils/global";
+import clsx from "clsx";
 
 const Index: React.FC = () => {
   const router = useRouter();
@@ -44,7 +46,10 @@ const Index: React.FC = () => {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const queryParams = queryString.parse(searchParams.toString());
+  const activeClass = getLocalItem("activeClassTab") || "real-estate";
   const activeTab = getLocalItem("activeAssetTab") || "active";
+  const assetClass =
+    activeClass || (queryParams?.class as string) || "real-estate";
   const assetStatus =
     activeTab || (queryParams?.status as string) || "approved";
   const currentPage = Number(queryParams?.page) || 1;
@@ -66,27 +71,31 @@ const Index: React.FC = () => {
   const searchTerm = useDebounce(search, 500);
   const PAGE_SIZE_OPTIONS = [5, 10, 25];
 
-  const { data: assetList, isLoading } = useAssetList({
+  const { data: assetList, isFetching: isLoading } = useAssetList({
     status: assetStatus,
     page: currentPage,
     limit: limit,
     search: searchTerm,
+    assetClass: assetClass,
   });
   const columns = getColumns(
     setAssetId,
     setIsListingFeeOpen,
     setSelectedDraft,
     assetStatus,
+    assetClass,
   );
 
   const onPageChange = (page: number) => {
     router.push(
-      `${pathname}?status=${assetStatus}&page=${page}&limit=${limit}`,
+      `${pathname}?class=${assetClass}&status=${assetStatus}&page=${page}&limit=${limit}`,
     );
   };
 
   const onPageSizeChange = (pageSize: number) => {
-    router.push(`${pathname}?status=${assetStatus}&page=1&limit=${pageSize}`);
+    router.push(
+      `${pathname}?class=${assetClass}&status=${assetStatus}&page=1&limit=${pageSize}`,
+    );
   };
 
   const updateStatus = async (updateAssetId: string, newStatus: string) => {
@@ -132,7 +141,16 @@ const Index: React.FC = () => {
 
   const handleTabChange = (tabId: string) => {
     setLocalItem("activeAssetTab", tabId);
-    router.push(`${pathname}?status=${tabId}&page=1&limit=${limit}`);
+    router.push(
+      `${pathname}?class=${assetClass}&status=${tabId}&page=1&limit=${limit}`,
+    );
+  };
+
+  const handleClassChange = (classId: string) => {
+    setLocalItem("activeClassTab", classId);
+    router.push(
+      `${pathname}?class=${classId}&status=${assetStatus}&page=1&limit=${limit}`,
+    );
   };
 
   const tabs = [
@@ -233,7 +251,7 @@ const Index: React.FC = () => {
   ];
 
   return (
-    <div className="p-2 space-y-2">
+    <div className="p-2 space-y-3">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-black">Assets List </h1>
         <div className="flex items-center gap-2">
@@ -260,6 +278,32 @@ const Index: React.FC = () => {
         isError={isError}
         error={error?.message as any}
       />
+      <div className="flex items-center gap-2">
+        {ASSET_CLASS_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            // variant={assetClass === tab.id ? "default" : "outline"}
+            className={clsx(
+              tab.id === assetClass
+                ? "bg-primary/10 text-primary border-primary"
+                : "bg-gray-300/10 text-gray-600 hover:bg-gray-200 border-gray-300",
+              "flex items-center gap-3 border rounded-md px-6  py-5 font-medium cursor-pointer transition-all duration-200 text-sm",
+              " w-50 h-17",
+            )}
+            onClick={() => handleClassChange(tab.id)}
+          >
+            <div
+              className={clsx(
+                "flex items-center justify-center rounded-full p-2",
+                tab.id === assetClass ? "bg-primary/20" : "bg-gray-300/20",
+              )}
+            >
+              {tab.icon && <tab.icon size={22} />}
+            </div>{" "}
+            {tab.title}
+          </button>
+        ))}
+      </div>
       <div className="space-y-4">
         <CustomTabs
           tabs={tabs}

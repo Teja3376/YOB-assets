@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import type React from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -87,10 +87,14 @@ const InputController: React.FC<InputControllerProps> = ({
                     onChange?.(e);
                   }}
                   onBlur={onBlur}
+                  onWheel={(e) => (e.target as HTMLInputElement).blur()}
                   className={cn(
                     icon && iconPosition === "left" && "pl-10",
                     icon && iconPosition === "right" && "pr-10",
-                    type === "url" && value && "rounded-r-none"
+                    type === "url" && value && "rounded-r-none",
+
+                    type == "number" &&
+                      "appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0",
                   )}
                 />
                 {icon && iconPosition === "right" && type !== "url" && (

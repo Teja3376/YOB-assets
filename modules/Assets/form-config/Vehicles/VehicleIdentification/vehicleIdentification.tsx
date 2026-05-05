@@ -1,10 +1,15 @@
 import { FormFieldConfig } from "@/components/use-form/ControllerMap";
-import { ASSET_STYLE, INSTRUMENT_TYPE, VEHICLE_BODY_STYLE } from "@/modules/Assets/utils/global";
+import {
+  ASSET_STYLE,
+  INSTRUMENT_TYPE,
+  VEHICLE_BODY_STYLE,
+} from "@/modules/Assets/utils/global";
 import { useFormContext } from "react-hook-form";
 import { COUNTRY_OPTIONS, CURRENCY_OPTIONS } from "@/helpers/global";
 
 import { useParams } from "next/navigation";
 import useLocations from "@/hooks/useLocations";
+import { max } from "lodash";
 
 interface Asset {
   country?: string;
@@ -30,28 +35,28 @@ export const vehicleIdentification = ({
 
   const { control, setValue, watch } = useFormContext();
 
-//   const selectedCountry = watch("country");
-//   const selectedState = watch("state");
+  //   const selectedCountry = watch("country");
+  //   const selectedState = watch("state");
 
-//   const { countries, useStates, useCities } = useLocations();
+  //   const { countries, useStates, useCities } = useLocations();
 
-//   const { data: states = [] } = useStates(selectedCountry);
-//   const { data: cities = [] } = useCities(selectedCountry, selectedState);
+  //   const { data: states = [] } = useStates(selectedCountry);
+  //   const { data: cities = [] } = useCities(selectedCountry, selectedState);
 
-//   const country = asset?.country ?? "";
-//   const state = asset?.state ?? "";
-//   const city = asset?.city ?? "";
-//   const places = asset?.metadata?.places ?? {};
+  //   const country = asset?.country ?? "";
+  //   const state = asset?.state ?? "";
+  //   const city = asset?.city ?? "";
+  //   const places = asset?.metadata?.places ?? {};
 
-//   const defaultState = {
-//     value: state,
-//     label: places?.[state] ?? state,
-//   };
+  //   const defaultState = {
+  //     value: state,
+  //     label: places?.[state] ?? state,
+  //   };
 
-//   const defaultCountry = {
-//     value: country,
-//     label: places?.[country] ?? country,
-//   };
+  //   const defaultCountry = {
+  //     value: country,
+  //     label: places?.[country] ?? country,
+  //   };
 
   return [
     {
@@ -72,7 +77,7 @@ export const vehicleIdentification = ({
     },
     {
       type: "text",
-      name: "trim/version",
+      name: "trim",
       control,
       label: "Trim/Version",
       rules: { required: "Trim/Version is required" },
@@ -102,14 +107,18 @@ export const vehicleIdentification = ({
       control,
       label: "VIN Number",
       placeholder: "17 Character VIN",
-      rules: { required: "VIN is required" },
+      rules: {
+        required: "VIN is required",
+        maxLength: { value: 17, message: "VIN must be 17 characters" },
+        minLength: { value: 17, message: "VIN must be 17 characters" },
+      },
       disabled: disable,
     },
     {
       type: "text",
       name: "odometer",
       control,
-      label: "Odometer",
+      label: "Odometer(KM)",
       rules: { required: "Odometer is required" },
       disabled: disable,
     },
@@ -129,7 +138,7 @@ export const vehicleIdentification = ({
       rules: { required: "Interior color is required" },
       disabled: disable,
     },
- 
+
     {
       type: "textarea",
       name: "about",

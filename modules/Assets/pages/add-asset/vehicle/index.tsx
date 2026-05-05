@@ -2,8 +2,7 @@
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { FormModeProvider } from "@/components/use-form/FormMode";
 import { removeKeyFromObject } from "@/helpers/global";
-import VehicleIdentification from "@/modules/Assets/ui/add-vehicle/steps/VehicleIdentification";
-import EngineAndSpecs from "@/modules/Assets/ui/add-vehicle/steps/EngineAndSpecs";
+// import EngineAndSpecs from "@/modules/Assets/ui/add-vehicle/steps/EngineAndSpecs";
 import StepIndicator from "@/modules/Assets/ui/add-asset/StepIndicator";
 import { VEHICLE_STEPS_TABS } from "@/modules/Assets/utils/global";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +14,21 @@ import { toast } from "sonner";
 import useCreateVehicle from "@/modules/Assets/hooks/useCreateVehicle";
 import useGetVehicleById from "@/modules/Assets/hooks/useGetVehicleById";
 import useUpdateVehicle from "@/modules/Assets/hooks/useUpdateVehicle";
+import dynamic from "next/dynamic";
+import VehicleStages from "@/modules/Assets/ui/add-vehicle/VehicleStages";
+
+const VehicleIdentification = dynamic(
+  () => import("../../../ui/add-vehicle/steps/VehicleIdentification"),
+);
+const EngineAndSpecs = dynamic(
+  () => import("../../../ui/add-vehicle/steps/EngineAndSpecs"),
+);
+const ValueAndInvestment = dynamic(
+  () => import("../../../ui/add-vehicle/steps/ValueAndInvestment"),
+);
+const OwnerShipDocsInfo = dynamic(
+  () => import("../../../ui/add-vehicle/steps/OwnerShipDocs"),
+);
 
 const toBodyTypeValue = (bodyType: unknown) => {
   if (typeof bodyType !== "string") return "";
@@ -26,12 +40,12 @@ const toBodyTypeValue = (bodyType: unknown) => {
 const isMongoObjectIdString = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
 const buildVehiclePayload = (data: Record<string, any>) => {
-  const trimVersion = String(data["trim/version"] ?? "").trim();
+  console.log("Form Data for Payload:", data);
+  const trimVersion = String(data.trim ?? "").trim();
   const trim = trimVersion;
   const specialVersionName = trimVersion;
   const km = Number(data.odometer);
-  const rawSpvId =
-    typeof data.spvId === "string" ? data.spvId.trim() : "";
+  const rawSpvId = typeof data.spvId === "string" ? data.spvId.trim() : "";
   const spvId =
     rawSpvId && isMongoObjectIdString(rawSpvId) ? rawSpvId : undefined;
 
@@ -46,12 +60,18 @@ const buildVehiclePayload = (data: Record<string, any>) => {
     km: Number.isFinite(km) ? Math.max(0, Math.trunc(km)) : 0,
     exteriorColor: data.exteriorColor,
     interiorColor: data.interiorColor,
-    specs: JSON.stringify({
-      engineDisplacement: data.engineDisplacment ?? "",
-      cylinders: data.cylinders ?? "",
-      horsepower: data.Horsepower ?? "",
-    }),
+    engineDisplacement: data.engineDisplacement,
+    cylinders: data.cylinders,
+    horsePower: data.horsePower,
+
     carDescription: data.about,
+    investmentStats: data.investmentStats,
+    registrationDocuments: data.registrationDocuments,
+    omologationDocuments: data.omologationDocuments,
+    proofOfOriginDocuments: data.proofOfOriginDocuments,
+    Notarised: data.Notarised,
+    EvaluationCertificates: data.EvaluationCertificates,
+    InsuranceCertificates: data.InsuranceCertificates,
     ...(spvId ? { spvId } : {}),
   };
 };
@@ -65,29 +85,16 @@ const mapVehicleToFormValues = (vehicle: Record<string, any>) => {
     "bookmarks",
   ]) as Record<string, any>;
 
-  const parsedSpecs = (() => {
-    const rawSpecs = payload.specs;
-    if (!rawSpecs) return {};
-    if (typeof rawSpecs === "string") {
-      try {
-        return JSON.parse(rawSpecs);
-      } catch {
-        return {};
-      }
-    }
-    return typeof rawSpecs === "object" ? rawSpecs : {};
-  })() as Record<string, any>;
-
   return {
     ...payload,
     "trim/version": payload.specialVersionName || payload.trim || "",
     vin: payload.vinNumber || "",
     odometer: payload.km ?? "",
     about: payload.carDescription || "",
-    engineDisplacment:
-      parsedSpecs.engineDisplacement || parsedSpecs.engineDisplacment || "",
-    cylinders: parsedSpecs.cylinders || "",
-    Horsepower: parsedSpecs.horsepower || parsedSpecs.Horsepower || "",
+    engineDisplacement:
+      payload.engineDisplacement || payload.engineDisplacment || "",
+    cylinders: payload.cylinders.toString() || "",
+    horsePower: payload.horsePower || payload.Horsepower || "",
   };
 };
 
@@ -205,7 +212,9 @@ export default function AddVehicle() {
         }
       },
       onError: (error: any) => {
-        toast.error(error?.response?.data?.message || "Failed to create vehicle");
+        toast.error(
+          error?.response?.data?.message || "Failed to create vehicle",
+        );
       },
     });
   };
@@ -226,45 +235,68 @@ export default function AddVehicle() {
       ];
       const isValid = await trigger(fields as any);
       if (!isValid) return;
-      const data = getValues() as Record<string, any>;
-      const payload = buildVehiclePayload(data);
+      //   const data = getValues() as Record<string, any>;
+      //   const payload = buildVehiclePayload(data);
 
-      if (assetId) {
-        updateVehicle(
-          { vehicleId: assetId, vehicleData: payload },
-          {
-            onSuccess: () => {
-              toast.success("Vehicle updated successfully");
-              nextTab();
-            },
-            onError: (error: any) => {
-              toast.error(
-                error?.response?.data?.message || "Failed to update vehicle",
-              );
-            },
-          },
-        );
-        return;
-      }
+      //   if (assetId) {
+      //     updateVehicle(
+      //       { vehicleId: assetId, vehicleData: payload },
+      //       {
+      //         onSuccess: () => {
+      //           toast.success("Vehicle updated successfully");
+      //           nextTab();
+      //         },
+      //         onError: (error: any) => {
+      //           toast.error(
+      //             error?.response?.data?.message || "Failed to update vehicle",
+      //           );
+      //         },
+      //       },
+      //     );
+      //     return;
+      //   }
 
-      createVehicle(payload, {
-        onSuccess: (res: any) => {
-          toast.success("Vehicle created successfully");
-          const newVehicleId = res?._id || res?.id;
-          if (newVehicleId) {
-            router.push(`/assets/edit-asset/${newVehicleId}/vehicle?step=engine-specs`);
-          }
-        },
-        onError: (error: any) => {
-          toast.error(
-            error?.response?.data?.message || "Failed to create vehicle",
-          );
-        },
-      });
-      return;
+      //   createVehicle(payload, {
+      //     onSuccess: (res: any) => {
+      //       toast.success("Vehicle created successfully");
+      //       const newVehicleId = res?._id || res?.id;
+      //       if (newVehicleId) {
+      //         router.push(
+      //           `/assets/edit-asset/${newVehicleId}/vehicle?step=engine-specs`,
+      //         );
+      //       }
+      //     },
+      //     onError: (error: any) => {
+      //       toast.error(
+      //         error?.response?.data?.message || "Failed to create vehicle",
+      //       );
+      //     },
+      //   });
+      //   return;
+      // }
+
+      nextTab();
     }
 
-    nextTab();
+    if (step === "engine-specs") {
+      const fields = ["engineDisplacement", "cylinders", "horsePower"];
+      const isValid = await trigger(fields as any);
+      if (!isValid) return;
+      nextTab();
+    }
+    if (step === "valuation-investment") {
+      const fields = [
+        "investmentStats.startingValue",
+        "investmentStats.targetFinalValue",
+        "investmentStats.appreciationExpectedYearly",
+        "investmentStats.minReturnToInvestors",
+        "investmentStats.investmentPeriod",
+        "investmentStats.linkToComparableListing",
+      ];
+      const isValid = await trigger(fields as any);
+      if (!isValid) return;
+      nextTab();
+    }
   };
 
   if (isLoadingVehicle && assetId) {
@@ -274,6 +306,7 @@ export default function AddVehicle() {
       </div>
     );
   }
+  const formData = methods.watch();
 
   return (
     <div className="flex items-start gap-3 bg-white p-2">
@@ -293,8 +326,16 @@ export default function AddVehicle() {
           >
             <Suspense fallback={<LoadingSpinner />}>
               {{
-                "vehicle-identification": <VehicleIdentification asset={vehicle || {}} />,
+                "vehicle-identification": (
+                  <VehicleIdentification asset={vehicle || {}} />
+                ),
                 "engine-specs": <EngineAndSpecs asset={vehicle || {}} />,
+                "valuation-investment": (
+                  <ValueAndInvestment asset={vehicle || {}} />
+                ),
+                "ownership-documents": (
+                  <OwnerShipDocsInfo asset={vehicle || {}} />
+                ),
               }[step] || null}
             </Suspense>
 
@@ -312,7 +353,12 @@ export default function AddVehicle() {
                   <Button
                     type="button"
                     onClick={handleNext}
-                    disabled={isReadOnly || isUpdatingVehicle || isCreatingVehicle || isLoadingVehicle}
+                    disabled={
+                      isReadOnly ||
+                      isUpdatingVehicle ||
+                      isCreatingVehicle ||
+                      isLoadingVehicle
+                    }
                   >
                     <ArrowRight /> Next
                   </Button>
@@ -330,7 +376,9 @@ export default function AddVehicle() {
                     }
                   >
                     <SaveIcon className="mr-2" />
-                    {isCreatingVehicle || isUpdatingVehicle ? "Saving..." : "Save"}
+                    {isCreatingVehicle || isUpdatingVehicle
+                      ? "Saving..."
+                      : "Save"}
                   </Button>
                 )}
                 {step === "marketplace-connectors" && (
@@ -348,6 +396,11 @@ export default function AddVehicle() {
           </form>
         </FormModeProvider>
       </FormProvider>
+      <VehicleStages
+        currentStep={step}
+        asset={vehicle || {}}
+        formData={formData}
+      />
     </div>
   );
 }

@@ -9,47 +9,246 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getRouteForAssetClass } from "../add-asset/AssetClass";
 
-const getColumns = (
+const vehicleColumns = (
+  setAssetId: (assetId: string) => void,
+  setIsActiveDialog: (isOpen: boolean) => void,
+  setSelectedDraft: any,
+) => [
+  {
+    header: "Asset Id",
+    accessorKey: "_id",
+    cell: (info: any) => {
+      const id = info.getValue();
+      return (
+        <div className="flex gap-2">
+          <Copy
+            onClick={() => handleCopy(id)}
+            size={4}
+            className="text-gray-500 cursor-pointer min-h-4 min-w-4"
+          />
+          <span className="text-sm truncate uppercase">
+            {maskId(id, "VEH")}
+          </span>
+        </div>
+      );
+    },
+  },
+
+  {
+    header: "VIN",
+    accessorKey: "vinNumber",
+    cell: (info: any) => {
+      const vin = info.getValue();
+      return (
+        <div className="flex gap-2">
+          <Copy
+            onClick={() => handleCopy(vin)}
+            size={4}
+            className="text-gray-500 cursor-pointer min-h-4 min-w-4"
+          />
+          <span className="text-sm font-mono">
+            {vin?.slice(0, 6)}...{vin?.slice(-4)}
+          </span>
+        </div>
+      );
+    },
+  },
+
+  {
+    header: "Vehicle",
+    accessorKey: "brand",
+    cell: (info: any) => {
+      const row = info.row.original;
+      return (
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">
+            {row.brand} {row.model}
+          </span>
+          <span className="text-xs text-gray-500">
+            {row.trim} • {row.year}
+          </span>
+        </div>
+      );
+    },
+  },
+
+  // ✅ ALWAYS DEFINE (visibility handled elsewhere)
+  {
+    header: "Blockchain Address",
+    accessorKey: "blockchainProjectAddress",
+    cell: (info: any) => {
+      const row = info.row.original;
+      const assetAddress =
+        row.blockchainProjectAddress || row.assetAddress || "";
+
+      if (!assetAddress) {
+        return <span className="text-gray-500">Not deployed</span>;
+      }
+
+      const formattedAddress = `${assetAddress.slice(0, 6)}...${assetAddress.slice(-4)}`;
+
+      return (
+        <div
+          onClick={() =>
+            handleViewOnBlockchain(assetAddress || "-", "asset")
+          }
+          className="group flex items-center gap-2"
+        >
+          <span className="group-hover:underline cursor-pointer font-medium text-gray-900">
+            {formattedAddress}
+          </span>
+
+          <Button variant="ghost" size="icon" className="h-6 w-6">
+            <ArrowUpRight size={14} />
+          </Button>
+        </div>
+      );
+    },
+  },
+
+  {
+    header: "KM",
+    accessorKey: "km",
+    cell: (info: any) => <span>{info.getValue()} km</span>,
+  },
+
+  {
+    header: "Company",
+    accessorKey: "companyName",
+  },
+
+  {
+    header: "Max Supply",
+    accessorKey: "tokenSupply",
+    cell: (info: any) => {
+      const value = formatCompactNumber(info.getValue() || 0);
+      return <span>{value}</span>;
+    },
+  },
+
+  {
+    header: "Investors",
+    accessorKey: "uniqueInvestorsCount",
+    cell: (info: any) => {
+      const value = formatCompactNumber(info.getValue() || 0);
+      return <span>{value}</span>;
+    },
+  },
+
+  {
+    header: "Orders",
+    accessorKey: "orderCount",
+    cell: (info: any) => {
+      const value = formatCompactNumber(info.getValue() || 0);
+      return <span>{value}</span>;
+    },
+  },
+
+  {
+    header: "Active",
+    accessorKey: "status",
+    cell: (info: any) => {
+      const status = info.getValue();
+      const isActive = status === "active";
+
+      const handleUpdateStatus = (assetId: string) => {
+        setAssetId(assetId);
+        setIsActiveDialog(true);
+      };
+
+      return (
+        <Switch
+          checked={isActive}
+          disabled={true}
+          onCheckedChange={() =>
+            handleUpdateStatus(info.row.original._id)
+          }
+        />
+      );
+    },
+  },
+
+  {
+    header: "Actions",
+    accessorKey: "actions",
+    cell: (info: any) => {
+      const router = useRouter();
+
+      return (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              router.push(`/assets/edit-asset/${info.row.original._id}/vehicle`)
+            }
+          >
+            <Edit className="h-5 w-5 text-gray-600" />
+          </Button>
+
+          {info.row.original.status !== "draft" && (
+            <Link href={`/assets/${info.row.original._id}/overview`}>
+              <Button variant="outline" size="icon">
+                <Eye className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
+
+          {info.row.original.status === "draft" && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setSelectedDraft(info.row.original)}
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
+      );
+    },
+  },
+];
+
+const realEstateColumns = (
   setAssetId: (assetId: string) => void,
   setIsActiveDialog: (isOpen: boolean) => void,
   setSelectedDraft: any,
   assetStatus?: string,
-) => {
-  return [
-    {
-      header: "Asset Id",
-      accessorKey: "_id",
-      cell: (info: any) => {
-        const id = info.getValue();
-        // console.log("@@@@, info colnsole ;art ",info.getValue());
+) => [
+  {
+    header: "Asset Id",
+    accessorKey: "_id",
+    cell: (info: any) => {
+      const id = info.getValue();
+      // console.log("@@@@, info colnsole ;art ",info.getValue());
 
-        // console.log(id,"id ishere in columns ")
-        return (
-          <div className="flex gap-2">
-            <Copy
-              onClick={() => handleCopy(id)}
-              size={4}
-              className="text-gray-500 cursor-pointer min-h-4 min-w-4"
-            />
-            <span className="text-sm truncate uppercase">
-              {maskId(id, "PROP")}
-            </span>
-          </div>
-        );
-      },
-      enableResizing: true,
-      size: 100,
-      maxSize: 200,
+      // console.log(id,"id ishere in columns ")
+      return (
+        <div className="flex gap-2">
+          <Copy
+            onClick={() => handleCopy(id)}
+            size={4}
+            className="text-gray-500 cursor-pointer min-h-4 min-w-4"
+          />
+          <span className="text-sm truncate uppercase">
+            {maskId(id, "PROP")}
+          </span>
+        </div>
+      );
     },
-    {
-      header: "Asset Name",
-      accessorKey: "logo",
-      cell: (info: any) => {
-        const fullName = String(info.row.original?.name ?? "SPV Name");
+    enableResizing: true,
+    size: 100,
+    maxSize: 200,
+  },
+  {
+    header: "Asset Name",
+    accessorKey: "logo",
+    cell: (info: any) => {
+      const fullName = String(info.row.original?.name ?? "SPV Name");
 
-        return (
-          <div className="flex items-center gap-2" title={fullName}>
-            {/* <img
+      return (
+        <div className="flex items-center gap-2" title={fullName}>
+          {/* <img
             src={logo}
             alt="logo"
             className="w-8 h-8 rounded-full object-cover shrink-0"
@@ -58,210 +257,230 @@ const getColumns = (
               e.currentTarget.src = fallbackLogo;
             }}
           /> */}
-            <div className="flex flex-col truncate">
-              <span className="truncate text-sm">{fullName}</span>
-              <span className="text-xs text-gray-500 truncate">
-                {info.row.original?.city}
-              </span>
-            </div>
+          <div className="flex flex-col truncate">
+            <span className="truncate text-sm">{fullName}</span>
+            <span className="text-xs text-gray-500 truncate">
+              {info.row.original?.city}
+            </span>
           </div>
-        );
-      },
-      enableResizing: true,
-      size: 100,
-      maxSize: 200,
+        </div>
+      );
     },
-    {
-      header: "Blockchain Address",
-      accessorKey: "blockchainProjectAddress",
-      cell: (info: any) => {
-        const row = info.row.original;
-        // Access the nested blockchain address from tokenInformation
-        const assetAddress =
-          row.blockchainProjectAddress || row.assetAddress || "";
-        if (!assetAddress) {
-          return <span className="text-gray-500">Not deployed</span>;
-        }
-        const formattedAddress = assetAddress
-          ? `${assetAddress.slice(0, 6)}...${assetAddress.slice(-4)}`
-          : "-";
+    enableResizing: true,
+    size: 100,
+    maxSize: 200,
+  },
+  {
+    header: "Blockchain Address",
+    accessorKey: "blockchainProjectAddress",
+    cell: (info: any) => {
+      const row = info.row.original;
+      // Access the nested blockchain address from tokenInformation
+      const assetAddress =
+        row.blockchainProjectAddress || row.assetAddress || "";
+      if (!assetAddress) {
+        return <span className="text-gray-500">Not deployed</span>;
+      }
+      const formattedAddress = assetAddress
+        ? `${assetAddress.slice(0, 6)}...${assetAddress.slice(-4)}`
+        : "-";
 
-        return (
-          <div
-            onClick={() => handleViewOnBlockchain(assetAddress || "-", "asset")}
-            className="group flex items-center gap-2"
+      return (
+        <div
+          onClick={() => handleViewOnBlockchain(assetAddress || "-", "asset")}
+          className="group flex items-center gap-2"
+        >
+          <span className="group-hover:underline cursor-pointer font-medium text-gray-900">
+            {formattedAddress}
+          </span>
+
+          {assetAddress && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 cursor-pointer"
+            >
+              <ArrowUpRight size={14} />
+            </Button>
+          )}
+        </div>
+      );
+    },
+    enableResizing: true,
+    size: 140,
+    minSize: 140,
+    maxSize: 140,
+  },
+  {
+    header: "Funding Status",
+    accessorKey: "percentageOfTokensSold",
+    cell: (info: any) => {
+      const row = info.row.original;
+      const availableTokensToBuy = row.availableTokensToBuy || 0;
+      const percentageOfTokensSold = row.percentageOfTokensSold || 0;
+      return (
+        <Badge className="bg-gray-200 rounded-full text-black hover:bg-gray-200 font-normal">
+          <span className="text-sm">
+            {percentageOfTokensSold.toFixed(2)}% sold{" "}
+          </span>
+          <span className="text-sm">
+            ({formatCompactNumber(availableTokensToBuy || 0)} left)
+          </span>
+        </Badge>
+      );
+    },
+    size: 100,
+    minSize: 100,
+    maxSize: 100,
+  },
+  {
+    header: "Max Supply",
+    accessorKey: "totalTokens",
+    cell: (info: any) => {
+      const totalTokens = info.getValue();
+      const value = formatCompactNumber(totalTokens || 0);
+      console.log("info.row.origina", info.row.original);
+      return <span>{value}</span>;
+    },
+    size: 50,
+    minSize: 50,
+    maxSize: 50,
+  },
+  {
+    header: "Investors",
+    accessorKey: "uniqueInvestorsCount",
+    cell: (info: any) => {
+      const uniqueInvestorCount = info.getValue();
+      const value = formatCompactNumber(uniqueInvestorCount || 0);
+      return <span>{value}</span>;
+    },
+    maxSize: 50,
+    size: 50,
+    minSize: 50,
+  },
+  {
+    header: "Orders",
+    accessorKey: "orderCount",
+    cell: (info: any) => {
+      const orderCount = info.getValue();
+      const value = formatCompactNumber(orderCount || 0);
+      return <span>{value}</span>;
+    },
+    maxSize: 50,
+    size: 50,
+    minSize: 50,
+  },
+  {
+    header: "Active",
+    accessorKey: "status",
+    cell: (info: any) => {
+      const status = info.getValue();
+      const isActive = status === "active";
+      const handleUpdateStatus = (assetId: string) => {
+        setAssetId(assetId);
+        setIsActiveDialog(true);
+      };
+      return (
+        <Switch
+          checked={isActive}
+          disabled={true}
+          onCheckedChange={() => handleUpdateStatus(info.row.original._id)}
+        />
+      );
+    },
+    size: 50,
+    minSize: 50,
+    maxSize: 50,
+  },
+  // {
+  //   header: "Join Waitlist",
+  //   accessorKey: "status",
+  //   cell: (info: any) => {
+  //     const status = info.getValue();
+  //     const isWaitlisted = status === "waitlist";
+  //     const handleUpdateStatus = (asset: any) => {
+  //       setAsset(asset);
+  //       setNewStatus(!isWaitlisted ? "waitlist" : "inactive");
+  //     };
+  //     return (
+  //       <Switch
+  //         checked={isWaitlisted}
+  //         onCheckedChange={() => handleUpdateStatus(info.row.original)}
+  //         disabled={status === "active"}
+  //       />
+  //     );
+  //   },
+  //   size: 60,
+  //   minSize: 60,
+  //   maxSize: 60,
+  // },
+  {
+    header: "Actions",
+    accessorKey: "actions",
+    cell: (info: any) => {
+      const router = useRouter();
+      const route = getRouteForAssetClass(
+        info.row.original?.class,
+        info.row.original?._id,
+      );
+      return (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="cursor-pointer"
+            type="button"
+            onClick={() => {
+              router.push(
+                `/assets/edit-asset/${info.row.original._id}/real-estate`,
+              );
+              // router.push(route.edit!);
+            }}
           >
-            <span className="group-hover:underline cursor-pointer font-medium text-gray-900">
-              {formattedAddress}
-            </span>
-
-            {assetAddress && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 cursor-pointer"
-              >
-                <ArrowUpRight size={14} />
+            <Edit className="h-5 w-5 text-gray-600" />
+          </Button>
+          {info.row.original.status !== "draft" && (
+            <Link href={`/assets/${info.row.original._id}/overview`}>
+              <Button variant="outline" size="icon">
+                <Eye className="h-5 w-5" />
               </Button>
-            )}
-          </div>
-        );
-      },
-      enableResizing: true,
-      size: 140,
-      minSize: 140,
-      maxSize: 140,
-    },
-    {
-      header: "Funding Status",
-      accessorKey: "percentageOfTokensSold",
-      cell: (info: any) => {
-        const row = info.row.original;
-        const availableTokensToBuy = row.availableTokensToBuy || 0;
-        const percentageOfTokensSold = row.percentageOfTokensSold || 0;
-        return (
-          <Badge className="bg-gray-200 rounded-full text-black hover:bg-gray-200 font-normal">
-            <span className="text-sm">
-              {percentageOfTokensSold.toFixed(2)}% sold{" "}
-            </span>
-            <span className="text-sm">
-              ({formatCompactNumber(availableTokensToBuy || 0)} left)
-            </span>
-          </Badge>
-        );
-      },
-      size: 100,
-      minSize: 100,
-      maxSize: 100,
-    },
-    {
-      header: "Max Supply",
-      accessorKey: "totalTokens",
-      cell: (info: any) => {
-        const totalTokens = info.getValue();
-        const value = formatCompactNumber(totalTokens || 0);
-        console.log("info.row.origina", info.row.original);
-        return <span>{value}</span>;
-      },
-      size: 50,
-      minSize: 50,
-      maxSize: 50,
-    },
-    {
-      header: "Investors",
-      accessorKey: "uniqueInvestorsCount",
-      cell: (info: any) => {
-        const uniqueInvestorCount = info.getValue();
-        const value = formatCompactNumber(uniqueInvestorCount || 0);
-        return <span>{value}</span>;
-      },
-      maxSize: 50,
-      size: 50,
-      minSize: 50,
-    },
-    {
-      header: "Orders",
-      accessorKey: "orderCount",
-      cell: (info: any) => {
-        const orderCount = info.getValue();
-        const value = formatCompactNumber(orderCount || 0);
-        return <span>{value}</span>;
-      },
-      maxSize: 50,
-      size: 50,
-      minSize: 50,
-    },
-    {
-      header: "Active",
-      accessorKey: "status",
-      cell: (info: any) => {
-        const status = info.getValue();
-        const isActive = status === "active";
-        const handleUpdateStatus = (assetId: string) => {
-          setAssetId(assetId);
-          setIsActiveDialog(true);
-        };
-        return (
-          <Switch
-            checked={isActive}
-            disabled={true}
-            onCheckedChange={() => handleUpdateStatus(info.row.original._id)}
-          />
-        );
-      },
-      size: 50,
-      minSize: 50,
-      maxSize: 50,
-    },
-    // {
-    //   header: "Join Waitlist",
-    //   accessorKey: "status",
-    //   cell: (info: any) => {
-    //     const status = info.getValue();
-    //     const isWaitlisted = status === "waitlist";
-    //     const handleUpdateStatus = (asset: any) => {
-    //       setAsset(asset);
-    //       setNewStatus(!isWaitlisted ? "waitlist" : "inactive");
-    //     };
-    //     return (
-    //       <Switch
-    //         checked={isWaitlisted}
-    //         onCheckedChange={() => handleUpdateStatus(info.row.original)}
-    //         disabled={status === "active"}
-    //       />
-    //     );
-    //   },
-    //   size: 60,
-    //   minSize: 60,
-    //   maxSize: 60,
-    // },
-    {
-      header: "Actions",
-      accessorKey: "actions",
-      cell: (info: any) => {
-        const router = useRouter();
-        const route = getRouteForAssetClass(
-          info.row.original?.class,
-          info.row.original?._id,
-        );
-        return (
-          <div className="flex items-center gap-2">
+            </Link>
+          )}
+          {info.row.original.status === "draft" && (
             <Button
               variant="outline"
               size="icon"
-              className="cursor-pointer"
-              type="button"
-              onClick={() => {
-                router.push(`/assets/edit-asset/${info.row.original._id}/real-estate`);
-                // router.push(route.edit!);
-              }}
+              onClick={() => setSelectedDraft(info.row.original)}
             >
-              <Edit className="h-5 w-5 text-gray-600" />
+              <Send className="h-5 w-5" />
             </Button>
-            {info.row.original.status !== "draft" && (
-              <Link href={`/assets/${info.row.original._id}/overview`}>
-                <Button variant="outline" size="icon">
-                  <Eye className="h-5 w-5" />
-                </Button>
-              </Link>
-            )}
-            {info.row.original.status === "draft" && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setSelectedDraft(info.row.original)}
-              >
-                <Send className="h-5 w-5" />
-              </Button>
-            )}
-          </div>
-        );
-      },
-      enableResizing: false,
-      size: 60,
-      maxSize: 80,
+          )}
+        </div>
+      );
     },
-  ];
+    enableResizing: false,
+    size: 60,
+    maxSize: 80,
+  },
+];
+
+const getColumns = (
+  setAssetId: (assetId: string) => void,
+  setIsActiveDialog: (isOpen: boolean) => void,
+  setSelectedDraft: any,
+  assetStatus?: string,
+  assetClass?: string,
+) => {
+  if (assetClass === "vehicles") {
+    return vehicleColumns(setAssetId, setIsActiveDialog, setSelectedDraft);
+  }
+
+  return realEstateColumns(
+    setAssetId,
+    setIsActiveDialog,
+    setSelectedDraft,
+    assetStatus,
+  );
 };
 
 export default getColumns;
