@@ -39,6 +39,57 @@ const toBodyTypeValue = (bodyType: unknown) => {
 
 const isMongoObjectIdString = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
+const normalizeDocumentPayload = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (!item || typeof item !== "object") return null;
+        const name =
+          typeof (item as Record<string, unknown>).name === "string"
+            ? (item as Record<string, unknown>).name
+            : "";
+        const url =
+          typeof (item as Record<string, unknown>).url === "string"
+            ? (item as Record<string, unknown>).url
+            : "";
+        if (!name || !url) return null;
+        return { name, url };
+      })
+      .filter(Boolean);
+  }
+
+  if (value && typeof value === "object") {
+    const doc = value as Record<string, unknown>;
+    const name = typeof doc.name === "string" ? doc.name : "";
+    const url = typeof doc.url === "string" ? doc.url : "";
+    if (!name || !url) return [];
+    return [{ name, url }];
+  }
+
+  return [];
+};
+
+const normalizeDocumentForForm = (value: unknown) => {
+  if (Array.isArray(value)) {
+    const first = value[0] as Record<string, unknown> | undefined;
+    if (!first || typeof first !== "object") return { name: null, url: null };
+    return {
+      name: typeof first.name === "string" ? first.name : null,
+      url: typeof first.url === "string" ? first.url : null,
+    };
+  }
+
+  if (value && typeof value === "object") {
+    const doc = value as Record<string, unknown>;
+    return {
+      name: typeof doc.name === "string" ? doc.name : null,
+      url: typeof doc.url === "string" ? doc.url : null,
+    };
+  }
+
+  return { name: null, url: null };
+};
+
 const buildVehiclePayload = (data: Record<string, any>) => {
   console.log("Form Data for Payload:", data);
   const trimVersion = String(data.trim ?? "").trim();
@@ -66,12 +117,12 @@ const buildVehiclePayload = (data: Record<string, any>) => {
 
     carDescription: data.about,
     investmentStats: data.investmentStats,
-    registrationDocuments: data.registrationDocuments,
-    omologationDocuments: data.omologationDocuments,
-    proofOfOriginDocuments: data.proofOfOriginDocuments,
-    Notarised: data.Notarised,
-    EvaluationCertificates: data.EvaluationCertificates,
-    InsuranceCertificates: data.InsuranceCertificates,
+    registrationDocuments: normalizeDocumentPayload(data.registrationDocuments),
+    omologationDocuments: normalizeDocumentPayload(data.omologationDocuments),
+    proofOfOriginDocuments: normalizeDocumentPayload(data.proofOfOriginDocuments),
+    Notarised: normalizeDocumentPayload(data.Notarised),
+    EvaluationCertificates: normalizeDocumentPayload(data.EvaluationCertificates),
+    InsuranceCertificates: normalizeDocumentPayload(data.InsuranceCertificates),
     ...(spvId ? { spvId } : {}),
   };
 };
@@ -95,6 +146,12 @@ const mapVehicleToFormValues = (vehicle: Record<string, any>) => {
       payload.engineDisplacement || payload.engineDisplacment || "",
     cylinders: payload.cylinders.toString() || "",
     horsePower: payload.horsePower || payload.Horsepower || "",
+    registrationDocuments: normalizeDocumentForForm(payload.registrationDocuments),
+    omologationDocuments: normalizeDocumentForForm(payload.omologationDocuments),
+    proofOfOriginDocuments: normalizeDocumentForForm(payload.proofOfOriginDocuments),
+    Notarised: normalizeDocumentForForm(payload.Notarised),
+    EvaluationCertificates: normalizeDocumentForForm(payload.EvaluationCertificates),
+    InsuranceCertificates: normalizeDocumentForForm(payload.InsuranceCertificates),
   };
 };
 
