@@ -14,7 +14,6 @@ import { boardMembersFormConfig } from "@/modules/SPV/form-config/boardMembers";
 import { useFormContext } from "react-hook-form";
 import { useABApi } from "@/hooks/spv/useABApi";
 
-
 interface BoardMembersDialogProps {
   index: number | null;
   setIndex: React.Dispatch<React.SetStateAction<number | null>>;
@@ -31,13 +30,12 @@ const BoardMembersDialog = ({
   setIndex,
   fields,
   remove,
-  
 }: BoardMembersDialogProps) => {
   const { createAB, updateAB } = useABApi();
   const { getValues: formGetValues, clearErrors, trigger } = useFormContext();
 
   const isOpen = index !== null;
-  const isEdit = index !== -1;
+  const isEdit = index !== null && fields[index]?._id;
 
   // const handleClose = () => {
   //   if (index !== null) {
@@ -58,17 +56,12 @@ const BoardMembersDialog = ({
   //   setOpenBoardMembersDialog(false);
   // };
 
-  const onOpenChange = (open: boolean) => {
-    if (!open) {
-      const previousValues = index !== null ? fields[index] : {};
-      if (index !== null) {
-        update(index, previousValues);
-      }
-
-      clearErrors(`boardMembers.${index}`);
-      setIndex(null);
-    }
-  };
+ const onOpenChange = (open: boolean) => {
+  if (!open) {
+    clearErrors();
+    setIndex(null);
+  }
+};
 
   const onSubmit = async () => {
     console.log("Submitting form for index:", index);
