@@ -84,6 +84,11 @@ export default function VehicleStages({
           isFilled(data.investmentStats?.investmentPeriod) &&
           isFilled(data.investmentStats?.linkToComparableListing)
         );
+      case "vehicle-gallery":
+        return (
+          (isFilled(data.media?.imageURL) || isFilled(data.media?.videoURL)) &&
+          isFilled(data.media?.gallery)
+        );
 
       default:
         return false;

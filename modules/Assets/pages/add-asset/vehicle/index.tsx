@@ -29,6 +29,9 @@ const ValueAndInvestment = dynamic(
 const OwnerShipDocsInfo = dynamic(
   () => import("../../../ui/add-vehicle/steps/OwnerShipDocs"),
 );
+const VehicleGallery = dynamic(
+  () => import("../../../ui/add-vehicle/steps/VehicleGallery"),
+);
 
 const toBodyTypeValue = (bodyType: unknown) => {
   if (typeof bodyType !== "string") return "";
@@ -119,10 +122,15 @@ const buildVehiclePayload = (data: Record<string, any>) => {
     investmentStats: data.investmentStats,
     registrationDocuments: normalizeDocumentPayload(data.registrationDocuments),
     omologationDocuments: normalizeDocumentPayload(data.omologationDocuments),
-    proofOfOriginDocuments: normalizeDocumentPayload(data.proofOfOriginDocuments),
+    proofOfOriginDocuments: normalizeDocumentPayload(
+      data.proofOfOriginDocuments,
+    ),
     Notarised: normalizeDocumentPayload(data.Notarised),
-    EvaluationCertificates: normalizeDocumentPayload(data.EvaluationCertificates),
+    EvaluationCertificates: normalizeDocumentPayload(
+      data.EvaluationCertificates,
+    ),
     InsuranceCertificates: normalizeDocumentPayload(data.InsuranceCertificates),
+    media: data.media,
     ...(spvId ? { spvId } : {}),
   };
 };
@@ -146,12 +154,23 @@ const mapVehicleToFormValues = (vehicle: Record<string, any>) => {
       payload.engineDisplacement || payload.engineDisplacment || "",
     cylinders: payload.cylinders.toString() || "",
     horsePower: payload.horsePower || payload.Horsepower || "",
-    registrationDocuments: normalizeDocumentForForm(payload.registrationDocuments),
-    omologationDocuments: normalizeDocumentForForm(payload.omologationDocuments),
-    proofOfOriginDocuments: normalizeDocumentForForm(payload.proofOfOriginDocuments),
+    registrationDocuments: normalizeDocumentForForm(
+      payload.registrationDocuments,
+    ),
+    omologationDocuments: normalizeDocumentForForm(
+      payload.omologationDocuments,
+    ),
+    proofOfOriginDocuments: normalizeDocumentForForm(
+      payload.proofOfOriginDocuments,
+    ),
     Notarised: normalizeDocumentForForm(payload.Notarised),
-    EvaluationCertificates: normalizeDocumentForForm(payload.EvaluationCertificates),
-    InsuranceCertificates: normalizeDocumentForForm(payload.InsuranceCertificates),
+    EvaluationCertificates: normalizeDocumentForForm(
+      payload.EvaluationCertificates,
+    ),
+    InsuranceCertificates: normalizeDocumentForForm(
+      payload.InsuranceCertificates,
+    ),
+    // media: payload.media ,
   };
 };
 
@@ -354,6 +373,25 @@ export default function AddVehicle() {
       if (!isValid) return;
       nextTab();
     }
+    if (step === "ownership-documents") {
+      const fields = [
+        "registrationDocuments",
+        "omologationDocuments",
+        "proofOfOriginDocuments",
+        "Notarised",
+        "EvaluationCertificates",
+        "InsuranceCertificates",
+      ];
+      const isValid = await trigger(fields as any);
+      if (!isValid) return;
+      nextTab();
+    }
+    if (step === "vehicle-gallery") {
+      const fields = ["media.imageURL", "media.videoURL", "media.gallery"];
+      const isValid = await trigger(fields as any);
+      if (!isValid) return;
+      nextTab();
+    }
   };
 
   if (isLoadingVehicle && assetId) {
@@ -386,6 +424,7 @@ export default function AddVehicle() {
                 "vehicle-identification": (
                   <VehicleIdentification asset={vehicle || {}} />
                 ),
+                "vehicle-gallery": <VehicleGallery asset={vehicle || {}} />,
                 "engine-specs": <EngineAndSpecs asset={vehicle || {}} />,
                 "valuation-investment": (
                   <ValueAndInvestment asset={vehicle || {}} />

@@ -29,7 +29,7 @@ export default function StepIndicator({
               <button
                 onClick={() => changeStep(step.id)}
                 disabled={isDisabled}
-                className={`flex items-center justify-center p-2 rounded-lg w-full transition-all border border-primary/50 ${
+                className={`flex items-center justify-center p-2 rounded-lg w-full transition-all border border-primary/50 cursor-pointer ${
                   isActive
                     ? 'bg-primary/30 text-black'
                     : 'bg-gray-50 text-black'

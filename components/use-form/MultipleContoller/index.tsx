@@ -112,7 +112,7 @@ export default function MultiImageUploader({
         htmlFor={name}
         className={cn('text-sm font-medium', error && 'text-destructive')}
       >
-        {label} {rules?.required && <span className="ml-1">*</span>}
+        {label} {rules?.required && <span className="ml-1 text-destructive">*</span>}
       </label>
 
       <div className="grid gap-4">

@@ -108,7 +108,7 @@ export default function ImageUploader({
         htmlFor={name}
         className={cn("text-sm font-medium", error && "text-destructive")}
       >
-        {label} {rules?.required && <span className="ml-1">*</span>}
+        {label} {rules?.required && <span className="ml-1 text-destructive">*</span>}
       </label>
 
       <div className="grid grid-cols-2 gap-4">

@@ -82,6 +82,10 @@ export const VEHICLE_STEPS_TABS = [
     title: "Engine & Specs",
   },
   {
+    id: "vehicle-gallery",
+    title: "Gallery",
+  },
+  {
     id: "valuation-investment",
     title: "Valuation & Investment",
   },
