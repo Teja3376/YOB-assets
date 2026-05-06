@@ -33,6 +33,10 @@ const VehicleGallery = dynamic(
   () => import("../../../ui/add-vehicle/steps/VehicleGallery"),
 );
 
+const TokenInformation = dynamic(
+  () => import("../../../ui/add-vehicle/steps/TokenInformation"),
+);
+  
 const toBodyTypeValue = (bodyType: unknown) => {
   if (typeof bodyType !== "string") return "";
   const normalized = bodyType.trim().toLowerCase();
@@ -93,6 +97,13 @@ const normalizeDocumentForForm = (value: unknown) => {
   return { name: null, url: null };
 };
 
+const normalizeTokenInformationPayload = (value: unknown) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+  return value as Record<string, unknown>;
+};
+
 const buildVehiclePayload = (data: Record<string, any>) => {
   console.log("Form Data for Payload:", data);
   const trimVersion = String(data.trim ?? "").trim();
@@ -120,6 +131,7 @@ const buildVehiclePayload = (data: Record<string, any>) => {
 
     carDescription: data.about,
     investmentStats: data.investmentStats,
+    tokenInformation: normalizeTokenInformationPayload(data.tokenInformation),
     registrationDocuments: normalizeDocumentPayload(data.registrationDocuments),
     omologationDocuments: normalizeDocumentPayload(data.omologationDocuments),
     proofOfOriginDocuments: normalizeDocumentPayload(
@@ -431,6 +443,9 @@ export default function AddVehicle() {
                 ),
                 "ownership-documents": (
                   <OwnerShipDocsInfo asset={vehicle || {}} />
+                ),
+                "token-information": (
+                  <TokenInformation asset={vehicle || {}} />
                 ),
               }[step] || null}
             </Suspense>
