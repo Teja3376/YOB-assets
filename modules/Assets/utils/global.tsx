@@ -93,6 +93,10 @@ export const VEHICLE_STEPS_TABS = [
     id: "marketplace-connectors",
     title: "Marketplace Connectors",
   },
+  {
+    id: "token-information",
+    title: "Token Information",
+  },
 ];
 export const ASSET_STYLE = [
   { label: "Tower", value: "tower" },
