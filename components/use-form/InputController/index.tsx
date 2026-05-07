@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import type React from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -78,7 +78,12 @@ const InputController: React.FC<InputControllerProps> = ({
                   placeholder={placeholder}
                   value={value !== null && value !== undefined ? value : ""}
                   onChange={(e) => {
-                    const raw = e.target.value;
+                    let raw = e.target.value;
+
+                    if (type === "number") {
+                      raw = raw.replace(/\D/g, "");
+                      raw = raw.slice(0, 12);
+                    }
                     let finalValue: string | number = raw;
                     if (type === "number") {
                       finalValue = raw === "" ? "" : Number(raw);
@@ -90,7 +95,7 @@ const InputController: React.FC<InputControllerProps> = ({
                   className={cn(
                     icon && iconPosition === "left" && "pl-10",
                     icon && iconPosition === "right" && "pr-10",
-                    type === "url" && value && "rounded-r-none"
+                    type === "url" && value && "rounded-r-none",
                   )}
                 />
                 {icon && iconPosition === "right" && type !== "url" && (

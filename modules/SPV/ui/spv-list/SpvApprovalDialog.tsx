@@ -94,6 +94,8 @@ const SendSpvDialog = ({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <Textarea
               placeholder="Enter the message"
+              className="w-full resize-none overflow-y-auto wrap-anywhere"
+                rows={4}
               {...register("message")}
             />
 
