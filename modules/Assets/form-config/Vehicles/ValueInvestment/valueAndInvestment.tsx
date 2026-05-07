@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 
 import { useParams } from "next/navigation";
 
-export const valueAndInvestmentConfig = (): FormFieldConfig[] => {
+export const valueAndInvestmentConfig = (currency: string): FormFieldConfig[] => {
   const param = useParams();
   const disable = !!param.id;
 
@@ -15,7 +15,7 @@ export const valueAndInvestmentConfig = (): FormFieldConfig[] => {
       type: "number",
       name: "investmentStats.startingValue",
       control,
-      label: "Starting Value",
+      label: `Starting Value (${currency})`,
       rules: { required: "Starting Value is required" },
       disabled: disable,
     },
@@ -23,9 +23,9 @@ export const valueAndInvestmentConfig = (): FormFieldConfig[] => {
       type: "number",
       name: "investmentStats.targetFinalValue",
       control,
-      label: "Target Final Value",
+      label: `Target Final Value (${currency})`,
       rules: { required: "Target Final Value  is required" },
-      disabled: disable,
+      disabled: true,
     },
     {
       type: "number",

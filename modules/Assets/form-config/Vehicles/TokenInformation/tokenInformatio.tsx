@@ -136,14 +136,14 @@ const formConfig = (asset: Asset): FormFieldConfig[] => {
     },
     {
       name: "tokenInformation.tokenPrice",
-      label: `Token Price (${asset?.currency})`,
+      label: `Token Price (${asset?.company?.currency})`,
       type: "number",
       control: control,
       disabled: true,
     },
     {
       name: "investmentStats.startingValue",
-      label: `Starting Value (${asset?.currency })`,
+      label: `Starting Value (${asset?.company?.currency })`,
       type: "number",
       control: control,
       disabled: true,
@@ -179,7 +179,7 @@ const formConfig = (asset: Asset): FormFieldConfig[] => {
 
     {
       name: "tokenInformation.softcapAmount",
-      label: `Softcap Amount (${asset?.currency ?? ""})`,
+      label: `Softcap Amount (${asset?.company?.currency ?? ""})`,
       type: "number",
       control: control,
       disabled: true,

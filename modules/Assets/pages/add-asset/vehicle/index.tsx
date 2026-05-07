@@ -36,7 +36,7 @@ const VehicleGallery = dynamic(
 const TokenInformation = dynamic(
   () => import("../../../ui/add-vehicle/steps/TokenInformation"),
 );
-  
+
 const toBodyTypeValue = (bodyType: unknown) => {
   if (typeof bodyType !== "string") return "";
   const normalized = bodyType.trim().toLowerCase();
@@ -143,6 +143,11 @@ const buildVehiclePayload = (data: Record<string, any>) => {
     ),
     InsuranceCertificates: normalizeDocumentPayload(data.InsuranceCertificates),
     media: data.media,
+    // fees: Array.isArray(data.fees)
+    //   ? data.fees.map((fee: Record<string, any>) => ({
+    //       ...fee,
+    //     }))
+    //   : [],
     ...(spvId ? { spvId } : {}),
   };
 };
@@ -182,6 +187,12 @@ const mapVehicleToFormValues = (vehicle: Record<string, any>) => {
     InsuranceCertificates: normalizeDocumentForForm(
       payload.InsuranceCertificates,
     ),
+
+    fees: Array.isArray(payload.fees)
+      ? payload.fees.map((fee: Record<string, any>) => ({
+          ...fee,
+        }))
+      : [],
     // media: payload.media ,
   };
 };
@@ -444,9 +455,7 @@ export default function AddVehicle() {
                 "ownership-documents": (
                   <OwnerShipDocsInfo asset={vehicle || {}} />
                 ),
-                "token-information": (
-                  <TokenInformation asset={vehicle || {}} />
-                ),
+                "token-information": <TokenInformation asset={vehicle || {}} />,
               }[step] || null}
             </Suspense>
 
