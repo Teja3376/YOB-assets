@@ -25,7 +25,7 @@ interface BoardMembersProps {
 }
 
 const BoardMembers: React.FC<BoardMembersProps> = ({ spv }) => {
-  const { control, reset } = useFormContext<any>();
+  const { control } = useFormContext<any>();
   const { deleteAB } = useABApi();
   const [index, setIndex] = useState<number | null>(null);
   // const [deleteIndex, setDeleteIndex] = useState<any | null>(null);
@@ -36,7 +36,6 @@ const BoardMembers: React.FC<BoardMembersProps> = ({ spv }) => {
   });
   const addBoardMember = () => {
     setIndex(-1);
-    reset();
   };
   // const isDelete = deleteIndex !== null;
   const onSubmit = async (rowData:any) => {

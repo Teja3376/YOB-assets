@@ -51,7 +51,20 @@ const index = ({ asset }: { asset?: any }) => {
     if (isEdit && index !== null) {
       const { expense_id, ...data } = values;
       updateExpense(
-        { expenseData: data, expenseId: values._id },
+        {
+          expenseData: data,
+          expenseId: values._id,
+          rentalInformation: {
+            grossMonthlyRent: grossRent,
+            netMonthlyRent: netRent,
+            grossAnnualRent: grossRent * 12,
+            netAnnualRent: netRent * 12,
+            expenses: {
+              monthlyExpenses: expenses,
+              annualExpenses: expenses * 12,
+            },
+          },
+        },
         {
           onSuccess: (res: any) => {
             console.log("Expense updated successfully:", res);
@@ -232,18 +245,24 @@ const index = ({ asset }: { asset?: any }) => {
           <Expenses
             title="Monthly Rent"
             sqft={rentNumberOfSfts}
-            grossRent={formatCompactNumber(grossRent)}
-            netRent={formatCompactNumber(netRent)}
-            expenses={formatCompactNumber(expenses)}
+            grossRent={formatCompactNumber(
+              asset?.rentalInformation?.grossMonthlyRent || 0,
+            )}
+            netRent={formatCompactNumber(
+              asset?.rentalInformation?.netMonthlyRent || 0,
+            )}
+            expenses={formatCompactNumber(
+              asset?.rentalInformation?.expenses?.monthlyExpenses || 0,
+            )}
             currency={asset?.currency}
             extraText="After All Expenses"
           />
           <Expenses
             title="Annual Rent"
             sqft={rentNumberOfSfts}
-            grossRent={formatCompactNumber(grossRent * 12)}
-            expenses={formatCompactNumber(expenses * 12)}
-            netRent={formatCompactNumber(netRent * 12)}
+            grossRent={formatCompactNumber(asset?.rentalInformation?.grossAnnualRent || 0,)}
+            netRent={formatCompactNumber(asset?.rentalInformation?.netAnnualRent || 0,)}
+            expenses={formatCompactNumber(asset?.rentalInformation?.expenses?.annualExpenses || 0,)}
             extraText="Monthly x12"
             currency={asset?.currency ?? ""}
           />

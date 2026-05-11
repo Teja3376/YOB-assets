@@ -2,7 +2,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Filter, X } from "lucide-react";
@@ -14,9 +18,8 @@ interface FiltersProps {
   selectedFilters: string[];
   handleFilterToggle: (value: string) => void;
   removeFilter: (value: string) => void;
-  clearAllFilters: () => void;  
+  clearAllFilters: () => void;
 }
-
 
 const Filters: React.FC<FiltersProps> = ({
   searchTerm,
@@ -78,18 +81,19 @@ const Filters: React.FC<FiltersProps> = ({
           selectedFilters.map((filter) => {
             const option = SPV_TYPES.find((opt) => opt.value === filter);
             return (
-              <Badge
-                key={filter}
-                variant="outline"
-                className="flex items-center gap-1 px-3 py-1"
-              >
-                {option?.label || filter}
-                <X
-                  size={14}
-                  className="cursor-pointer"
-                  onClick={() => removeFilter(filter)}
-                />
-              </Badge>
+              <div className="flex items-center gap-1 border border-gray-300 rounded-full px-2 py-1 text-xs text-black">
+                <span>{option?.label || filter}</span>
+
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFilter(filter);
+                  }}
+                  className="cursor-pointer flex items-center justify-center"
+                >
+                  <X size={12} />
+                </span>
+              </div>
             );
           })
         ) : (
