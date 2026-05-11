@@ -3,7 +3,6 @@ import { formatCurrencyWithLocale } from "@/lib/format.utils";
 const Expenses = ({
   title,
   extraText,
-  sqft,
   grossRent,
   netRent,
   expenses = 0,
@@ -11,7 +10,6 @@ const Expenses = ({
 }: {
   title: string;
   extraText: string;
-  sqft: number;
   grossRent: number | string;
   netRent: number | string;
   expenses?: number | string;
@@ -39,15 +37,16 @@ const Expenses = ({
         <div className='flex items-center gap-2'>
           <h1 className='text-lg font-semibold'>{title}</h1>
         </div>
-        <span className='rounded-full bg-gray-500 text-white px-3 py-1  text-sm shadow-sm'>
+        {/* <span className='rounded-full bg-gray-500 text-white px-3 py-1  text-sm shadow-sm'>
           {sqft} sft
-        </span>
+        </span> */}
       </div>
       <div className='bg-white flex flex-col p-5 space-y-4'>
         <div className='flex justify-between gap-6 w-full'>
           <div className='flex flex-col items-start p-3  rounded-md flex-1'>
             <h1 className='text-sm text-gray-500 mb-1'>Gross Rent</h1>
             <span className='text-lg font-semibold text-slate-800'>
+              {/* {currencySymbol} {grossRent} */}
               {formatCurrencyWithLocale(grossRent, currency)}
             </span>
           </div>
@@ -62,7 +61,7 @@ const Expenses = ({
             <h1 className='font-medium text-sm text-slate-700'>Net {title}</h1>
             <p className='text-sm text-gray-500'> {extraText}</p>
           </div>
-            <span className='text-md font-bold text-black'> {formatCurrencyWithLocale(netRent, currency)}</span>
+          <span className='text-md font-bold text-black'> {formatCurrencyWithLocale(netRent, currency)}</span>
         </div>
       </div>
     </div>

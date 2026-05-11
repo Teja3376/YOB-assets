@@ -62,6 +62,7 @@ const SendAssetApprovalDialog = ({
   });
 
   const onSubmit = (data: SendAssetFormValues) => {
+    console.log("Form Data:", data);
     onSend(assetId, data.message);
     reset(); // clear after send
   };

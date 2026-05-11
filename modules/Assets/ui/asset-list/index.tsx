@@ -37,6 +37,7 @@ import { PaymentDialog } from "@/modules/PaymentRequest/ui/PaymentTypeDialog";
 import { getLocalItem, setLocalItem } from "@/lib/localStorage";
 import { ASSET_CLASS_TABS } from "../../utils/global";
 import clsx from "clsx";
+import useSendVehicleApproval from "../../hooks/vehicle/useSendVehicleApproval";
 
 const Index: React.FC = () => {
   const router = useRouter();
@@ -60,7 +61,12 @@ const Index: React.FC = () => {
   const [isListingFeeOpen, setIsListingFeeOpen] = useState<boolean>(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
 
-  const { mutate: sendApproval, isPending: isSending } = useSendApproval();
+  const { mutate: sendRealEstateApproval, isPending: isRealEstateApproving } =
+    useSendApproval();
+  const { mutate: sendVehicleApproval, isPending: isVehicleApproving } =
+    useSendVehicleApproval();
+
+  // const
   const {
     mutate: activateAsset,
     isPending: isActivating,
@@ -118,25 +124,57 @@ const Index: React.FC = () => {
   };
 
   const handleSendStatus = (assetId: string, message?: string) => {
-    sendApproval(
-      {
-        assetId,
-        sendApprovalData: { status: "pending", issuerComments: message || "" },
-      },
-      {
-        onSuccess: () => {
-          setSelectedDraft(null);
-          toast.success("Asset sent for approval successfully");
+    // toast("Sending asset for approval...", { icon: <Spinner /> });
+    if (assetClass === "vehicles") {
+
+      // console.log("Sending Vehicle Approval with message:", assetId);
+      sendVehicleApproval(
+        {
+          assetId,
+          sendApprovalData: {
+            status: "pending",
+            issuerComments: message || "",
+          },
         },
-        onError: (error: any) => {
-          console.error("Error sending asset for approval:", error);
-          toast.error(
-            error?.response?.data?.message ||
-              "Failed to send asset for approval",
-          );
+        {
+          onSuccess: () => {
+            setSelectedDraft(null);
+            toast.success("Asset sent for approval successfully");
+          },
+          onError: (error: any) => {
+            console.error("Error sending asset for approval:", error);
+            toast.error(
+              error?.response?.data?.message ||
+                "Failed to send asset for approval",
+            );
+          },
         },
-      },
-    );
+      );
+    }
+    if (assetClass === "real-estate") {
+      sendRealEstateApproval(
+        {
+          assetId,
+          sendApprovalData: {
+            status: "pending",
+            issuerComments: message || "",
+          },
+        },
+        {
+          onSuccess: () => {
+            setSelectedDraft(null);
+            toast.success("Asset sent for approval successfully");
+          },
+          onError: (error: any) => {
+            console.error("Error sending asset for approval:", error);
+            toast.error(
+              error?.response?.data?.message ||
+                "Failed to send asset for approval",
+            );
+          },
+        },
+      );
+    }
   };
 
   const handleTabChange = (tabId: string) => {
@@ -249,6 +287,8 @@ const Index: React.FC = () => {
       ),
     },
   ];
+
+  const isSending = isRealEstateApproving || isVehicleApproving;
 
   return (
     <div className="p-2 space-y-3">

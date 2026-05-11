@@ -4,7 +4,7 @@ import { formatCurrencyFlexible } from "@/lib/format.utils";
 import { valueAndInvestmentConfig } from "@/modules/Assets/form-config/Vehicles/ValueInvestment/valueAndInvestment";
 import { useFormContext } from "react-hook-form";
 import Feee from "../Feee";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 const VALUATION_FIELDS = [
   "investmentStats.startingValue",
   "investmentStats.targetFinalValue",
@@ -15,8 +15,7 @@ export default function ValuationTab() {
   const { watch, setValue } = useFormContext();
   const startingValue = watch("investmentStats.startingValue");
   const currency = watch("company.currency");
-  console.log("Starting Value:", startingValue);
-  console.log("Currency:", currency);
+
 
   const allFields = valueAndInvestmentConfig(currency);
   const config = allFields.filter((field) =>
@@ -24,21 +23,25 @@ export default function ValuationTab() {
   );
 
   const fees = watch("fees");
-  console.log("Fees:", fees);
 
-  const feesValue = fees?.reduce((acc: number, fee: any) => {
-    if (fee.status) {
+  const totalFees = useMemo(() => {
+    if (!fees?.length) return 0;
+
+    return fees.reduce((acc: number, fee: any) => {
+      if (!fee.status) return acc;
+
       if (fee.isPercentage) {
-        return acc + (startingValue * fee.value) / 100;
+        return acc + (Number(startingValue || 0) * fee.value) / 100;
       }
+
       return acc + fee.value;
-    }
-    return acc;
-  }, 0);
+    }, 0);
+  }, [fees, startingValue]);
 
-  const totalFees = feesValue;
-  const targetFinalValue = Number(startingValue || 0) + feesValue;
-
+  const targetFinalValue = useMemo(() => {
+    return Number(startingValue || 0) + totalFees;
+  }, [startingValue, totalFees]);
+  
   useEffect(() => {
     setValue("investmentStats.targetFinalValue", targetFinalValue);
   }, [targetFinalValue, setValue]);

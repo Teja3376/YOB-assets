@@ -143,6 +143,7 @@ const buildVehiclePayload = (data: Record<string, any>) => {
     ),
     InsuranceCertificates: normalizeDocumentPayload(data.InsuranceCertificates),
     media: data.media,
+    rentalInformation: data.rentalInformation,
     // fees: Array.isArray(data.fees)
     //   ? data.fees.map((fee: Record<string, any>) => ({
     //       ...fee,
@@ -191,6 +192,11 @@ const mapVehicleToFormValues = (vehicle: Record<string, any>) => {
     fees: Array.isArray(payload.fees)
       ? payload.fees.map((fee: Record<string, any>) => ({
           ...fee,
+        }))
+      : [],
+    expenses: Array.isArray(payload.expenses)
+      ? payload.expenses.map((expense: Record<string, any>) => ({
+          ...expense,
         }))
       : [],
     // media: payload.media ,
