@@ -6,23 +6,6 @@ export const daoFormConfig = () => {
   const { control, watch, setValue } = useFormContext<any>();
 
   const daoName = watch("daoConfiguration.daoName");
-  const tokenSymbol = watch("daoConfiguration.tokenSymbol");
-
-  useEffect(() => {
-    if (!daoName) {
-      setValue("daoConfiguration.tokenSymbol", "", {
-        shouldDirty: false,
-      });
-      return;
-    }
-
-    const cleaned = daoName.slice(0, 3).trim().replace(/\s+/g, "_").toUpperCase();
-    const autoSymbol = `${cleaned}_DAO`;
-
-    setValue("daoConfiguration.tokenSymbol", autoSymbol, {
-      shouldDirty: true,
-    });
-  }, [daoName, setValue]);
 
   return [
     {
@@ -39,18 +22,6 @@ export const daoFormConfig = () => {
         },
       },
     //   disabled: spv?.daoConfiguration?.daoName ? true : false,
-    },
-    {
-      label: "Token Symbol",
-      name: `daoConfiguration.tokenSymbol`,
-      type: "text",
-      fullWidth: false,
-      control,
-      rules: {
-        required: "Token Symbol is required",
-      },
-      // defaultValue: spVName,
-      disabled: true,
     },
   ];
 };
