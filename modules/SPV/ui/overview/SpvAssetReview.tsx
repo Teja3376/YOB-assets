@@ -258,7 +258,7 @@ const SpvAssetReview = ({ values, embedded }: SpvAssetReviewProps) => {
         )}
       </ReviewSection>
 
-      <ReviewSection icon={<Wallet2 className="h-5 w-5" />} title="DAO integration">
+      <ReviewSection icon={<Wallet2 className="h-5 w-5" />} title="DAO Integration">
         {daoSkipped ? (
           <p className="rounded-md border border-amber-100 bg-amber-50 px-3 py-2 text-amber-900">
             DAO setup was skipped. You can configure it from the SPV edit flow.
@@ -266,35 +266,6 @@ const SpvAssetReview = ({ values, embedded }: SpvAssetReviewProps) => {
         ) : (
           <>
             <Row label="DAO name" value={String(dao.daoName ?? "—")} />
-            <Row label="Token symbol" value={String(dao.tokenSymbol ?? "—")} />
-            <Row label="Blockchain" value={String(dao.blockchain ?? "—")} />
-            <Row label="Governance model" value={String(dao.governanceModel ?? "—")} />
-            <Row
-              label="Proposal threshold"
-              value={
-                dao.proposalThresholdPercent != null &&
-                dao.proposalThresholdPercent !== ""
-                  ? `${dao.proposalThresholdPercent}%`
-                  : "—"
-              }
-            />
-            <Row
-              label="Quorum"
-              value={
-                dao.quorumPercent != null && dao.quorumPercent !== ""
-                  ? `${dao.quorumPercent}%`
-                  : "—"
-              }
-            />
-            <Row
-              label="Voting period"
-              value={
-                votingPeriod
-                  ? `${votingPeriod.days ?? 0}d ${votingPeriod.hours ?? 0}h`
-                  : "—"
-              }
-            />
-            <Row label="Decision type" value={String(dao.decisionType ?? "—")} />
             <Row
               label="Voting rights"
               value={governanceRights?.votingRights ? "On" : "Off"}
@@ -302,6 +273,10 @@ const SpvAssetReview = ({ values, embedded }: SpvAssetReviewProps) => {
             <Row
               label="Proposal creation"
               value={governanceRights?.proposalCreation ? "On" : "Off"}
+            />
+            <Row
+              label="Veto power"
+              value={dao.adminVetoPower ? "On" : "Off"}
             />
             <Row
               label="Authorized representative confirmed"

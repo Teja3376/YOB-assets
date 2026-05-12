@@ -111,7 +111,7 @@ export const governanceConfig = (): FormFieldConfig[] => {
           value: "major-decision-only",
         },
         {
-          label: "All Decisions",
+          label: "All Decision",
           value: "all-decisions",
         },
       ],

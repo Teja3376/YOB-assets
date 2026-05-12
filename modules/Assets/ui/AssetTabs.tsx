@@ -15,6 +15,7 @@ import UpdateAssetStatusDialog from "./asset-list/UpdateAssetStatusDIalog";
 import { PaymentSuccessDialog } from "@/modules/PaymentRequest/ui/SuccessDialog";
 import { PaymentFailedDialog } from "@/modules/PaymentRequest/ui/FailedDialog";
 
+
 const tabs = [
   {
     title: "Overview",
@@ -35,6 +36,10 @@ const tabs = [
   {
     title: "Waitlist",
     href: "waitlist",
+  },
+  {
+    title: "DAO",
+    href: "dao",
   },
 ];
 
