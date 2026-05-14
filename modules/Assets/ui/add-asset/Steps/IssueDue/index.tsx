@@ -22,28 +22,35 @@ const IssuesDue = memo(({ tab, step, asset }: Props) => {
   const router = useRouter();
   const country = asset.country;
 
-  let countryCode = "";
-  if (country) {
-    switch (country) {
-      case "IN":
-        countryCode = "+91";
-        break;
-      case "US":
-        countryCode = "+1";
-        break;
-      case "UK":
-        countryCode = "+44";
-        break;
-      case "AE":
-        countryCode = "+971";
-        break;
-      case "QAR":
-        countryCode = "+974";
-        break;
-      default:
-        countryCode = "";
-    }
-  }
+  // console.log("country", country);
+
+  // let countryCode = "";
+  // if (country) {
+  //   switch (country) {
+  //     case "IN":
+  //       countryCode = "+91";
+  //       break;
+  //     case "US":
+  //       countryCode = "+1";
+  //       break;
+  //     case "UK":
+  //       countryCode = "+44";
+  //       break;
+  //     case "AE":
+  //       countryCode = "+971";
+  //       break;
+  //     case "QAR":
+  //       countryCode = "+974";
+  //       break;
+  //     // case "IT":
+  //     //   countryCode = "+39";
+  //     //   break;  
+  //     default:
+  //       countryCode = "";
+  //   }
+  // }
+
+  const countryCode = country || ""; // keep ISO like "IT"
   console.log("countryCode", countryCode)
   // Memoized tab change handler
   const handleTabChange = useCallback(

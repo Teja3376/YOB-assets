@@ -48,7 +48,6 @@ const SendAssetApprovalDialog = ({
   description = "This will notify the super admin to review this Asset",
   note = "Note: Once sent, Admin will be notified and can request changes before the asset goes live.",
 }: SendAssetDialogProps) => {
-  
   const {
     register,
     handleSubmit,
@@ -78,44 +77,45 @@ const SendAssetApprovalDialog = ({
       }}
     >
       <DialogContent>
-        {isSending&&<Loading/>}
-       { !isSending&&<div>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            {description}
-            {assetName ? ` (${assetName})` : ""}
-          </DialogDescription>
-        </DialogHeader>
+        {isSending && <Loading />}
+        {!isSending && (
+          <div>
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>
+                {description}
+                {assetName ? ` (${assetName})` : ""}
+              </DialogDescription>
+            </DialogHeader>
 
-        <p className="text-sm text-gray-600">{note}</p>
+            <p className="text-sm text-gray-600">{note}</p>
 
-        {/* ✅ FORM START */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          
-          <Textarea
-            placeholder="Enter the message"
-            {...register("message")}
-          />
+            {/* ✅ FORM START */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+              <Textarea
+                placeholder="Enter the message"
+                className="w-full resize-none overflow-y-auto wrap-anywhere"
+                rows={4}
+                {...register("message")}
+              />
 
-          {/* ❌ Error */}
-          {errors.message && (
-            <p className="text-sm text-red-500">
-              {errors.message.message}
-            </p>
-          )}
+              {/* ❌ Error */}
+              {errors.message && (
+                <p className="text-sm text-red-500">{errors.message.message}</p>
+              )}
 
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={onClose}>
-              Close
-            </Button>
+              <DialogFooter>
+                <Button type="button" variant="secondary" onClick={onClose}>
+                  Close
+                </Button>
 
-            <Button type="submit" disabled={isSending}>
-              { "Send"}
-            </Button>
-          </DialogFooter>
-        </form>
-        </div>}
+                <Button type="submit" disabled={isSending}>
+                  {"Send"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </div>
+        )}
         {/* ✅ FORM END */}
       </DialogContent>
     </Dialog>

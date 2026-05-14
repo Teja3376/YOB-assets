@@ -18,7 +18,6 @@ import { useFormContext } from "react-hook-form";
 import { daoFormConfig } from "@/modules/SPV/form-config/daoConfig";
 import {
     adminVetoPowerConfig,
-    governanceConfig,
     proposalCreationConfig,
     votingRightsConfig,
 } from "@/modules/SPV/form-config/governaceConfig";
@@ -35,14 +34,10 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
     const { spvId: id } = useParams();
     const [isFormVisible, setIsFormVisible] = useState(false);
     const daoName = watch("daoConfiguration.daoName");
-    const tokenSymbol = watch("daoConfiguration.tokenSymbol");
-    const blockChain = watch("daoConfiguration.blockchain");
-    const governanceModel = watch("daoConfiguration.governanceModel");
     const issuerRepSignature = watch("daoConfiguration.issuerRepSignature");
 
     const hasDaoConfiguration =
-        Boolean(String(daoName ?? "").trim()) ||
-        Boolean(String(tokenSymbol ?? "").trim());
+        Boolean(String(daoName ?? "").trim());
 
     /** Intro overlay + dimming only when there is no saved DAO data yet */
     const showDraftMask = !isFormVisible && !hasDaoConfiguration;
@@ -147,106 +142,9 @@ const DAOCreation = ({ onCompleteDao, isCompleting }: DAOCreationProps) => {
                             {FormGenerator(daoFormConfig())}
                         </div>
 
-                        {/* Blockchain Section */}
-                        <div className=" py-4 border-t border-gray-100">
-                            <span className="text-black font-medium block mb-3">
-                                Block Chain
-                            </span>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                {["Ethereum", "Polygon", "XRPL"].map((chain) => (
-                                    <Button
-                                        key={chain}
-                                        variant={
-                                            blockChain === chain ? "default" : "outline"
-                                        }
-                                        className="w-full h-10 justify-center relative"
-                                        type="button"
-                                        onClick={() => handleChainSelect(chain)}
-                                    >
-                                        {chain.charAt(0).toUpperCase() + chain.slice(1)}
-                                        {blockChain === chain && (
-                                            <Check className="absolute right-2 h-4 w-4" />
-                                        )}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
 
-                        {/* Governance Model Section */}
-                        <div className="py-4 border-t border-gray-100">
-                            <span className="text-black font-medium block mb-3">
-                                Governance Model
-                            </span>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <Button
-                                    variant={
-                                        governanceModel === "Token-Weighted"
-                                            ? "default"
-                                            : "outline"
-                                    }
-                                    className="w-full h-12 justify-start px-4 relative"
-                                    type="button"
-                                    onClick={() =>
-                                        handleGovernanceModelSelect("Token-Weighted")
-                                    }
-                                >
-                                    <Coins className="text-gray-500 mr-2 h-5 w-5" />
-                                    <span>Token Weighted</span>
-                                    {governanceModel === "Token-Weighted" && (
-                                        <Check className="absolute right-3 h-4 w-4" />
-                                    )}
-                                </Button>
 
-                                <Button
-                                    variant={
-                                        governanceModel === "Equal-Voting"
-                                            ? "default"
-                                            : "outline"
-                                    }
-                                    className="w-full h-12 justify-start px-4 relative"
-                                    type="button"
-                                    onClick={() =>
-                                        handleGovernanceModelSelect("Equal-Voting")
-                                    }
-                                >
-                                    <Users className="text-gray-500 mr-2 h-5 w-5" />
-                                    <span>Equal Voting</span>
-                                    {governanceModel === "Equal-Voting" && (
-                                        <Check className="absolute right-3 h-4 w-4" />
-                                    )}
-                                </Button>
-
-                                <Button
-                                    variant={
-                                        governanceModel === "Reputation-Based"
-                                            ? "default"
-                                            : "outline"
-                                    }
-                                    className="w-full h-12 justify-start px-4 relative"
-                                    type="button"
-                                    onClick={() =>
-                                        handleGovernanceModelSelect("Reputation-Based")
-                                    }
-                                >
-                                    <Star className="text-gray-500 mr-2 h-5 w-5" />
-                                    <span>Reputation Based</span>
-                                    {governanceModel === "Reputation-Based" && (
-                                        <Check className="absolute right-3 h-4 w-4" />
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Governance Parameters Section */}
-                        <div className="py-4 border-t border-gray-100">
-                            <span className="text-black font-medium block mb-3">
-                                Governance Parameters
-                            </span>
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                {FormGenerator(governanceConfig())}
-                            </div>
-                        </div>
-
+                        
                         {/* Governance Rights Section */}
                         <div className="py-4 border-t border-gray-100">
                             <div className="flex items-center gap-2 mb-3">

@@ -78,7 +78,12 @@ const InputController: React.FC<InputControllerProps> = ({
                   placeholder={placeholder}
                   value={value !== null && value !== undefined ? value : ""}
                   onChange={(e) => {
-                    const raw = e.target.value;
+                    let raw = e.target.value;
+
+                    if (type === "number") {
+                      raw = raw.replace(/\D/g, "");
+                      raw = raw.slice(0, 12);
+                    }
                     let finalValue: string | number = raw;
                     if (type === "number") {
                       finalValue = raw === "" ? "" : Number(raw);
