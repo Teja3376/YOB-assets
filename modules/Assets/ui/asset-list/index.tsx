@@ -38,6 +38,7 @@ import { getLocalItem, setLocalItem } from "@/lib/localStorage";
 import { ASSET_CLASS_TABS } from "../../utils/global";
 import clsx from "clsx";
 import useSendVehicleApproval from "../../hooks/vehicle/useSendVehicleApproval";
+import useVehicleActive from "../../hooks/vehicle/useVehicleActive";
 
 const Index: React.FC = () => {
   const router = useRouter();
@@ -73,6 +74,12 @@ const Index: React.FC = () => {
     isError,
     error,
   } = useActivateAsset();
+  const {
+    mutate: activateVehicle,
+    isPending: isActivatingVehicle,
+    isError: isVehicleError,
+    error: vehicleError,
+  } = useVehicleActive();
 
   const searchTerm = useDebounce(search, 500);
   const PAGE_SIZE_OPTIONS = [5, 10, 25];
@@ -105,28 +112,48 @@ const Index: React.FC = () => {
   };
 
   const updateStatus = async (updateAssetId: string, newStatus: string) => {
-    activateAsset(
-      { assetId: updateAssetId, status: newStatus },
-      {
-        onSuccess: () => {
-          toast.success("Asset status updated successfully");
-          setAssetId(null);
-          setIsActiveDialog(false);
+    if (assetClass === "vehicles") {
+      activateVehicle(
+        { assetId: updateAssetId, status: newStatus },
+        {
+          onSuccess: () => {
+            toast.success("Asset status updated successfully");
+            setAssetId(null);
+            setIsActiveDialog(false);
+          },
+          onError: (error: any) => {
+            console.error("Error updating asset status:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update asset status",
+            );
+          },
         },
-        onError: (error: any) => {
-          console.error("Error updating asset status:", error);
-          toast.error(
-            error?.response?.data?.message || "Failed to update asset status",
-          );
+      );
+    }
+    if (assetClass === "real-estate") {
+      activateAsset(
+        { assetId: updateAssetId, status: newStatus },
+        {
+          onSuccess: () => {
+            toast.success("Asset status updated successfully");
+            setAssetId(null);
+            setIsActiveDialog(false);
+          },
+          onError: (error: any) => {
+            console.error("Error updating asset status:", error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update asset status",
+            );
+          },
         },
-      },
-    );
+      );
+    }
+    return;
   };
 
   const handleSendStatus = (assetId: string, message?: string) => {
     // toast("Sending asset for approval...", { icon: <Spinner /> });
     if (assetClass === "vehicles") {
-
       // console.log("Sending Vehicle Approval with message:", assetId);
       sendVehicleApproval(
         {

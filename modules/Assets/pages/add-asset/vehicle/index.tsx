@@ -117,6 +117,7 @@ const buildVehiclePayload = (data: Record<string, any>) => {
   return {
     brand: data.brand,
     model: data.model,
+    currency: data.currency,
     trim,
     specialVersionName,
     bodyType: toBodyTypeValue(data.bodyType),

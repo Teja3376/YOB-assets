@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getRouteForAssetClass } from "../add-asset/AssetClass";
+import { stat } from "fs";
 
 const vehicleColumns = (
   setAssetId: (assetId: string) => void,
@@ -159,7 +160,7 @@ const vehicleColumns = (
       return (
         <Switch
           checked={isActive}
-          disabled={true}
+          disabled={status === "draft"||status=="active"}
           onCheckedChange={() =>
             handleUpdateStatus(info.row.original._id)
           }
@@ -383,7 +384,7 @@ const realEstateColumns = (
       return (
         <Switch
           checked={isActive}
-          disabled={true}
+          disabled={status === "draft"||status=="active"}
           onCheckedChange={() => handleUpdateStatus(info.row.original._id)}
         />
       );
